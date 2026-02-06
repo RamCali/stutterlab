@@ -84,7 +84,7 @@ const modules = [
     description:
       "Gentle onset, continuous phonation, light articulatory contact, and prolonged speech — the core techniques explained.",
     icon: Activity,
-    color: "bg-sage-100 text-sage-600 dark:bg-sage-500/10 dark:text-sage-500",
+    color: "bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary",
     lessons: 6,
     readTime: "20 min",
     free: false,
@@ -106,7 +106,7 @@ const modules = [
     description:
       "How speaking anxiety and anticipation amplify disfluency — and what CBT, ACT, and mindfulness can do about it.",
     icon: Heart,
-    color: "bg-warm-100 text-warm-600 dark:bg-warm-500/10 dark:text-warm-500",
+    color: "bg-brand-amber/10 text-brand-amber dark:bg-brand-amber/15 dark:text-brand-amber",
     lessons: 4,
     readTime: "12 min",
     free: false,
@@ -161,7 +161,7 @@ export default function LearnPage() {
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {quickFacts.map((fact) => (
-          <Card key={fact.label} className="border-0 shadow-sm">
+          <Card key={fact.label} className="border-0">
             <CardContent className="pt-4 pb-3 text-center">
               <p className="text-xl md:text-2xl font-bold text-primary">
                 {fact.stat}
@@ -175,10 +175,10 @@ export default function LearnPage() {
       </div>
 
       {/* Featured Module */}
-      <Card className="border-0 shadow-sm bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5">
+      <Card className="border-0 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5">
         <CardContent className="pt-5 pb-4">
           <div className="flex items-start gap-3">
-            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <div className="h-12 w-12 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
               <Sparkles className="h-6 w-6 text-primary" />
             </div>
             <div className="flex-1">
@@ -213,12 +213,12 @@ export default function LearnPage() {
             return (
               <Card
                 key={mod.id}
-                className="border-0 shadow-sm hover:shadow-md transition-shadow group cursor-pointer"
+                className="border-0 hover:border-primary/30 transition-shadow group cursor-pointer"
               >
                 <CardContent className="pt-5 pb-4">
                   <div className="flex items-start gap-3">
                     <div
-                      className={`h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0 ${mod.color} group-hover:scale-105 transition-transform`}
+                      className={`h-10 w-10 rounded-md flex items-center justify-center flex-shrink-0 ${mod.color} group-hover:scale-105 transition-transform`}
                     >
                       <Icon className="h-5 w-5" />
                     </div>
@@ -265,10 +265,10 @@ export default function LearnPage() {
       </div>
 
       {/* Research References */}
-      <Card className="border-0 shadow-sm">
+      <Card className="border-0">
         <CardContent className="pt-5 pb-4">
           <div className="flex items-start gap-3">
-            <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
+            <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
               <Atom className="h-5 w-5 text-muted-foreground" />
             </div>
             <div>

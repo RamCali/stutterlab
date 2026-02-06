@@ -164,19 +164,19 @@ export default function ChallengesPage() {
 
       {/* Stats Row */}
       <div className="grid grid-cols-3 gap-3">
-        <Card className="border-0 shadow-sm">
+        <Card className="border-0">
           <CardContent className="pt-4 pb-3 text-center">
             <p className="text-2xl font-bold text-primary">0</p>
             <p className="text-xs text-muted-foreground">Challenges Done</p>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm">
+        <Card className="border-0">
           <CardContent className="pt-4 pb-3 text-center">
             <p className="text-2xl font-bold">0</p>
             <p className="text-xs text-muted-foreground">Current Streak</p>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm">
+        <Card className="border-0">
           <CardContent className="pt-4 pb-3 text-center">
             <p className="text-2xl font-bold">0</p>
             <p className="text-xs text-muted-foreground">XP Earned</p>
@@ -185,7 +185,7 @@ export default function ChallengesPage() {
       </div>
 
       {/* Today's Challenges */}
-      <Card className="border-0 shadow-sm">
+      <Card className="border-0">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -206,7 +206,7 @@ export default function ChallengesPage() {
             return (
               <div
                 key={challenge.id}
-                className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/60 transition-colors"
+                className="flex items-center gap-3 p-3 rounded-md hover:bg-muted/60 transition-colors"
               >
                 {/* Check */}
                 <button className="flex-shrink-0">
@@ -261,7 +261,7 @@ export default function ChallengesPage() {
       </Card>
 
       {/* Weekly Challenges */}
-      <Card className="border-0 shadow-sm">
+      <Card className="border-0">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-primary" />
@@ -277,10 +277,10 @@ export default function ChallengesPage() {
             return (
               <div
                 key={challenge.id}
-                className="p-3 rounded-xl border border-border/60 hover:border-primary/30 transition-colors"
+                className="p-3 rounded-md border border-border/60 hover:border-primary/30 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <div className="flex-shrink-0 h-10 w-10 rounded-md bg-primary/10 flex items-center justify-center">
                     <Icon className="h-5 w-5 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -319,7 +319,7 @@ export default function ChallengesPage() {
       </Card>
 
       {/* Achievement Milestones */}
-      <Card className="border-0 shadow-sm">
+      <Card className="border-0">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Award className="h-5 w-5 text-primary" />
@@ -335,14 +335,14 @@ export default function ChallengesPage() {
               return (
                 <div
                   key={milestone.title}
-                  className={`p-3 rounded-xl border text-center ${
+                  className={`p-3 rounded-md border text-center ${
                     milestone.earned
                       ? "border-primary/30 bg-primary/5"
                       : "border-border/60 opacity-50"
                   }`}
                 >
                   <div
-                    className={`h-10 w-10 rounded-xl mx-auto flex items-center justify-center ${
+                    className={`h-10 w-10 rounded-md mx-auto flex items-center justify-center ${
                       milestone.earned
                         ? "bg-primary/10"
                         : "bg-muted"
@@ -370,11 +370,11 @@ export default function ChallengesPage() {
       </Card>
 
       {/* Tip */}
-      <Card className="border-0 shadow-sm bg-gradient-to-br from-sage-50 to-sage-100 dark:from-sage-500/10 dark:to-sage-600/5">
+      <Card className="border-0 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5">
         <CardContent className="pt-5 pb-4">
           <div className="flex items-start gap-3">
-            <div className="h-10 w-10 rounded-xl bg-sage-500/15 flex items-center justify-center flex-shrink-0">
-              <Sparkles className="h-5 w-5 text-sage-600 dark:text-sage-500" />
+            <div className="h-10 w-10 rounded-md bg-primary/15 flex items-center justify-center flex-shrink-0">
+              <Sparkles className="h-5 w-5 text-primary dark:text-primary" />
             </div>
             <div>
               <h3 className="font-semibold text-sm">Pro Tip</h3>

@@ -95,7 +95,7 @@ const quickTools = [
     href: "/exercises",
     icon: BookOpen,
     label: "Exercises",
-    color: "bg-sage-100 text-sage-600 dark:bg-sage-500/15 dark:text-sage-500",
+    color: "bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary",
   },
   {
     href: "/ai-practice",
@@ -107,7 +107,7 @@ const quickTools = [
     href: "/voice-journal",
     icon: Mic,
     label: "Journal",
-    color: "bg-warm-100 text-warm-600 dark:bg-warm-500/15 dark:text-warm-500",
+    color: "bg-brand-amber/10 text-brand-amber dark:bg-brand-amber/15 dark:text-brand-amber",
   },
   {
     href: "/mindfulness",
@@ -155,11 +155,11 @@ function getTypeColor(type: string) {
     case "warmup":
       return "bg-sky-500/10 text-sky-600 dark:text-sky-400";
     case "exercise":
-      return "bg-sage-100 text-sage-600 dark:bg-sage-500/15 dark:text-sage-500";
+      return "bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary";
     case "audio-lab":
       return "bg-primary/10 text-primary";
     case "journal":
-      return "bg-warm-100 text-warm-600 dark:bg-warm-500/15 dark:text-warm-500";
+      return "bg-brand-amber/10 text-brand-amber dark:bg-brand-amber/15 dark:text-brand-amber";
     case "ai":
       return "bg-violet-500/10 text-violet-600 dark:text-violet-400";
     case "mindfulness":
@@ -258,10 +258,10 @@ export default function DashboardPage() {
 
         {/* Stats Grid */}
         <div className="md:col-span-2 grid grid-cols-2 gap-3">
-          <Card className="border-0 shadow-sm">
+          <Card className="border-0">
             <CardContent className="pt-5 pb-4">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-md bg-orange-500/10 flex items-center justify-center">
                   <Flame className="h-5 w-5 text-orange-500" />
                 </div>
                 <div>
@@ -275,10 +275,10 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-0 shadow-sm">
+          <Card className="border-0">
             <CardContent className="pt-5 pb-4">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-yellow-500/10 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-md bg-yellow-500/10 flex items-center justify-center">
                   <Trophy className="h-5 w-5 text-yellow-500" />
                 </div>
                 <div>
@@ -292,10 +292,10 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-0 shadow-sm">
+          <Card className="border-0">
             <CardContent className="pt-5 pb-4">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-md bg-primary/10 flex items-center justify-center">
                   <Target className="h-5 w-5 text-primary" />
                 </div>
                 <div>
@@ -309,10 +309,10 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-0 shadow-sm">
+          <Card className="border-0">
             <CardContent className="pt-5 pb-4">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-md bg-emerald-500/10 flex items-center justify-center">
                   <TrendingUp className="h-5 w-5 text-emerald-500" />
                 </div>
                 <div>
@@ -328,7 +328,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ═══ Daily Practice Plan (from curriculum engine) ═══ */}
-      <Card className="border-0 shadow-sm">
+      <Card className="border-0">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -357,7 +357,7 @@ export default function DashboardPage() {
               <Link
                 key={index}
                 href={isPremium ? "#" : task.href}
-                className={`group flex items-center gap-3 p-3 rounded-xl transition-colors ${
+                className={`group flex items-center gap-3 p-3 rounded-md transition-colors ${
                   isCompleted
                     ? "bg-primary/5 opacity-75"
                     : isPremium
@@ -433,10 +433,10 @@ export default function DashboardPage() {
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
           {quickTools.map((tool) => (
             <Link key={tool.href} href={tool.href}>
-              <Card className="border-0 shadow-sm hover:shadow-md transition-all cursor-pointer group">
+              <Card className="border-0 hover:border-primary/30 transition-all cursor-pointer group">
                 <CardContent className="pt-4 pb-3 flex flex-col items-center text-center">
                   <div
-                    className={`h-11 w-11 rounded-xl flex items-center justify-center ${tool.color} group-hover:scale-105 transition-transform`}
+                    className={`h-11 w-11 rounded-md flex items-center justify-center ${tool.color} group-hover:scale-105 transition-transform`}
                   >
                     <tool.icon className="h-5 w-5" />
                   </div>
@@ -451,11 +451,11 @@ export default function DashboardPage() {
       {/* ═══ Bottom Row: Smart Warm-Up + Daily Affirmation ═══ */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Smart Warm-Up */}
-        <Card className="border-0 shadow-sm bg-gradient-to-br from-sage-50 to-sage-100 dark:from-sage-500/10 dark:to-sage-600/5">
+        <Card className="border-0 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5">
           <CardContent className="pt-5 pb-4">
             <div className="flex items-start gap-3">
-              <div className="h-10 w-10 rounded-xl bg-sage-500/15 flex items-center justify-center flex-shrink-0">
-                <Sun className="h-5 w-5 text-sage-600 dark:text-sage-500" />
+              <div className="h-10 w-10 rounded-md bg-primary/15 flex items-center justify-center flex-shrink-0">
+                <Sun className="h-5 w-5 text-primary dark:text-primary" />
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-sm">Smart Daily Warm-Up</h3>
@@ -464,7 +464,7 @@ export default function DashboardPage() {
                 </p>
                 <Button
                   size="sm"
-                  className="mt-3 bg-sage-600 hover:bg-sage-500 text-white"
+                  className="mt-3 bg-primary hover:bg-primary/90 text-white"
                   asChild
                 >
                   <Link href="/exercises">
@@ -478,11 +478,11 @@ export default function DashboardPage() {
         </Card>
 
         {/* Daily Affirmation */}
-        <Card className="border-0 shadow-sm bg-gradient-to-br from-warm-50 to-warm-100 dark:from-warm-500/10 dark:to-warm-600/5">
+        <Card className="border-0 bg-gradient-to-br from-brand-amber/5 to-brand-amber/10 dark:from-brand-amber/10 dark:to-brand-amber/5">
           <CardContent className="pt-5 pb-4">
             <div className="flex items-start gap-3">
-              <div className="h-10 w-10 rounded-xl bg-warm-200 dark:bg-warm-500/15 flex items-center justify-center flex-shrink-0">
-                <Zap className="h-5 w-5 text-warm-600 dark:text-warm-500" />
+              <div className="h-10 w-10 rounded-md bg-brand-amber/10 dark:bg-brand-amber/15 flex items-center justify-center flex-shrink-0">
+                <Zap className="h-5 w-5 text-brand-amber dark:text-brand-amber" />
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-sm">Daily Affirmation</h3>
@@ -500,11 +500,11 @@ export default function DashboardPage() {
       </div>
 
       {/* ═══ Weekly Challenge ═══ */}
-      <Card className="border-0 shadow-sm">
+      <Card className="border-0">
         <CardContent className="pt-5 pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-violet-500/10 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-md bg-violet-500/10 flex items-center justify-center">
                 <Target className="h-5 w-5 text-violet-600 dark:text-violet-400" />
               </div>
               <div>

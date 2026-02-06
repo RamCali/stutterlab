@@ -97,7 +97,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Streak indicator */}
-        <div className="flex items-center gap-2 mx-3 mt-3 px-3 py-2.5 rounded-xl bg-primary/5 dark:bg-primary/10">
+        <div className="flex items-center gap-2 mx-3 mt-3 px-3 py-2.5 rounded-md bg-primary/5 dark:bg-primary/10">
           <Flame className="h-4 w-4 text-orange-500" />
           <span className="text-sm font-semibold">0 day streak</span>
           <span className="ml-auto text-xs text-muted-foreground font-medium">
@@ -117,9 +117,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <Link
                     href={item.href}
                     className={cn(
-                      "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
+                      "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-all",
                       isActive
-                        ? "bg-primary text-primary-foreground shadow-sm"
+                        ? "bg-primary text-primary-foreground"
                         : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
                     )}
                   >
@@ -137,9 +137,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <Link
             href="/settings"
             className={cn(
-              "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
+              "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-all",
               pathname === "/settings"
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-primary text-primary-foreground"
                 : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
             )}
           >

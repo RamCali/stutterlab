@@ -49,11 +49,11 @@ function getTypeColor(type: TaskType) {
     case "warmup":
       return "bg-sky-500/10 text-sky-600 dark:text-sky-400";
     case "exercise":
-      return "bg-sage-100 text-sage-600 dark:bg-sage-500/15 dark:text-sage-500";
+      return "bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary";
     case "audio-lab":
       return "bg-primary/10 text-primary";
     case "journal":
-      return "bg-warm-100 text-warm-600 dark:bg-warm-500/15 dark:text-warm-500";
+      return "bg-brand-amber/10 text-brand-amber dark:bg-brand-amber/15 dark:text-brand-amber";
     case "ai":
       return "bg-violet-500/10 text-violet-600 dark:text-violet-400";
     case "mindfulness":
@@ -74,7 +74,7 @@ function getPhaseColor(phase: number) {
     case 1:
       return "from-sky-500/10 to-sky-500/5";
     case 2:
-      return "from-sage-100 to-sage-50 dark:from-sage-500/10 dark:to-sage-500/5";
+      return "from-primary/10 to-primary/5 dark:from-primary/10 dark:to-primary/5";
     case 3:
       return "from-violet-500/10 to-violet-500/5";
     case 4:
@@ -110,7 +110,7 @@ export default function DailyPlanPage() {
       </div>
 
       {/* Day Navigator */}
-      <Card className="border-0 shadow-sm">
+      <Card className="border-0">
         <CardContent className="pt-4 pb-3">
           <div className="flex items-center justify-between">
             <Button
@@ -174,7 +174,7 @@ export default function DailyPlanPage() {
             }}
             className={`flex-1 py-2 rounded-lg text-center transition-all ${
               p === phaseInfo.phase
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-primary text-primary-foreground"
                 : "bg-muted/50 text-muted-foreground hover:bg-muted"
             }`}
           >
@@ -186,7 +186,7 @@ export default function DailyPlanPage() {
 
       {/* Affirmation */}
       <Card
-        className={`border-0 shadow-sm bg-gradient-to-br ${getPhaseColor(
+        className={`border-0 bg-gradient-to-br ${getPhaseColor(
           phaseInfo.phase
         )}`}
       >
@@ -202,7 +202,7 @@ export default function DailyPlanPage() {
       </Card>
 
       {/* Today's Tasks */}
-      <Card className="border-0 shadow-sm">
+      <Card className="border-0">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
@@ -221,7 +221,7 @@ export default function DailyPlanPage() {
               <Link
                 key={index}
                 href={task.href}
-                className="group flex items-center gap-3 p-3 rounded-xl hover:bg-muted/60 transition-colors"
+                className="group flex items-center gap-3 p-3 rounded-md hover:bg-muted/60 transition-colors"
               >
                 {/* Step number */}
                 <div className="flex-shrink-0 h-6 w-6 rounded-full border-2 border-muted-foreground/30 flex items-center justify-center">
@@ -274,7 +274,7 @@ export default function DailyPlanPage() {
       </Card>
 
       {/* Day Navigation Grid (mini calendar) */}
-      <Card className="border-0 shadow-sm">
+      <Card className="border-0">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm text-muted-foreground">
             Jump to Day
@@ -291,7 +291,7 @@ export default function DailyPlanPage() {
                   onClick={() => setCurrentDay(d)}
                   className={`h-7 w-full rounded text-[10px] font-medium transition-all ${
                     isActive
-                      ? "bg-primary text-primary-foreground shadow-sm"
+                      ? "bg-primary text-primary-foreground"
                       : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                   title={`Day ${d} — Phase ${phase}: ${PHASE_LABELS[phase]}`}

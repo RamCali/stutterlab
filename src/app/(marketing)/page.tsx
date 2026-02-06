@@ -47,16 +47,16 @@ const features = [
     title: "Phone Call Simulator",
     description:
       "Practice the most anxiety-inducing scenarios with an adaptive AI partner. Build real confidence.",
-    color: "text-sage-600 dark:text-sage-500",
-    bg: "bg-sage-100 dark:bg-sage-500/10",
+    color: "text-primary dark:text-primary",
+    bg: "bg-primary/10 dark:bg-primary/15",
   },
   {
     icon: BookOpen,
     title: "90-Day Curriculum",
     description:
       "Structured daily exercises that progressively build your fluency — from gentle onset to real-world conversations.",
-    color: "text-warm-600 dark:text-warm-500",
-    bg: "bg-warm-100 dark:bg-warm-500/10",
+    color: "text-brand-amber dark:text-brand-amber",
+    bg: "bg-brand-amber/10 dark:bg-brand-amber/15",
   },
   {
     icon: Heart,
@@ -297,11 +297,11 @@ export default function LandingPage() {
             {features.map((feature) => (
               <Card
                 key={feature.title}
-                className="border-0 shadow-sm hover:shadow-md transition-shadow group"
+                className="border-0 hover:border-primary/30 transition-shadow group"
               >
                 <CardContent className="pt-6">
                   <div
-                    className={`inline-flex p-2.5 rounded-xl ${feature.bg} mb-4 group-hover:scale-105 transition-transform`}
+                    className={`inline-flex p-2.5 rounded-md ${feature.bg} mb-4 group-hover:scale-105 transition-transform`}
                   >
                     <feature.icon className={`h-5 w-5 ${feature.color}`} />
                   </div>
@@ -355,7 +355,7 @@ export default function LandingPage() {
               },
             ].map((step) => (
               <div key={step.step} className="text-center">
-                <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground text-xl font-bold mb-5 shadow-md">
+                <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl bg-primary text-primary-foreground text-xl font-bold mb-5">
                   {step.step}
                 </div>
                 <h3 className="font-semibold text-lg">{step.title}</h3>
@@ -384,7 +384,7 @@ export default function LandingPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((t) => (
-              <Card key={t.name} className="border-0 shadow-sm">
+              <Card key={t.name} className="border-0">
                 <CardContent className="pt-6 pb-5">
                   <div className="flex gap-0.5 mb-3">
                     {[...Array(5)].map((_, i) => (
@@ -496,7 +496,7 @@ export default function LandingPage() {
       {/* ═══ For SLPs Banner ═══ */}
       <section id="for-slps" className="py-16 px-6 bg-muted/30">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex p-3 rounded-2xl bg-primary/10 mb-5">
+          <div className="inline-flex p-3 rounded-xl bg-primary/10 mb-5">
             <Stethoscope className="h-6 w-6 text-primary" />
           </div>
           <h2 className="text-2xl md:text-3xl font-bold">

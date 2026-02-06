@@ -102,10 +102,10 @@ export default function FearedWordsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
-        <Card className="border-0 shadow-sm">
+        <Card className="border-0">
           <CardContent className="pt-5 pb-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-md bg-primary/10 flex items-center justify-center">
                 <Target className="h-5 w-5 text-primary" />
               </div>
               <div>
@@ -115,10 +115,10 @@ export default function FearedWordsPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm">
+        <Card className="border-0">
           <CardContent className="pt-5 pb-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-md bg-emerald-500/10 flex items-center justify-center">
                 <CheckCircle2 className="h-5 w-5 text-emerald-500" />
               </div>
               <div>
@@ -128,10 +128,10 @@ export default function FearedWordsPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm">
+        <Card className="border-0">
           <CardContent className="pt-5 pb-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-violet-500/10 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-md bg-violet-500/10 flex items-center justify-center">
                 <TrendingUp className="h-5 w-5 text-violet-500" />
               </div>
               <div>
@@ -144,7 +144,7 @@ export default function FearedWordsPage() {
       </div>
 
       {/* AI Suggestion Banner */}
-      <Card className="border-0 shadow-sm bg-gradient-to-br from-violet-500/5 to-violet-500/10 dark:from-violet-500/10 dark:to-violet-500/5">
+      <Card className="border-0 bg-gradient-to-br from-violet-500/5 to-violet-500/10 dark:from-violet-500/10 dark:to-violet-500/5">
         <CardContent className="pt-5 pb-4">
           <div className="flex items-center gap-4">
             <div className="p-2.5 rounded-full bg-violet-500/10">
@@ -200,7 +200,7 @@ export default function FearedWordsPage() {
         {filtered.map((word) => (
           <Card
             key={word.id}
-            className={`border-0 shadow-sm ${word.mastered ? "opacity-60" : ""}`}
+            className={`border-0 ${word.mastered ? "opacity-60" : ""}`}
           >
             <CardContent className="py-3 px-4">
               <div className="flex items-center gap-3">

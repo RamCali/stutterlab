@@ -159,7 +159,7 @@ export default function NewJournalEntry() {
       </div>
 
       {/* Recording Area */}
-      <Card className="border-0 shadow-sm">
+      <Card className="border-0">
         <CardContent className="pt-6 pb-6">
           <div className="flex flex-col items-center">
             {/* Waveform Visualization */}
@@ -245,7 +245,7 @@ export default function NewJournalEntry() {
 
       {/* Emotional Tag */}
       {recorded && (
-        <Card className="border-0 shadow-sm">
+        <Card className="border-0">
           <CardContent className="pt-5 pb-4">
             <h3 className="font-semibold text-sm mb-3">
               How does your speech feel today?
@@ -274,7 +274,7 @@ export default function NewJournalEntry() {
 
       {/* Notes */}
       {recorded && (
-        <Card className="border-0 shadow-sm">
+        <Card className="border-0">
           <CardContent className="pt-5 pb-4">
             <h3 className="font-semibold text-sm mb-2">
               Notes (optional)
