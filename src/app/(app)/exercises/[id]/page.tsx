@@ -1,339 +1,317 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft,
-  AudioWaveform,
-  CheckCircle2,
-  ChevronRight,
-  Clock,
   Mic,
   MicOff,
-  Pause,
+  Square,
   Play,
-  RotateCcw,
-  Settings2,
-  SkipForward,
+  Pause,
+  ChevronLeft,
+  ChevronRight,
+  AudioWaveform,
+  Clock,
+  CheckCircle2,
   Volume2,
 } from "lucide-react";
 
-/* ─── Sample exercise data (would come from DB) ─── */
-const exercise = {
-  id: "gentle-onset-1",
-  title: "Gentle Onset Practice",
-  technique: "Gentle Onset",
-  difficulty: "beginner",
-  estimatedTime: "5 min",
-  instructions:
-    "Read each word slowly. Start with a soft, relaxed voice. Let the air flow before the sound begins. Focus on a smooth, easy start.",
-  steps: [
-    {
-      type: "word" as const,
-      content: "Easy",
-      hint: "Start with a soft 'ee' sound",
-    },
-    {
-      type: "word" as const,
-      content: "Open",
-      hint: "Let the 'oh' flow gently",
-    },
-    {
-      type: "word" as const,
-      content: "Always",
-      hint: "Soft breath before 'aw'",
-    },
-    {
-      type: "phrase" as const,
-      content: "I am calm",
-      hint: "Connect the words smoothly",
-    },
-    {
-      type: "phrase" as const,
-      content: "My voice is steady",
-      hint: "Keep airflow continuous",
-    },
-    {
-      type: "sentence" as const,
-      content: "I speak at my own comfortable pace.",
-      hint: "Gentle onset on 'I', pause naturally at commas",
-    },
-    {
-      type: "sentence" as const,
-      content: "Every word I say has value and deserves to be heard.",
-      hint: "Maintain light contact throughout",
-    },
-    {
-      type: "paragraph" as const,
-      content:
-        "The morning sun rose gently over the hills. A light breeze carried the scent of fresh grass across the valley. Birds sang their songs from the treetops, welcoming a new day. Everything felt calm and peaceful.",
-      hint: "Take natural pauses at periods. Remember: gentle onset on each sentence start.",
-    },
+/* ─── Reading content by difficulty ─── */
+const readingContent = {
+  words: [
+    "hello", "morning", "water", "today", "happy",
+    "beautiful", "sunshine", "together", "wonderful", "practice",
+    "breathing", "gentle", "slowly", "natural", "progress",
+  ],
+  phrases: [
+    "Good morning",
+    "How are you today",
+    "I would like to order",
+    "My name is",
+    "Thank you very much",
+    "Nice to meet you",
+    "Can I help you",
+    "I'm doing well",
+  ],
+  sentences: [
+    "I am practicing my speech techniques today.",
+    "The weather is beautiful this morning.",
+    "Could you please help me find the right section?",
+    "I'd like to schedule an appointment for next week.",
+    "Thank you for your patience and understanding.",
+    "I'm working on improving my fluency every day.",
+  ],
+  paragraphs: [
+    "Speaking is a skill that improves with practice. Every time you use your techniques — gentle onset, light contact, or pacing — you build new neural pathways. The key is consistency, not perfection. Some days will feel easier than others, and that is completely normal.",
+    "The ocean waves rolled gently onto the shore as the sun began to set. A cool breeze carried the scent of salt and seaweed. Children played near the water's edge while their parents watched from colorful beach chairs. It was the perfect end to a long summer day.",
   ],
 };
 
-function getStepLabel(type: string) {
-  switch (type) {
-    case "word":
-      return "Word";
-    case "phrase":
-      return "Phrase";
-    case "sentence":
-      return "Sentence";
-    case "paragraph":
-      return "Paragraph";
-    default:
-      return type;
-  }
-}
-
-function getStepColor(type: string) {
-  switch (type) {
-    case "word":
-      return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400";
-    case "phrase":
-      return "bg-sky-500/10 text-sky-600 dark:text-sky-400";
-    case "sentence":
-      return "bg-violet-500/10 text-violet-600 dark:text-violet-400";
-    case "paragraph":
-      return "bg-primary/10 text-primary";
-    default:
-      return "bg-muted text-muted-foreground";
-  }
-}
+type Level = "words" | "phrases" | "sentences" | "paragraphs";
 
 export default function ExercisePlayerPage() {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [level, setLevel] = useState<Level>("words");
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [dafEnabled, setDafEnabled] = useState(false);
-  const [completedSteps, setCompletedSteps] = useState<Set<number>>(
-    new Set()
-  );
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [completedItems, setCompletedItems] = useState<Set<number>>(new Set());
 
-  const step = exercise.steps[currentStep];
-  const totalSteps = exercise.steps.length;
-  const progress = Math.round((completedSteps.size / totalSteps) * 100);
+  // Real recording state
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  function markComplete() {
-    const next = new Set(completedSteps);
-    next.add(currentStep);
-    setCompletedSteps(next);
-    if (currentStep < totalSteps - 1) {
-      setCurrentStep(currentStep + 1);
+  // Simulated waveform bars
+  const [bars, setBars] = useState<number[]>(Array(50).fill(5));
+
+  const items = readingContent[level];
+  const currentItem = items[currentIndex];
+
+  useEffect(() => {
+    if (isRecording) {
+      const interval = setInterval(() => {
+        setBars(Array(50).fill(0).map(() => Math.random() * 100));
+      }, 100);
+      return () => clearInterval(interval);
+    } else {
+      setBars(Array(50).fill(5));
+    }
+  }, [isRecording]);
+
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start();
+      setIsRecording(true);
+      setElapsedSeconds(0);
+      timerRef.current = setInterval(() => {
+        setElapsedSeconds((s) => s + 1);
+      }, 1000);
+    } catch {
+      // Fallback: simulate recording without mic access
+      setIsRecording(true);
+      setElapsedSeconds(0);
+      timerRef.current = setInterval(() => {
+        setElapsedSeconds((s) => s + 1);
+      }, 1000);
     }
   }
 
+  function stopRecording() {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream.getTracks().forEach((t) => t.stop());
+    }
+    setIsRecording(false);
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    // Mark current item as completed
+    setCompletedItems((prev) => new Set(prev).add(currentIndex));
+  }
+
+  function nextItem() {
+    if (currentIndex < items.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    }
+  }
+
+  function prevItem() {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  }
+
+  function changeLevel(newLevel: Level) {
+    setLevel(newLevel);
+    setCurrentIndex(0);
+    setCompletedItems(new Set());
+  }
+
+  const formatTime = (s: number) =>
+    `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
+
+  const progress = Math.round(
+    (completedItems.size / items.length) * 100
+  );
+
   return (
-    <div className="flex flex-col h-full">
-      {/* ═══ Top Bar ═══ */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border/60 bg-card">
+    <div className="flex flex-col h-[calc(100vh-4rem)]">
+      {/* Header */}
+      <div className="border-b px-4 py-3 flex items-center justify-between bg-background">
         <div className="flex items-center gap-3">
           <Link href="/exercises">
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+            <Button variant="ghost" size="sm">
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </Link>
           <div>
-            <h1 className="text-sm font-semibold">{exercise.title}</h1>
-            <p className="text-[10px] text-muted-foreground">
-              {exercise.technique} - {exercise.difficulty}
+            <h1 className="font-semibold text-sm">Reading Exercise</h1>
+            <p className="text-xs text-muted-foreground">
+              {level.charAt(0).toUpperCase() + level.slice(1)} — Item{" "}
+              {currentIndex + 1} of {items.length}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="secondary" className="text-[10px]">
-            <Clock className="h-3 w-3 mr-1" />
-            {exercise.estimatedTime}
+          <Badge variant="secondary" className="text-xs">
+            {progress}% done
           </Badge>
           <Badge
-            variant="secondary"
-            className="text-[10px] bg-primary/10 text-primary border-0"
+            variant={dafEnabled ? "default" : "outline"}
+            className="text-xs cursor-pointer"
+            onClick={() => setDafEnabled(!dafEnabled)}
           >
-            {completedSteps.size}/{totalSteps}
+            <AudioWaveform className="h-3 w-3 mr-1" />
+            DAF {dafEnabled ? "ON" : "OFF"}
           </Badge>
         </div>
       </div>
 
-      {/* ═══ Progress Bar ═══ */}
-      <div className="h-1 bg-muted">
-        <div
-          className="h-full bg-primary transition-all duration-500"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-
-      {/* ═══ Main Content Area ═══ */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-2xl mx-auto p-4 md:p-6 space-y-6">
-          {/* Step Progress Dots */}
-          <div className="flex items-center justify-center gap-1.5">
-            {exercise.steps.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentStep(i)}
-                className={`h-2 rounded-full transition-all ${
-                  i === currentStep
-                    ? "w-6 bg-primary"
-                    : completedSteps.has(i)
-                    ? "w-2 bg-primary/50"
-                    : "w-2 bg-muted"
-                }`}
-              />
-            ))}
-          </div>
-
-          {/* Step Type Badge */}
-          <div className="flex items-center justify-center gap-2">
-            <Badge
-              variant="secondary"
-              className={`${getStepColor(step.type)} border-0`}
-            >
-              {getStepLabel(step.type)}
-            </Badge>
-            <span className="text-xs text-muted-foreground">
-              Step {currentStep + 1} of {totalSteps}
-            </span>
-          </div>
-
-          {/* ═══ Reading Content — Large Text Display ═══ */}
-          <Card className="border-0 shadow-sm bg-card">
-            <CardContent className="pt-8 pb-8 px-6 md:px-10">
-              <p
-                className={`leading-relaxed text-center ${
-                  step.type === "word"
-                    ? "text-4xl md:text-5xl font-bold"
-                    : step.type === "phrase"
-                    ? "text-2xl md:text-3xl font-semibold"
-                    : step.type === "sentence"
-                    ? "text-xl md:text-2xl font-medium"
-                    : "text-lg md:text-xl leading-loose"
-                }`}
-              >
-                {step.content}
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Hint */}
-          {step.hint && (
-            <div className="bg-primary/5 dark:bg-primary/10 rounded-xl p-3 text-center">
-              <p className="text-xs text-primary font-medium">
-                Tip: {step.hint}
-              </p>
-            </div>
-          )}
-
-          {/* Instructions */}
-          <p className="text-xs text-muted-foreground text-center leading-relaxed">
-            {exercise.instructions}
-          </p>
-
-          {/* ═══ Waveform Visualization Placeholder ═══ */}
-          <Card className="border-0 shadow-sm bg-muted/30">
-            <CardContent className="py-6">
-              <div className="flex items-center justify-center gap-[2px] h-16">
-                {/* Simulated waveform bars */}
-                {Array.from({ length: 60 }, (_, i) => {
-                  const height = isRecording
-                    ? Math.random() * 100
-                    : 10 + Math.sin(i * 0.3) * 8;
-                  return (
-                    <div
-                      key={i}
-                      className={`w-1 rounded-full transition-all duration-150 ${
-                        isRecording
-                          ? "bg-primary"
-                          : "bg-muted-foreground/20"
-                      }`}
-                      style={{ height: `${Math.max(4, height)}%` }}
-                    />
-                  );
-                })}
-              </div>
-              {isRecording && (
-                <p className="text-[10px] text-primary text-center mt-2 font-medium animate-pulse">
-                  Recording...
-                </p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* DAF Toggle */}
-          <div className="flex items-center justify-center gap-3">
+      {/* Level Selector */}
+      <div className="border-b px-4 py-2 flex gap-2 bg-background/80">
+        {(["words", "phrases", "sentences", "paragraphs"] as const).map(
+          (l) => (
             <Button
-              variant={dafEnabled ? "default" : "outline"}
+              key={l}
+              variant={level === l ? "default" : "ghost"}
               size="sm"
-              onClick={() => setDafEnabled(!dafEnabled)}
+              onClick={() => changeLevel(l)}
               className="text-xs"
             >
-              <AudioWaveform className="h-3.5 w-3.5 mr-1.5" />
-              DAF {dafEnabled ? "On" : "Off"}
+              {l.charAt(0).toUpperCase() + l.slice(1)}
             </Button>
-            <Button variant="outline" size="sm" className="text-xs">
-              <Volume2 className="h-3.5 w-3.5 mr-1.5" />
-              Listen
-            </Button>
-            <Button variant="outline" size="sm" className="text-xs">
-              <Settings2 className="h-3.5 w-3.5 mr-1.5" />
-              Settings
-            </Button>
-          </div>
-        </div>
+          )
+        )}
       </div>
 
-      {/* ═══ Bottom Control Bar ═══ */}
-      <div className="border-t border-border/60 bg-card px-4 py-3">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          {/* Previous */}
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col items-center justify-center p-6">
+        {/* Step Dots */}
+        <div className="flex gap-1.5 mb-8">
+          {items.map((_, i) => (
+            <div
+              key={i}
+              className={`h-2 rounded-full transition-all ${
+                i === currentIndex
+                  ? "w-6 bg-primary"
+                  : completedItems.has(i)
+                  ? "w-2 bg-primary/50"
+                  : "w-2 bg-muted"
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Reading Text */}
+        <div className="max-w-2xl text-center mb-8">
+          <p
+            className={`font-medium leading-relaxed ${
+              level === "words"
+                ? "text-5xl"
+                : level === "phrases"
+                ? "text-3xl"
+                : level === "sentences"
+                ? "text-2xl"
+                : "text-lg"
+            }`}
+          >
+            {currentItem}
+          </p>
+          {completedItems.has(currentIndex) && (
+            <div className="mt-4 flex items-center justify-center gap-1 text-emerald-500">
+              <CheckCircle2 className="h-4 w-4" />
+              <span className="text-sm">Completed</span>
+            </div>
+          )}
+        </div>
+
+        {/* Navigation */}
+        <div className="flex items-center gap-4">
           <Button
             variant="ghost"
             size="sm"
-            disabled={currentStep === 0}
-            onClick={() => setCurrentStep((s) => Math.max(0, s - 1))}
+            onClick={prevItem}
+            disabled={currentIndex === 0}
           >
-            <RotateCcw className="h-4 w-4 mr-1" />
-            Redo
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Prev
           </Button>
-
-          {/* Record Button */}
           <Button
-            size="lg"
-            className={`rounded-full h-14 w-14 ${
-              isRecording
-                ? "bg-rose-500 hover:bg-rose-600 animate-pulse"
-                : "bg-primary hover:bg-primary/90"
-            }`}
-            onClick={() => setIsRecording(!isRecording)}
-          >
-            {isRecording ? (
-              <MicOff className="h-6 w-6 text-white" />
-            ) : (
-              <Mic className="h-6 w-6 text-primary-foreground" />
-            )}
-          </Button>
-
-          {/* Next / Complete */}
-          <Button
-            variant={currentStep === totalSteps - 1 ? "default" : "ghost"}
+            variant="ghost"
             size="sm"
-            onClick={markComplete}
+            onClick={nextItem}
+            disabled={currentIndex === items.length - 1}
           >
-            {currentStep === totalSteps - 1 ? (
-              <>
-                <CheckCircle2 className="h-4 w-4 mr-1" />
-                Finish
-              </>
-            ) : (
-              <>
-                Next
-                <SkipForward className="h-4 w-4 ml-1" />
-              </>
-            )}
+            Next
+            <ChevronRight className="h-4 w-4 ml-1" />
           </Button>
         </div>
+      </div>
+
+      {/* Waveform + Controls */}
+      <div className="border-t bg-background p-4">
+        {/* Waveform */}
+        <div className="flex items-end justify-center gap-[2px] h-12 mb-4">
+          {bars.map((height, i) => (
+            <div
+              key={i}
+              className={`w-1 rounded-full transition-all duration-75 ${
+                isRecording ? "bg-primary" : "bg-muted"
+              }`}
+              style={{ height: `${Math.max(height, 3)}%` }}
+            />
+          ))}
+        </div>
+
+        {/* Timer + Record Button */}
+        <div className="flex items-center justify-center gap-6">
+          <span className="text-sm font-mono text-muted-foreground w-12 text-right">
+            {formatTime(elapsedSeconds)}
+          </span>
+
+          {isRecording ? (
+            <Button
+              size="lg"
+              variant="destructive"
+              className="rounded-full h-14 w-14"
+              onClick={stopRecording}
+            >
+              <Square className="h-5 w-5" />
+            </Button>
+          ) : (
+            <Button
+              size="lg"
+              className="rounded-full h-14 w-14"
+              onClick={startRecording}
+            >
+              <Mic className="h-5 w-5" />
+            </Button>
+          )}
+
+          <span className="text-xs text-muted-foreground w-12">
+            {isRecording ? (
+              <span className="text-red-500 animate-pulse flex items-center gap-1">
+                <span className="h-2 w-2 rounded-full bg-red-500" />
+                REC
+              </span>
+            ) : (
+              "Ready"
+            )}
+          </span>
+        </div>
+
+        {dafEnabled && (
+          <p className="text-center text-xs text-primary mt-2 flex items-center justify-center gap-1">
+            <AudioWaveform className="h-3 w-3" />
+            DAF Active — 70ms delay
+          </p>
+        )}
       </div>
     </div>
   );

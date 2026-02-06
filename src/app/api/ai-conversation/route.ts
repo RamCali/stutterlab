@@ -1,0 +1,81 @@
+import { NextRequest, NextResponse } from "next/server";
+import Anthropic from "@anthropic-ai/sdk";
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
+
+const SCENARIO_PROMPTS: Record<string, string> = {
+  "phone-call":
+    "You are a receptionist at a doctor's office. The user is calling to schedule an appointment. Be natural, ask relevant questions (name, preferred date/time, reason for visit). Be patient and kind.",
+  "job-interview":
+    "You are a friendly but professional hiring manager conducting a job interview. Ask common interview questions one at a time. Be encouraging. The user is practicing speaking fluently during interviews.",
+  "ordering-food":
+    "You are a barista/waiter at a coffee shop. Take the user's order naturally. Ask about size, additions, name for the order. Be casual and friendly.",
+  "class-presentation":
+    "You are a supportive audience member at a presentation. The user will present a topic. Ask a question or two after they finish. Be encouraging.",
+  "small-talk":
+    "You are at a casual social gathering. Start a light conversation with the user. Topics: weather, weekend plans, hobbies, movies. Be warm and easygoing.",
+  "shopping":
+    "You are a store employee. The user wants to return an item or ask about a product. Be helpful but ask for details like receipt, reason for return, etc.",
+  "asking-directions":
+    "You are a friendly stranger. The user is asking for directions to a place. Give clear but conversational directions. Ask if they need clarification.",
+  "customer-service":
+    "You are a customer service representative on a phone call. Help the user resolve an issue with their account/order. Ask for details, be professional.",
+  "meeting-intro":
+    "You are at a professional meeting. The user is introducing themselves. React naturally, ask a follow-up question about their role or background.",
+};
+
+export async function POST(req: NextRequest) {
+  try {
+    const { scenario, messages, userMessage } = await req.json();
+
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return NextResponse.json(
+        { error: "AI service not configured. Add ANTHROPIC_API_KEY to .env" },
+        { status: 503 }
+      );
+    }
+
+    const systemPrompt = `You are helping someone who stutters practice real-world speaking scenarios. ${
+      SCENARIO_PROMPTS[scenario] ||
+      "You are a friendly conversation partner. Have a natural conversation with the user."
+    }
+
+IMPORTANT RULES:
+- Keep responses SHORT (1-3 sentences). This is a conversation, not a monologue.
+- Be patient, warm, and natural. Never mention or react to stuttering.
+- Stay in character. Don't break the fourth wall.
+- Ask one question at a time to keep the conversation flowing.
+- Match the user's energy and pace.`;
+
+    const conversationHistory = (messages || []).map(
+      (msg: { role: string; content: string }) => ({
+        role: msg.role as "user" | "assistant",
+        content: msg.content,
+      })
+    );
+
+    if (userMessage) {
+      conversationHistory.push({ role: "user", content: userMessage });
+    }
+
+    const response = await anthropic.messages.create({
+      model: "claude-sonnet-4-5-20250929",
+      max_tokens: 256,
+      system: systemPrompt,
+      messages: conversationHistory,
+    });
+
+    const assistantMessage =
+      response.content[0].type === "text" ? response.content[0].text : "";
+
+    return NextResponse.json({ message: assistantMessage });
+  } catch (error) {
+    console.error("AI conversation error:", error);
+    return NextResponse.json(
+      { error: "Failed to generate response" },
+      { status: 500 }
+    );
+  }
+}

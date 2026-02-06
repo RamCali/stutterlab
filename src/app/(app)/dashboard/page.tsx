@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   AudioWaveform,
@@ -10,7 +11,6 @@ import {
   Clock,
   Flame,
   Mic,
-  Moon,
   Play,
   Sparkles,
   Sun,
@@ -20,12 +20,20 @@ import {
   Wind,
   Zap,
   CheckCircle2,
-  Circle,
   Lock,
+  Heart,
+  Shield,
+  Volume2,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  getDailyPlan,
+  getPhaseInfo,
+  type DailyPlan,
+  type TaskType,
+} from "@/lib/curriculum/daily-plans";
 
 /* ─── Circular Progress Ring ─── */
 function CircularProgress({
@@ -75,71 +83,6 @@ function CircularProgress({
   );
 }
 
-/* ─── Daily Plan Data (Day 1 example) ─── */
-const dailyPlan = {
-  day: 1,
-  phase: "Foundation",
-  title: "Getting Started",
-  tasks: [
-    {
-      id: 1,
-      title: "Diaphragmatic Breathing",
-      subtitle: "Learn proper breathing technique",
-      duration: "3 min",
-      type: "warmup" as const,
-      icon: Wind,
-      completed: false,
-      href: "/exercises",
-    },
-    {
-      id: 2,
-      title: "Gentle Onset Practice",
-      subtitle: "Single words with soft start",
-      duration: "5 min",
-      type: "exercise" as const,
-      icon: BookOpen,
-      completed: false,
-      href: "/exercises",
-    },
-    {
-      id: 3,
-      title: "DAF Reading — Easy Passage",
-      subtitle: "Read along with delayed auditory feedback",
-      duration: "10 min",
-      type: "audio-lab" as const,
-      icon: AudioWaveform,
-      completed: false,
-      href: "/audio-lab",
-    },
-    {
-      id: 4,
-      title: "Voice Journal Entry",
-      subtitle: "Record how your speech feels today",
-      duration: "2 min",
-      type: "journal" as const,
-      icon: Mic,
-      completed: false,
-      href: "/voice-journal/new",
-    },
-    {
-      id: 5,
-      title: "AI Conversation — Ordering Food",
-      subtitle: "Practice a real-world scenario",
-      duration: "5 min",
-      type: "ai" as const,
-      icon: Brain,
-      completed: false,
-      locked: true,
-      href: "/ai-practice",
-    },
-  ],
-};
-
-const completedCount = dailyPlan.tasks.filter((t) => t.completed).length;
-const progressPercent = Math.round(
-  (completedCount / dailyPlan.tasks.length) * 100
-);
-
 /* ─── Quick Tools Grid ─── */
 const quickTools = [
   {
@@ -180,6 +123,32 @@ const quickTools = [
   },
 ];
 
+/* ─── Type Icon Map ─── */
+function getTaskIcon(type: TaskType) {
+  switch (type) {
+    case "warmup":
+      return Wind;
+    case "exercise":
+      return BookOpen;
+    case "audio-lab":
+      return AudioWaveform;
+    case "journal":
+      return Mic;
+    case "ai":
+      return Brain;
+    case "mindfulness":
+      return Heart;
+    case "learn":
+      return BookOpen;
+    case "challenge":
+      return Target;
+    case "feared-words":
+      return Shield;
+    default:
+      return BookOpen;
+  }
+}
+
 /* ─── Type Color Map ─── */
 function getTypeColor(type: string) {
   switch (type) {
@@ -193,31 +162,78 @@ function getTypeColor(type: string) {
       return "bg-warm-100 text-warm-600 dark:bg-warm-500/15 dark:text-warm-500";
     case "ai":
       return "bg-violet-500/10 text-violet-600 dark:text-violet-400";
+    case "mindfulness":
+      return "bg-pink-500/10 text-pink-600 dark:text-pink-400";
+    case "learn":
+      return "bg-amber-500/10 text-amber-600 dark:text-amber-400";
+    case "challenge":
+      return "bg-red-500/10 text-red-600 dark:text-red-400";
+    case "feared-words":
+      return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400";
     default:
       return "bg-muted text-muted-foreground";
   }
 }
 
 export default function DashboardPage() {
+  // TODO: Replace with real user data from DB once auth is connected
+  const currentDay = 1;
+  const stats = {
+    currentStreak: 0,
+    totalXp: 0,
+    totalExercisesCompleted: 0,
+  };
+
+  const plan = getDailyPlan(currentDay);
+  const phaseInfo = getPhaseInfo(currentDay);
+
+  // Track completed tasks locally (will be persisted to DB later)
+  const [completedTasks, setCompletedTasks] = useState<Set<number>>(new Set());
+
+  if (!plan) return null;
+
+  const completedCount = completedTasks.size;
+  const totalTasks = plan.tasks.length;
+  const progressPercent = Math.round((completedCount / totalTasks) * 100);
+
+  const totalMinutes = plan.tasks.reduce((sum, t) => {
+    const mins = parseInt(t.duration) || 0;
+    return sum + mins;
+  }, 0);
+  const completedMinutes = plan.tasks.reduce((sum, t, i) => {
+    if (completedTasks.has(i)) {
+      return sum + (parseInt(t.duration) || 0);
+    }
+    return sum;
+  }, 0);
+  const remainingMinutes = totalMinutes - completedMinutes;
+
+  const greeting = (() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning!";
+    if (hour < 17) return "Good afternoon!";
+    return "Good evening!";
+  })();
+
   return (
     <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-6">
       {/* Welcome + Day Badge */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            Good morning!
-          </h1>
+          <h1 className="text-2xl font-bold tracking-tight">{greeting}</h1>
           <p className="text-muted-foreground mt-0.5">
             Your daily practice makes a real difference.
           </p>
         </div>
-        <Badge
-          variant="secondary"
-          className="bg-primary/10 text-primary border-0 text-sm px-3 py-1"
-        >
-          <Calendar className="h-3.5 w-3.5 mr-1.5" />
-          Day {dailyPlan.day}
-        </Badge>
+        <Link href="/daily-plan">
+          <Badge
+            variant="secondary"
+            className="bg-primary/10 text-primary border-0 text-sm px-3 py-1 cursor-pointer hover:bg-primary/20 transition-colors"
+          >
+            <Calendar className="h-3.5 w-3.5 mr-1.5" />
+            Day {plan.day}
+          </Badge>
+        </Link>
       </div>
 
       {/* ═══ Top Section: Circular Progress + Stats ═══ */}
@@ -232,10 +248,10 @@ export default function DashboardPage() {
               </span>
             </CircularProgress>
             <p className="mt-3 text-sm font-medium">
-              {completedCount} of {dailyPlan.tasks.length} tasks done
+              {completedCount} of {totalTasks} tasks done
             </p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              ~25 min remaining
+              ~{remainingMinutes} min remaining
             </p>
           </CardContent>
         </Card>
@@ -249,7 +265,9 @@ export default function DashboardPage() {
                   <Flame className="h-5 w-5 text-orange-500" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold leading-none">0</p>
+                  <p className="text-2xl font-bold leading-none">
+                    {stats.currentStreak}
+                  </p>
                   <p className="text-xs text-muted-foreground mt-1">
                     Day Streak
                   </p>
@@ -264,7 +282,9 @@ export default function DashboardPage() {
                   <Trophy className="h-5 w-5 text-yellow-500" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold leading-none">0</p>
+                  <p className="text-2xl font-bold leading-none">
+                    {stats.totalXp}
+                  </p>
                   <p className="text-xs text-muted-foreground mt-1">
                     Total XP
                   </p>
@@ -279,7 +299,9 @@ export default function DashboardPage() {
                   <Target className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold leading-none">0</p>
+                  <p className="text-2xl font-bold leading-none">
+                    {stats.totalExercisesCompleted}
+                  </p>
                   <p className="text-xs text-muted-foreground mt-1">
                     Exercises
                   </p>
@@ -305,21 +327,21 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ═══ Daily Practice Plan ═══ */}
+      {/* ═══ Daily Practice Plan (from curriculum engine) ═══ */}
       <Card className="border-0 shadow-sm">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
               <CardTitle className="text-base">
-                Day {dailyPlan.day}: {dailyPlan.title}
+                Day {plan.day}: {plan.title}
               </CardTitle>
             </div>
             <Badge
               variant="outline"
               className="text-xs border-primary/30 text-primary"
             >
-              Phase 1 — {dailyPlan.phase}
+              Phase {plan.phase} — {plan.phaseLabel}
             </Badge>
           </div>
           <p className="text-xs text-muted-foreground">
@@ -327,26 +349,33 @@ export default function DashboardPage() {
           </p>
         </CardHeader>
         <CardContent className="space-y-1">
-          {dailyPlan.tasks.map((task, index) => {
-            const TaskIcon = task.icon;
-            const isLocked = task.locked;
+          {plan.tasks.map((task, index) => {
+            const TaskIcon = getTaskIcon(task.type);
+            const isCompleted = completedTasks.has(index);
+            const isPremium = task.premium;
             return (
               <Link
-                key={task.id}
-                href={isLocked ? "#" : task.href}
+                key={index}
+                href={isPremium ? "#" : task.href}
                 className={`group flex items-center gap-3 p-3 rounded-xl transition-colors ${
-                  task.completed
+                  isCompleted
                     ? "bg-primary/5 opacity-75"
-                    : isLocked
+                    : isPremium
                     ? "opacity-50 cursor-not-allowed"
                     : "hover:bg-muted/60"
                 }`}
+                onClick={(e) => {
+                  if (isPremium) {
+                    e.preventDefault();
+                    return;
+                  }
+                }}
               >
                 {/* Step number / check */}
                 <div className="flex-shrink-0">
-                  {task.completed ? (
+                  {isCompleted ? (
                     <CheckCircle2 className="h-6 w-6 text-primary" />
-                  ) : isLocked ? (
+                  ) : isPremium ? (
                     <Lock className="h-5 w-5 text-muted-foreground" />
                   ) : (
                     <div className="h-6 w-6 rounded-full border-2 border-muted-foreground/30 flex items-center justify-center">
@@ -370,7 +399,7 @@ export default function DashboardPage() {
                 <div className="flex-1 min-w-0">
                   <p
                     className={`text-sm font-medium leading-tight ${
-                      task.completed ? "line-through text-muted-foreground" : ""
+                      isCompleted ? "line-through text-muted-foreground" : ""
                     }`}
                   >
                     {task.title}
@@ -386,7 +415,7 @@ export default function DashboardPage() {
                     <Clock className="h-3 w-3" />
                     {task.duration}
                   </span>
-                  {!isLocked && !task.completed && (
+                  {!isPremium && !isCompleted && (
                     <ChevronRight className="h-4 w-4 text-muted-foreground/50 group-hover:text-primary transition-colors" />
                   )}
                 </div>
@@ -458,11 +487,11 @@ export default function DashboardPage() {
               <div className="flex-1">
                 <h3 className="font-semibold text-sm">Daily Affirmation</h3>
                 <p className="text-sm text-foreground/80 mt-1 italic leading-relaxed">
-                  &ldquo;My voice has value. I speak at my own pace, and that
-                  pace is perfect.&rdquo;
+                  &ldquo;{plan.affirmation}&rdquo;
                 </p>
                 <p className="text-[10px] text-muted-foreground mt-1.5 uppercase tracking-wider">
-                  Day 1 of 90
+                  Day {plan.day} of 90 — {phaseInfo.progress}% through{" "}
+                  {phaseInfo.label}
                 </p>
               </div>
             </div>

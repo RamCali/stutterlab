@@ -8,7 +8,9 @@ import {
   real,
   uuid,
   pgEnum,
+  primaryKey,
 } from "drizzle-orm/pg-core";
+type AdapterAccountType = "oauth" | "oidc" | "email" | "credentials";
 
 // Enums
 export const userRoleEnum = pgEnum("user_role", ["user", "slp"]);
@@ -55,7 +57,65 @@ export const emotionalTagEnum = pgEnum("emotional_tag", [
   "discouraged",
 ]);
 
-// ==================== USERS & AUTH ====================
+// ==================== NEXTAUTH TABLES ====================
+
+export const users = pgTable("users", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text("name"),
+  email: text("email").unique(),
+  emailVerified: timestamp("emailVerified", { mode: "date" }),
+  image: text("image"),
+});
+
+export const accounts = pgTable(
+  "accounts",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").$type<AdapterAccountType>().notNull(),
+    provider: text("provider").notNull(),
+    providerAccountId: text("providerAccountId").notNull(),
+    refresh_token: text("refresh_token"),
+    access_token: text("access_token"),
+    expires_at: integer("expires_at"),
+    token_type: text("token_type"),
+    scope: text("scope"),
+    id_token: text("id_token"),
+    session_state: text("session_state"),
+  },
+  (account) => [
+    primaryKey({
+      columns: [account.provider, account.providerAccountId],
+    }),
+  ]
+);
+
+export const authSessions = pgTable("auth_sessions", {
+  sessionToken: text("sessionToken").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  expires: timestamp("expires", { mode: "date" }).notNull(),
+});
+
+export const verificationTokens = pgTable(
+  "verificationToken",
+  {
+    identifier: text("identifier").notNull(),
+    token: text("token").notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+  },
+  (verificationToken) => [
+    primaryKey({
+      columns: [verificationToken.identifier, verificationToken.token],
+    }),
+  ]
+);
+
+// ==================== USER PROFILES ====================
 
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -259,6 +319,20 @@ export const speechSituations = pgTable("speech_situations", {
   fluencyRating: integer("fluency_rating"), // 1-10
   techniquesUsed: jsonb("techniques_used"),
   outcome: text("outcome"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ==================== FEARED WORDS ====================
+
+export const fearedWords = pgTable("feared_words", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull(),
+  word: text("word").notNull(),
+  phoneme: text("phoneme"),
+  difficulty: text("difficulty").default("medium").notNull(), // easy, medium, hard
+  practiceCount: integer("practice_count").default(0).notNull(),
+  mastered: boolean("mastered").default(false).notNull(),
+  lastPracticed: timestamp("last_practiced"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
