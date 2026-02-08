@@ -6,7 +6,10 @@
  * Phase 3 (Days 31-50): Technique Integration — cancellation, pull-out, choral
  * Phase 4 (Days 51-70): Real-World Practice — AI conversations, phone sims, feared words
  * Phase 5 (Days 71-90): Mastery & Maintenance — advanced scenarios, community, independence
+ * Phase 6 (Day 91+): Adaptive Maintenance — infinite personalized plans via adaptive-engine.ts
  */
+
+import { getAdaptiveDailyPlan as getAdaptiveDailyPlanImport } from "./adaptive-engine";
 
 export type TaskType =
   | "warmup"
@@ -45,6 +48,7 @@ export const PHASE_LABELS: Record<number, string> = {
   3: "Technique Integration",
   4: "Real-World Practice",
   5: "Mastery & Maintenance",
+  6: "Adaptive Maintenance",
 };
 
 export const PHASE_RANGES: Record<number, [number, number]> = {
@@ -53,6 +57,7 @@ export const PHASE_RANGES: Record<number, [number, number]> = {
   3: [31, 50],
   4: [51, 70],
   5: [71, 90],
+  6: [91, Infinity],
 };
 
 const affirmations = [
@@ -66,6 +71,16 @@ const affirmations = [
   "I deserve to be heard, just like everyone else.",
   "Today, I practice not for perfection, but for progress.",
   "I am building new neural pathways with every exercise.",
+  "Stuttering is neurology, not a character flaw. I practice to rewire, not to fix who I am.",
+  "fMRI studies prove that practice changes brain structure. Every session is literally reshaping my speech circuits.",
+  "70 million people stutter worldwide. I'm not alone, and I'm doing something about it.",
+  "Avoidance makes stuttering harder. Speaking up — even imperfectly — is the path forward.",
+  "The same brain that stutters also compensates, adapts, and grows. Neuroplasticity is on my side.",
+  "Talking more helps, not hurts. Every conversation is practice, and every practice strengthens new pathways.",
+  "My stutter has zero correlation with my intelligence. Research confirms this — repeatedly.",
+  "Stress doesn't cause stuttering — it just raises tension temporarily. I have techniques for that.",
+  "I speak not because it's easy, but because what I have to say matters.",
+  "Singing and reading aloud use different neural pathways. I'm building those alternative circuits right now.",
 ];
 
 function getAffirmation(day: number): string {
@@ -77,7 +92,8 @@ function getPhase(day: number): number {
   if (day <= 30) return 2;
   if (day <= 50) return 3;
   if (day <= 70) return 4;
-  return 5;
+  if (day <= 90) return 5;
+  return 6;
 }
 
 /* ─── Generate all 90 daily plans ─── */
@@ -434,24 +450,41 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
   return tasks;
 }
 
-/** Get plan for a specific day */
+/** Get plan for a specific day (days 1-90 use curated curriculum, 91+ use adaptive engine) */
 export function getDailyPlan(day: number): DailyPlan | null {
-  if (day < 1 || day > 90) return null;
-  const plans = generateDailyPlans();
-  return plans[day - 1];
+  if (day < 1) return null;
+  if (day <= 90) {
+    const plans = generateDailyPlans();
+    return plans[day - 1];
+  }
+  // Day 91+: delegate to adaptive engine (balanced default when no outcome data)
+  return getAdaptiveDailyPlanImport(day);
 }
 
 /** Get current phase info */
 export function getPhaseInfo(day: number) {
   const phase = getPhase(day);
   const [start, end] = PHASE_RANGES[phase];
+
+  // Maintenance phase (day 91+) has no fixed end
+  if (phase === 6) {
+    const dayInPhase = day - start + 1;
+    return {
+      phase,
+      label: PHASE_LABELS[phase],
+      dayInPhase,
+      daysInPhase: null as number | null,
+      progress: 100, // always "complete" in maintenance
+    };
+  }
+
   const daysInPhase = end - start + 1;
   const dayInPhase = day - start + 1;
   return {
     phase,
     label: PHASE_LABELS[phase],
     dayInPhase,
-    daysInPhase,
+    daysInPhase: daysInPhase as number | null,
     progress: Math.round((dayInPhase / daysInPhase) * 100),
   };
 }

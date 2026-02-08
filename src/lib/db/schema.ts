@@ -56,6 +56,10 @@ export const emotionalTagEnum = pgEnum("emotional_tag", [
   "hopeful",
   "discouraged",
 ]);
+export const techniqueCategoryEnum = pgEnum("technique_category", [
+  "fluency_shaping",
+  "stuttering_modification",
+]);
 
 // ==================== NEXTAUTH TABLES ====================
 
@@ -133,6 +137,8 @@ export const profiles = pgTable("profiles", {
   slpAvailability: jsonb("slp_availability"),
   slpHourlyRate: real("slp_hourly_rate"),
   slpBio: text("slp_bio"),
+  preferredApproach: techniqueCategoryEnum("preferred_approach"),
+  approachConfidence: real("approach_confidence"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -167,6 +173,9 @@ export const sessions = pgTable("sessions", {
   toolsUsed: jsonb("tools_used"), // ["daf", "faf", "metronome", "choral"]
   selfRatedFluency: integer("self_rated_fluency"), // 1-10
   aiFluencyScore: real("ai_fluency_score"), // 0-100
+  techniqueCategory: techniqueCategoryEnum("technique_category"),
+  confidenceBefore: integer("confidence_before"), // 1-10
+  confidenceAfter: integer("confidence_after"), // 1-10
   notes: text("notes"),
   recordingUrl: text("recording_url"),
 });
@@ -182,6 +191,22 @@ export const exerciseCompletions = pgTable("exercise_completions", {
   xpEarned: integer("xp_earned").default(0).notNull(),
   recordingUrl: text("recording_url"),
   aiFeedback: text("ai_feedback"),
+});
+
+// ==================== TECHNIQUE OUTCOMES (A/B TESTING) ====================
+
+export const techniqueOutcomes = pgTable("technique_outcomes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull(),
+  sessionId: uuid("session_id").references(() => sessions.id),
+  techniqueId: text("technique_id").notNull(),
+  category: techniqueCategoryEnum("category").notNull(),
+  confidenceDelta: integer("confidence_delta"),
+  completionRate: real("completion_rate"),
+  selfRatedFluency: integer("self_rated_fluency"),
+  durationSeconds: integer("duration_seconds"),
+  contentLevel: text("content_level"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 // ==================== VOICE JOURNAL ====================
@@ -241,6 +266,7 @@ export const userStats = pgTable("user_stats", {
   totalExercisesCompleted: integer("total_exercises_completed")
     .default(0)
     .notNull(),
+  currentDay: integer("current_day").default(1).notNull(),
 });
 
 // ==================== COMMUNITY ====================
@@ -334,6 +360,120 @@ export const fearedWords = pgTable("feared_words", {
   mastered: boolean("mastered").default(false).notNull(),
   lastPracticed: timestamp("last_practiced"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ==================== AUDIO LAB PRESETS ====================
+
+// ==================== MONTHLY PROGRESS REPORTS ====================
+
+export const severityRatingEnum = pgEnum("severity_rating", [
+  "normal",
+  "mild",
+  "moderate",
+  "severe",
+]);
+
+export const monthlyReports = pgTable("monthly_reports", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull(),
+  month: timestamp("month").notNull(), // first day of the month
+  passageId: text("passage_id").notNull(),
+  audioUrl: text("audio_url"),
+  transcription: text("transcription"),
+  totalSyllables: integer("total_syllables"),
+  stutteredSyllables: integer("stuttered_syllables"),
+  percentSS: real("percent_ss"),
+  severityRating: severityRatingEnum("severity_rating"),
+  speakingRate: real("speaking_rate"),
+  fluencyScore: integer("fluency_score"),
+  analysisJson: jsonb("analysis_json"), // detailed disfluency breakdown
+  recommendationsJson: jsonb("recommendations_json"), // AI-generated clinical recommendations
+  shareToken: text("share_token").unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ==================== AUDIO LAB PRESETS ====================
+
+// ==================== COMMUNITY VICTORIES (I DID IT) ====================
+
+export const communityVictories = pgTable("community_victories", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull(),
+  anonymousName: text("anonymous_name").notNull(),
+  victoryType: text("victory_type").notNull(), // phone_call, meeting, order, presentation, conversation, asked_help
+  description: text("description"),
+  celebrateCount: integer("celebrate_count").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ==================== ACCOUNTABILITY BUDDIES ====================
+
+export const buddyPairings = pgTable("buddy_pairings", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userAId: text("user_a_id").notNull(),
+  userBId: text("user_b_id").notNull(),
+  userAName: text("user_a_name").notNull(), // anonymous name
+  userBName: text("user_b_name").notNull(), // anonymous name
+  sharedStreak: integer("shared_streak").default(0).notNull(),
+  status: text("status").default("active").notNull(), // active, ended
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  lastActiveAt: timestamp("last_active_at").defaultNow().notNull(),
+});
+
+// ==================== COMMUNITY CHALLENGES ====================
+
+export const communityChallenges = pgTable("community_challenges", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  targetValue: integer("target_value").notNull(),
+  currentValue: integer("current_value").default(0).notNull(),
+  xpReward: integer("xp_reward").default(100).notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  participantCount: integer("participant_count").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const challengeParticipants = pgTable("challenge_participants", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  challengeId: uuid("challenge_id")
+    .references(() => communityChallenges.id)
+    .notNull(),
+  userId: text("user_id").notNull(),
+  contribution: integer("contribution").default(0).notNull(),
+  joinedAt: timestamp("joined_at").defaultNow().notNull(),
+});
+
+// ==================== SHADOWING SCORES ====================
+
+export const shadowingScores = pgTable("shadowing_scores", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull(),
+  clipId: text("clip_id").notNull(),
+  technique: text("technique").notNull(),
+  overallScore: integer("overall_score").notNull(),
+  rhythmMatch: integer("rhythm_match").notNull(),
+  techniqueAccuracy: integer("technique_accuracy").notNull(),
+  paceMatch: integer("pace_match").notNull(),
+  stars: integer("stars").notNull(),
+  feedback: text("feedback"),
+  techniqueNotes: text("technique_notes"),
+  xpEarned: integer("xp_earned").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ==================== MICRO-CHALLENGE COMPLETIONS ====================
+
+export const microChallengeCompletions = pgTable("micro_challenge_completions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull(),
+  challengeDate: text("challenge_date").notNull(), // ISO date string (YYYY-MM-DD)
+  challengeTitle: text("challenge_title").notNull(),
+  technique: text("technique").notNull(),
+  xpEarned: integer("xp_earned").default(10).notNull(),
+  completedAt: timestamp("completed_at").defaultNow().notNull(),
 });
 
 // ==================== AUDIO LAB PRESETS ====================

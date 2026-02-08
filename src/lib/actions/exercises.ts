@@ -5,9 +5,12 @@ import {
   exerciseCompletions,
   userStats,
   sessions,
+  techniqueOutcomes,
 } from "@/lib/db/schema";
 import { eq, sql, desc, and, gte } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth/helpers";
+import type { TechniqueCategory } from "@/lib/curriculum/technique-categories";
+import { ensureUserStats } from "@/lib/actions/user-progress";
 
 export async function completeExercise(data: {
   exerciseId: string;
@@ -131,4 +134,77 @@ export async function getTodayCompletions() {
         gte(exerciseCompletions.completedAt, today)
       )
     );
+}
+
+/**
+ * Complete a full daily practice session.
+ * Creates a session, records technique outcome for A/B analysis,
+ * and updates user stats (XP, streak, practice time).
+ */
+export async function completeSession(data: {
+  techniqueId: string;
+  techniqueCategory: TechniqueCategory;
+  durationSeconds: number;
+  confidenceBefore?: number;
+  confidenceAfter?: number;
+  selfRatedFluency?: number;
+  contentLevel?: string;
+  mood: string;
+  note: string;
+}) {
+  const user = await requireAuth();
+  const xp = calculateXp(data.durationSeconds);
+
+  // Ensure stats row exists
+  await ensureUserStats(user.id);
+
+  // Create session with new confidence + category fields
+  const [session] = await db
+    .insert(sessions)
+    .values({
+      userId: user.id,
+      exerciseType: data.techniqueId,
+      techniqueCategory: data.techniqueCategory,
+      durationSeconds: data.durationSeconds,
+      selfRatedFluency: data.selfRatedFluency,
+      confidenceBefore: data.confidenceBefore,
+      confidenceAfter: data.confidenceAfter,
+      notes: data.note || null,
+      endedAt: new Date(),
+    })
+    .returning();
+
+  // Record technique outcome for A/B analysis
+  const confidenceDelta =
+    data.confidenceBefore != null && data.confidenceAfter != null
+      ? data.confidenceAfter - data.confidenceBefore
+      : null;
+
+  await db.insert(techniqueOutcomes).values({
+    userId: user.id,
+    sessionId: session.id,
+    techniqueId: data.techniqueId,
+    category: data.techniqueCategory,
+    confidenceDelta,
+    completionRate: 1.0, // completed session = 100%
+    selfRatedFluency: data.selfRatedFluency,
+    durationSeconds: data.durationSeconds,
+    contentLevel: data.contentLevel,
+  });
+
+  // Update user stats
+  await db
+    .update(userStats)
+    .set({
+      totalXp: sql`${userStats.totalXp} + ${xp}`,
+      totalExercisesCompleted: sql`${userStats.totalExercisesCompleted} + 1`,
+      totalPracticeSeconds: sql`${userStats.totalPracticeSeconds} + ${data.durationSeconds}`,
+      lastPracticeDate: new Date(),
+    })
+    .where(eq(userStats.userId, user.id));
+
+  // Update streak
+  await updateStreak(user.id);
+
+  return { xp, sessionId: session.id };
 }

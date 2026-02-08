@@ -329,6 +329,10 @@ export class AudioEngine {
     return this.audioContext;
   }
 
+  getMediaStream(): MediaStream | null {
+    return this.stream;
+  }
+
   static async getAudioDevices(): Promise<MediaDeviceInfo[]> {
     const devices = await navigator.mediaDevices.enumerateDevices();
     return devices.filter((d) => d.kind === "audioinput");

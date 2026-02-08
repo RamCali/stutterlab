@@ -1,0 +1,37 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users can only access their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Subcollections under user
+      match /sessions/{sessionId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      match /checkIns/{checkInId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      match /conversations/{conversationId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      match /analyses/{analysisId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Exercises are global and read-only for authenticated users
+    match /exercises/{exerciseId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Admin-only via Firebase Console or seeding script
+    }
+
+    // Techniques are global and read-only
+    match /techniques/{techniqueId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+  }
+}

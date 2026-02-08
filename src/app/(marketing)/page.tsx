@@ -177,53 +177,7 @@ const testimonials = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background">
-      {/* ═══ Navigation ═══ */}
-      <header className="border-b border-border/60 bg-background/95 backdrop-blur sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <AudioWaveform className="h-4 w-4 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold tracking-tight">StutterLab</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <a
-              href="#features"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Features
-            </a>
-            <a
-              href="#how-it-works"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              How It Works
-            </a>
-            <a
-              href="#pricing"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Pricing
-            </a>
-            <a
-              href="#for-slps"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              For SLPs
-            </a>
-          </nav>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/login">Log in</Link>
-            </Button>
-            <Button size="sm" asChild>
-              <Link href="/signup">Get Started</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
-
+    <>
       {/* ═══ Hero Section ═══ */}
       <section className="relative py-20 md:py-32 px-6 overflow-hidden">
         {/* Warm gradient background */}
@@ -237,15 +191,15 @@ export default function LandingPage() {
             The First Browser-Based Stuttering Treatment Platform
           </Badge>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1]">
-            Your Speech,{" "}
-            <span className="text-primary">Your Pace,</span>
+            Speak Without Fear{" "}
+            <span className="text-primary">at Work,</span>
             <br />
-            Your Power
+            on Dates, on the Phone
           </h1>
           <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Combine DAF + FAF audio therapy, AI speech analysis, a 90-day
-            structured curriculum, and real-world conversation practice. All in
-            your browser. No downloads. No waiting.
+            Practice the conversations that scare you — with AI that adapts to
+            your stuttering patterns. Build real-world confidence 25 minutes a
+            day. No downloads. No waiting rooms.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button size="lg" className="px-8" asChild>
@@ -521,12 +475,12 @@ export default function LandingPage() {
       <section className="py-20 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold">
-            Ready to Transform Your Speech?
+            What Would You Say If Stuttering Wasn&apos;t in the Way?
           </h2>
           <p className="text-muted-foreground mt-4 text-lg leading-relaxed">
-            Join thousands of adults taking control of their fluency with
-            evidence-based tools and AI-powered practice. Your 7-day free trial
-            starts now.
+            Your ideas deserve to be heard in that meeting. Your date deserves
+            the real you. Start practicing the conversations that matter — free
+            for 7 days.
           </p>
           <Button size="lg" className="mt-8 px-10" asChild>
             <Link href="/signup">
@@ -540,58 +494,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ Footer ═══ */}
-      <footer className="border-t border-border/60 py-12 px-6 bg-card">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row items-start justify-between gap-8">
-            <div>
-              <div className="flex items-center gap-2.5">
-                <div className="h-7 w-7 rounded-lg bg-primary flex items-center justify-center">
-                  <AudioWaveform className="h-3.5 w-3.5 text-primary-foreground" />
-                </div>
-                <span className="font-bold text-lg">StutterLab</span>
-              </div>
-              <p className="text-sm text-muted-foreground mt-2 max-w-xs">
-                Evidence-based stuttering treatment, powered by AI, accessible
-                from any browser.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-x-12 gap-y-2 text-sm">
-              <Link
-                href="#features"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Features
-              </Link>
-              <Link
-                href="#pricing"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Pricing
-              </Link>
-              <Link
-                href="#for-slps"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                For SLPs
-              </Link>
-              <Link
-                href="/login"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Log In
-              </Link>
-            </div>
-          </div>
-          <div className="border-t border-border/60 mt-8 pt-6 flex flex-col md:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
-            <p>&copy; 2026 StutterLab. All rights reserved.</p>
-            <p>
-              StutterLab is not a substitute for professional diagnosis or
-              treatment. Always consult a qualified SLP.
-            </p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </>
   );
 }

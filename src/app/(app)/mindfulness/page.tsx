@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -12,165 +12,9 @@ import {
   Clock,
   Sparkles,
   Volume2,
-  Play,
-  Pause,
-  X,
+  Crown,
 } from "lucide-react";
-
-/* ─── Breathing Exercise Modal ─── */
-function BreathingExercise({
-  pattern,
-  onClose,
-}: {
-  pattern: { name: string; inhale: number; hold: number; exhale: number; holdAfter: number };
-  onClose: () => void;
-}) {
-  const [phase, setPhase] = useState<"inhale" | "hold" | "exhale" | "holdAfter">("inhale");
-  const [timeLeft, setTimeLeft] = useState(pattern.inhale);
-  const [cycles, setCycles] = useState(0);
-  const [running, setRunning] = useState(true);
-  const totalCycles = 4;
-
-  useEffect(() => {
-    if (!running) return;
-
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          // Move to next phase
-          if (phase === "inhale") {
-            if (pattern.hold > 0) {
-              setPhase("hold");
-              return pattern.hold;
-            }
-            setPhase("exhale");
-            return pattern.exhale;
-          }
-          if (phase === "hold") {
-            setPhase("exhale");
-            return pattern.exhale;
-          }
-          if (phase === "exhale") {
-            if (pattern.holdAfter > 0) {
-              setPhase("holdAfter");
-              return pattern.holdAfter;
-            }
-            setCycles((c) => c + 1);
-            setPhase("inhale");
-            return pattern.inhale;
-          }
-          if (phase === "holdAfter") {
-            setCycles((c) => c + 1);
-            setPhase("inhale");
-            return pattern.inhale;
-          }
-          return prev;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [phase, running, pattern]);
-
-  useEffect(() => {
-    if (cycles >= totalCycles) {
-      setRunning(false);
-    }
-  }, [cycles]);
-
-  const phaseLabels = {
-    inhale: "Breathe In",
-    hold: "Hold",
-    exhale: "Breathe Out",
-    holdAfter: "Hold",
-  };
-
-  const phaseColors = {
-    inhale: "text-sky-400",
-    hold: "text-amber-400",
-    exhale: "text-emerald-400",
-    holdAfter: "text-amber-400",
-  };
-
-  const scale = phase === "inhale" ? 1.3 : phase === "exhale" ? 0.8 : 1.0;
-
-  return (
-    <div className="fixed inset-0 z-50 bg-background/95 flex items-center justify-center">
-      <Button
-        variant="ghost"
-        size="sm"
-        className="absolute top-4 right-4"
-        onClick={onClose}
-      >
-        <X className="h-5 w-5" />
-      </Button>
-
-      <div className="text-center">
-        <p className="text-sm text-muted-foreground mb-2">{pattern.name}</p>
-
-        {cycles >= totalCycles ? (
-          <div className="space-y-4">
-            <div className="h-48 w-48 mx-auto rounded-full bg-emerald-500/10 flex items-center justify-center">
-              <Heart className="h-16 w-16 text-emerald-500" />
-            </div>
-            <h2 className="text-2xl font-bold">Great job!</h2>
-            <p className="text-muted-foreground">
-              {totalCycles} cycles complete. You should feel calmer now.
-            </p>
-            <Button onClick={onClose}>Done</Button>
-          </div>
-        ) : (
-          <>
-            {/* Breathing Circle */}
-            <div
-              className="h-48 w-48 mx-auto rounded-full bg-primary/10 flex items-center justify-center transition-transform duration-[2000ms] ease-in-out"
-              style={{ transform: `scale(${scale})` }}
-            >
-              <div className="text-center">
-                <p className={`text-4xl font-bold ${phaseColors[phase]}`}>
-                  {timeLeft}
-                </p>
-                <p className={`text-sm font-medium ${phaseColors[phase]}`}>
-                  {phaseLabels[phase]}
-                </p>
-              </div>
-            </div>
-
-            <p className="mt-6 text-muted-foreground text-sm">
-              Cycle {cycles + 1} of {totalCycles}
-            </p>
-
-            <div className="flex gap-1 justify-center mt-3">
-              {Array.from({ length: totalCycles }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-2 w-8 rounded-full ${
-                    i < cycles
-                      ? "bg-primary"
-                      : i === cycles
-                      ? "bg-primary/50"
-                      : "bg-muted"
-                  }`}
-                />
-              ))}
-            </div>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              className="mt-4"
-              onClick={() => setRunning(!running)}
-            >
-              {running ? <Pause className="h-4 w-4 mr-1" /> : <Play className="h-4 w-4 mr-1" />}
-              {running ? "Pause" : "Resume"}
-            </Button>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
+import { BreathingExercise } from "@/components/breathing-exercise";
 
 /* ─── Section Data ─── */
 const sections = [
@@ -188,18 +32,18 @@ const sections = [
         pattern: { name: "4-7-8 Breathing", inhale: 4, hold: 7, exhale: 8, holdAfter: 0 },
       },
       {
-        title: "Diaphragmatic Breathing",
-        description: "Deep belly breathing to support speech airflow and reduce tension.",
-        duration: "5 min",
-        isPremium: false,
-        pattern: { name: "Diaphragmatic Breathing", inhale: 4, hold: 0, exhale: 6, holdAfter: 0 },
-      },
-      {
         title: "Box Breathing",
         description: "Equal inhale, hold, exhale, hold. Used by Navy SEALs for calm under pressure.",
         duration: "4 min",
         isPremium: false,
         pattern: { name: "Box Breathing", inhale: 4, hold: 4, exhale: 4, holdAfter: 4 },
+      },
+      {
+        title: "Diaphragmatic Breathing",
+        description: "Deep belly breathing to support speech airflow and reduce tension.",
+        duration: "5 min",
+        isPremium: false,
+        pattern: { name: "Diaphragmatic Breathing", inhale: 4, hold: 0, exhale: 6, holdAfter: 0 },
       },
     ],
   },
@@ -292,21 +136,17 @@ const sections = [
   },
 ];
 
+type Pattern = { name: string; inhale: number; hold: number; exhale: number; holdAfter: number };
+
 export default function MindfulnessPage() {
-  const [activeExercise, setActiveExercise] = useState<{
-    name: string;
-    inhale: number;
-    hold: number;
-    exhale: number;
-    holdAfter: number;
-  } | null>(null);
+  const [activeExercise, setActiveExercise] = useState<Pattern | null>(null);
 
   return (
     <>
       {activeExercise && (
         <BreathingExercise
           pattern={activeExercise}
-          onClose={() => setActiveExercise(null)}
+          onComplete={() => setActiveExercise(null)}
         />
       )}
 
@@ -317,12 +157,11 @@ export default function MindfulnessPage() {
             Mindfulness & CBT
           </h1>
           <p className="text-muted-foreground mt-1">
-            Address speaking anxiety with breathing exercises, guided meditation,
-            and cognitive behavioral therapy tools
+            Address speaking anxiety with breathing exercises, guided meditation, and cognitive behavioral therapy tools
           </p>
         </div>
 
-        {/* Quick Access: Pre-Speaking Toolkit */}
+        {/* Quick Access */}
         <Card className="border-green-500/30 bg-green-500/5">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
@@ -338,8 +177,7 @@ export default function MindfulnessPage() {
                   </Badge>
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  About to make a phone call or give a presentation? Use the 2-minute
-                  calm-down routine to prepare.
+                  About to make a phone call or give a presentation? Use the 2-minute calm-down routine.
                 </p>
               </div>
               <Button
@@ -376,12 +214,13 @@ export default function MindfulnessPage() {
                       <div className="flex items-start justify-between mb-2">
                         <h3 className="font-medium text-sm">{item.title}</h3>
                         {item.isPremium && (
-                          <Badge variant="outline" className="text-[10px]">Pro</Badge>
+                          <Badge variant="outline" className="text-[10px]">
+                            <Crown className="h-2.5 w-2.5 mr-0.5" />
+                            PRO
+                          </Badge>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground mb-3">
-                        {item.description}
-                      </p>
+                      <p className="text-xs text-muted-foreground mb-3">{item.description}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Clock className="h-3 w-3" />
@@ -391,9 +230,7 @@ export default function MindfulnessPage() {
                           size="sm"
                           variant="ghost"
                           onClick={() => {
-                            if (item.pattern) {
-                              setActiveExercise(item.pattern);
-                            }
+                            if (item.pattern) setActiveExercise(item.pattern);
                           }}
                           disabled={!item.pattern}
                         >

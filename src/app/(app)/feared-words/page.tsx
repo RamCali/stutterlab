@@ -1,295 +1,314 @@
 "use client";
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
-  Shield,
+  AlertTriangle,
   Plus,
-  Trash2,
-  Star,
-  Volume2,
-  Brain,
-  Sparkles,
+  X,
   CheckCircle2,
-  Target,
-  TrendingUp,
+  RotateCcw,
+  Play,
+  Star,
+  Crown,
+  Loader2,
 } from "lucide-react";
+import {
+  getFearedWordsStore,
+  addFearedWord,
+  removeFearedWord,
+  toggleMastered,
+  getCurrentTrainingLevel,
+  cacheGeneratedContent,
+  type FearedWordEntry,
+  type FearedWordsStore,
+  type TrainingLevel,
+} from "@/lib/feared-words/store";
 
-type FearedWord = {
-  id: string;
-  word: string;
-  phoneme: string;
-  difficulty: "easy" | "medium" | "hard";
-  practiceCount: number;
-  mastered: boolean;
+const diffColors = { easy: "text-green-500", medium: "text-amber-500", hard: "text-red-500" };
+
+const LEVEL_LABELS: Record<TrainingLevel, string> = {
+  words: "W",
+  phrases: "P",
+  sentences: "S",
+  paragraphs: "St",
 };
 
-const sampleWords: FearedWord[] = [
-  { id: "1", word: "specifically", phoneme: "/sp/", difficulty: "hard", practiceCount: 0, mastered: false },
-  { id: "2", word: "situation", phoneme: "/s/", difficulty: "medium", practiceCount: 3, mastered: false },
-  { id: "3", word: "presentation", phoneme: "/pr/", difficulty: "hard", practiceCount: 1, mastered: false },
-  { id: "4", word: "telephone", phoneme: "/t/", difficulty: "medium", practiceCount: 5, mastered: false },
-  { id: "5", word: "basically", phoneme: "/b/", difficulty: "easy", practiceCount: 8, mastered: true },
-  { id: "6", word: "probably", phoneme: "/pr/", difficulty: "medium", practiceCount: 2, mastered: false },
-];
-
-const difficultyColors = {
-  easy: "bg-green-500/10 text-green-600 dark:text-green-400",
-  medium: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400",
-  hard: "bg-red-500/10 text-red-600 dark:text-red-400",
-};
+const LEVEL_ORDER: TrainingLevel[] = ["words", "phrases", "sentences", "paragraphs"];
 
 export default function FearedWordsPage() {
-  const [words, setWords] = useState<FearedWord[]>(sampleWords);
+  const router = useRouter();
+  const [store, setStore] = useState<FearedWordsStore>({ words: [], generatedContent: {} });
   const [newWord, setNewWord] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "mastered">("all");
+  const [generatingId, setGeneratingId] = useState<string | null>(null);
 
-  function addWord() {
+  const refreshStore = useCallback(() => {
+    const s = getFearedWordsStore();
+    if (s) setStore(s);
+  }, []);
+
+  useEffect(() => {
+    refreshStore();
+  }, [refreshStore]);
+
+  async function generateContent(entry: FearedWordEntry) {
+    setGeneratingId(entry.id);
+    try {
+      const res = await fetch("/api/feared-words/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ word: entry.word, difficulty: entry.difficulty }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        cacheGeneratedContent(entry.id, {
+          wordId: entry.id,
+          word: entry.word,
+          ...data.content,
+          generatedAt: new Date().toISOString(),
+        });
+        refreshStore();
+      }
+    } catch {
+      // Content generation failed — fallback content will be used
+    }
+    setGeneratingId(null);
+  }
+
+  function handleAddWord() {
     if (!newWord.trim()) return;
-    const word: FearedWord = {
-      id: crypto.randomUUID(),
-      word: newWord.trim().toLowerCase(),
-      phoneme: "",
-      difficulty: "medium",
-      practiceCount: 0,
-      mastered: false,
-    };
-    setWords((prev) => [...prev, word]);
+    const entry = addFearedWord(newWord.trim());
     setNewWord("");
+    refreshStore();
+    generateContent(entry);
   }
 
-  function removeWord(id: string) {
-    setWords((prev) => prev.filter((w) => w.id !== id));
+  function handleRemove(id: string) {
+    removeFearedWord(id);
+    refreshStore();
   }
 
-  function toggleMastered(id: string) {
-    setWords((prev) =>
-      prev.map((w) => (w.id === id ? { ...w, mastered: !w.mastered } : w))
-    );
+  function handleToggleMastered(id: string) {
+    toggleMastered(id);
+    refreshStore();
   }
 
-  function practiceWord(id: string) {
-    setWords((prev) =>
-      prev.map((w) =>
-        w.id === id ? { ...w, practiceCount: w.practiceCount + 1 } : w
-      )
-    );
+  function handlePractice(wordId: string) {
+    router.push(`/feared-words/practice/${wordId}`);
   }
 
+  const words = store.words;
   const filtered = words.filter((w) => {
     if (filter === "active") return !w.mastered;
     if (filter === "mastered") return w.mastered;
     return true;
   });
 
-  const masteredCount = words.filter((w) => w.mastered).length;
-  const totalPractice = words.reduce((sum, w) => sum + w.practiceCount, 0);
+  const stats = {
+    total: words.length,
+    mastered: words.filter((w) => w.mastered).length,
+    practices: words.reduce((sum, w) => sum + w.practiceCount, 0),
+  };
 
   return (
-    <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-6">
+    <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Shield className="h-6 w-6 text-primary" />
+          <AlertTriangle className="h-6 w-6 text-primary" />
           Feared Words
         </h1>
         <p className="text-muted-foreground mt-1">
-          Track, practice, and conquer the words that trigger your stuttering
+          Track words you find difficult and practice them at word, phrase, sentence, and story level
         </p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        <Card className="border-0">
-          <CardContent className="pt-5 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-md bg-primary/10 flex items-center justify-center">
-                <Target className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{words.length}</p>
-                <p className="text-xs text-muted-foreground">Total Words</p>
-              </div>
-            </div>
+      <div className="grid grid-cols-3 gap-3">
+        <Card>
+          <CardContent className="pt-5 pb-4 text-center">
+            <AlertTriangle className="h-5 w-5 text-amber-500 mx-auto mb-1" />
+            <p className="text-2xl font-bold">{stats.total}</p>
+            <p className="text-[10px] text-muted-foreground">Total Words</p>
           </CardContent>
         </Card>
-        <Card className="border-0">
-          <CardContent className="pt-5 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-md bg-emerald-500/10 flex items-center justify-center">
-                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{masteredCount}</p>
-                <p className="text-xs text-muted-foreground">Mastered</p>
-              </div>
-            </div>
+        <Card>
+          <CardContent className="pt-5 pb-4 text-center">
+            <Star className="h-5 w-5 text-emerald-500 mx-auto mb-1" />
+            <p className="text-2xl font-bold">{stats.mastered}</p>
+            <p className="text-[10px] text-muted-foreground">Mastered</p>
           </CardContent>
         </Card>
-        <Card className="border-0">
-          <CardContent className="pt-5 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-md bg-violet-500/10 flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-violet-500" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{totalPractice}</p>
-                <p className="text-xs text-muted-foreground">Practices</p>
-              </div>
-            </div>
+        <Card>
+          <CardContent className="pt-5 pb-4 text-center">
+            <RotateCcw className="h-5 w-5 text-blue-500 mx-auto mb-1" />
+            <p className="text-2xl font-bold">{stats.practices}</p>
+            <p className="text-[10px] text-muted-foreground">Practices</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* AI Suggestion Banner */}
-      <Card className="border-0 bg-gradient-to-br from-violet-500/5 to-violet-500/10 dark:from-violet-500/10 dark:to-violet-500/5">
-        <CardContent className="pt-5 pb-4">
-          <div className="flex items-center gap-4">
-            <div className="p-2.5 rounded-full bg-violet-500/10">
-              <Brain className="h-5 w-5 text-violet-500" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-sm flex items-center gap-2">
-                AI Word Suggestion
-                <Badge variant="secondary" className="text-[10px]">
-                  <Sparkles className="h-3 w-3 mr-1" />
-                  Pro
-                </Badge>
-              </h3>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Based on your speech patterns, the AI will suggest words you may
-                find challenging. Practice these for maximum improvement.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Add Word */}
+      <div className="flex gap-2">
+        <Input
+          placeholder="Add a feared word..."
+          value={newWord}
+          onChange={(e) => setNewWord(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleAddWord()}
+        />
+        <Button onClick={handleAddWord} disabled={!newWord.trim()}>
+          <Plus className="h-4 w-4 mr-1" />
+          Add
+        </Button>
+      </div>
 
-      {/* Add Word + Filter */}
-      <div className="flex flex-wrap gap-3">
-        <div className="flex-1 min-w-[200px] flex gap-2">
-          <Input
-            placeholder="Add a feared word..."
-            value={newWord}
-            onChange={(e) => setNewWord(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && addWord()}
-          />
-          <Button onClick={addWord} size="sm">
-            <Plus className="h-4 w-4 mr-1" />
-            Add
+      {/* Filter */}
+      <div className="flex gap-1">
+        {(["all", "active", "mastered"] as const).map((f) => (
+          <Button
+            key={f}
+            variant={filter === f ? "default" : "ghost"}
+            size="sm"
+            onClick={() => setFilter(f)}
+          >
+            {f.charAt(0).toUpperCase() + f.slice(1)}
           </Button>
-        </div>
-        <div className="flex gap-2">
-          {(["all", "active", "mastered"] as const).map((f) => (
-            <Button
-              key={f}
-              variant={filter === f ? "default" : "outline"}
-              size="sm"
-              onClick={() => setFilter(f)}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </Button>
-          ))}
-        </div>
+        ))}
       </div>
 
       {/* Word List */}
       <div className="space-y-2">
-        {filtered.map((word) => (
-          <Card
-            key={word.id}
-            className={`border-0 ${word.mastered ? "opacity-60" : ""}`}
-          >
-            <CardContent className="py-3 px-4">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => toggleMastered(word.id)}
-                  className="flex-shrink-0"
-                >
-                  {word.mastered ? (
-                    <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                  ) : (
-                    <div className="h-5 w-5 rounded-full border-2 border-muted-foreground/30" />
-                  )}
-                </button>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className={`font-semibold ${word.mastered ? "line-through text-muted-foreground" : ""}`}>
-                      {word.word}
-                    </p>
-                    {word.phoneme && (
-                      <span className="text-xs text-muted-foreground font-mono">
-                        {word.phoneme}
-                      </span>
-                    )}
-                    <Badge variant="secondary" className={`text-[10px] ${difficultyColors[word.difficulty]}`}>
-                      {word.difficulty}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Practiced {word.practiceCount} times
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => practiceWord(word.id)} disabled={word.mastered}>
-                    <Volume2 className="h-4 w-4 mr-1" />
-                    Practice
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => toggleMastered(word.id)}>
-                    <Star className={`h-4 w-4 ${word.mastered ? "text-yellow-500 fill-yellow-500" : ""}`} />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeWord(word.id)}
-                    className="text-muted-foreground hover:text-red-500"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-
         {filtered.length === 0 && (
-          <Card className="border-dashed">
-            <CardContent className="py-12 text-center">
-              <Shield className="h-8 w-8 mx-auto mb-3 text-muted-foreground opacity-50" />
-              <p className="text-sm text-muted-foreground">
-                {filter === "mastered"
-                  ? "No mastered words yet. Keep practicing!"
-                  : "No feared words yet. Add words that trigger your stuttering."}
-              </p>
-            </CardContent>
-          </Card>
+          <p className="text-sm text-muted-foreground text-center py-8">
+            {filter === "all"
+              ? "No feared words yet. Add one above to start training."
+              : `No ${filter} words.`}
+          </p>
         )}
+        {filtered.map((word) => {
+          const currentLevel = getCurrentTrainingLevel(word);
+          const hasContent = !!store.generatedContent[word.id];
+          const isGenerating = generatingId === word.id;
+
+          return (
+            <Card key={word.id} className={word.mastered ? "opacity-60" : ""}>
+              <CardContent className="py-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={() => handleToggleMastered(word.id)}
+                    >
+                      {word.mastered ? (
+                        <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                      ) : (
+                        <div className="h-5 w-5 rounded-full border-2 border-muted-foreground/30" />
+                      )}
+                    </Button>
+                    <div>
+                      <p className={`font-medium text-sm ${word.mastered ? "line-through" : ""}`}>
+                        {word.word}
+                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className={`text-[10px] ${diffColors[word.difficulty]}`}>
+                          {word.difficulty}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">
+                          {word.practiceCount}x practiced
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {isGenerating ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mr-2" />
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handlePractice(word.id)}
+                        disabled={word.mastered}
+                      >
+                        <Play className="h-4 w-4 mr-1" />
+                        Practice
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemove(word.id)}
+                    >
+                      <X className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Level Progress */}
+                {!word.mastered && (
+                  <div className="flex items-center gap-1 mt-2 ml-11">
+                    {LEVEL_ORDER.map((level, i) => {
+                      const lp = word.levelProgress[level];
+                      const isCurrent = level === currentLevel;
+                      const isComplete = lp.completed;
+                      return (
+                        <div key={level} className="flex items-center">
+                          <div
+                            className={`text-[9px] font-medium w-5 h-5 rounded-full flex items-center justify-center ${
+                              isComplete
+                                ? "bg-emerald-500 text-white"
+                                : isCurrent
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {LEVEL_LABELS[level]}
+                          </div>
+                          {i < LEVEL_ORDER.length - 1 && (
+                            <div
+                              className={`w-3 h-0.5 ${
+                                isComplete ? "bg-emerald-500" : "bg-muted"
+                              }`}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                    {!hasContent && !isGenerating && (
+                      <button
+                        onClick={() => generateContent(word)}
+                        className="text-[10px] text-primary ml-2 hover:underline"
+                      >
+                        Generate content
+                      </button>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
-      {/* Phoneme Drill */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Volume2 className="h-4 w-4" />
-            Quick Phoneme Drill
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-xs text-muted-foreground mb-3">
-            Practice challenging starting sounds with these common phonemes
-          </p>
-          <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
-            {["/b/", "/d/", "/g/", "/k/", "/p/", "/s/", "/st/", "/sp/", "/pr/", "/str/", "/th/", "/w/", "/f/", "/v/", "/ch/", "/sh/"].map(
-              (phoneme) => (
-                <Button key={phoneme} variant="outline" size="sm" className="font-mono text-xs">
-                  {phoneme}
-                </Button>
-              )
-            )}
+      {/* AI Suggestion */}
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="pt-5 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <p className="text-sm font-medium">AI Word Suggestions</p>
+              <p className="text-xs text-muted-foreground">
+                Get personalized feared word suggestions based on your speech patterns.
+              </p>
+            </div>
+            <Badge variant="outline" className="text-[10px]">
+              <Crown className="h-2.5 w-2.5 mr-0.5" />
+              PRO
+            </Badge>
           </div>
         </CardContent>
       </Card>

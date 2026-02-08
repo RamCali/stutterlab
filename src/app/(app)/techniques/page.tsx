@@ -1,162 +1,167 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  NotebookPen,
+  Wrench,
   Wind,
   Hand,
   Timer,
   Pause,
-  RotateCcw,
-  ArrowRight,
-  Target,
-  Brain,
-  Heart,
-  Volume2,
+  Undo2,
+  ArrowUpRight,
+  Shield,
+  Zap,
+  AudioWaveform,
 } from "lucide-react";
 
 const techniques = [
   {
-    title: "Gentle Onset",
+    name: "Gentle Onset",
+    category: "Fluency Shaping",
     icon: Wind,
-    category: "Fluency Shaping",
-    evidence: "Strong",
-    description: "Start the first sound of a word softly and gradually increase to normal volume. Reduces blocks on initial sounds.",
-    howTo: "Begin speaking with a soft, breathy voice and gradually transition to normal volume. Focus on vowel-starting words first, then consonants.",
-    bestFor: "Blocks at the beginning of words, hard starts",
+    color: "text-cyan-500",
+    bg: "bg-cyan-500/10",
+    description: "Begin words with a soft, easy airflow rather than a hard glottal attack. Reduces blocks on initial sounds.",
+    when: "Use on words starting with vowels or when you feel tension building before speaking.",
+    evidence: "Speech restructuring shows large effect sizes (d = 0.75–1.63). Targets the brain region connecting speech planning to execution.",
+    science: "Neuroimaging shows reduced white matter integrity in the left rolandic operculum in people who stutter. Gentle onset helps bypass the hard-attack pattern by establishing airflow before phonation.",
   },
   {
-    title: "Light Articulatory Contact",
+    name: "Light Articulatory Contact",
+    category: "Fluency Shaping",
     icon: Hand,
-    category: "Fluency Shaping",
-    evidence: "Strong",
-    description: "Use minimal pressure when your tongue, lips, and jaw make contact during speech. Prevents getting 'stuck' on sounds.",
-    howTo: "When producing consonants like /b/, /p/, /t/, /d/, /k/, /g/, barely touch the articulators together instead of pressing hard.",
-    bestFor: "Blocks on stop consonants, jaw tension",
+    color: "text-green-500",
+    bg: "bg-green-500/10",
+    description: "Touch your articulators (lips, tongue, teeth) lightly when forming consonants instead of pressing hard.",
+    when: "Use on plosive sounds like /p/, /b/, /t/, /d/, /k/, /g/ where you tend to block.",
+    evidence: "Reduces the physical tension that maintains stuttering blocks. Addresses the behavioral component of the ABC model of stuttering.",
+    science: "Elevated dopamine in the striatum disrupts speech motor timing. Light contact reduces the muscular over-preparation that creates blocks.",
   },
   {
-    title: "Prolonged Speech",
+    name: "Prolonged Speech",
+    category: "Fluency Shaping",
     icon: Timer,
-    category: "Fluency Shaping",
-    evidence: "Strong",
-    description: "Stretch out vowels and consonants to slow your speaking rate. Creates smoother, more continuous speech.",
-    howTo: "Extend each sound slightly longer than normal, connecting sounds smoothly together. Gradually increase speed as fluency improves.",
-    bestFor: "General fluency improvement, establishing a baseline",
+    color: "text-purple-500",
+    bg: "bg-purple-500/10",
+    description: "Stretch vowel sounds and blend words together for continuous, flowing speech.",
+    when: "Start at very slow rates (60 SPM) and gradually increase to natural speaking rate.",
+    evidence: "Shown to reduce stuttering by 90%+ in clinical trials. Continuous phonation activates different neural pathways.",
+    science: "Similar to why singing eliminates stuttering for most people — continuous airflow and steady rhythm bypass the basal ganglia timing disruption that causes disfluency.",
   },
   {
-    title: "Pausing Strategies",
+    name: "Pausing Strategy",
+    category: "Fluency Shaping",
     icon: Pause,
-    category: "Fluency Shaping",
-    evidence: "Moderate",
-    description: "Insert natural pauses between phrases and thought groups. Gives you time to prepare the next phrase and maintain airflow.",
-    howTo: "Pause at natural phrase boundaries (commas, periods, between ideas). Take a breath during each pause.",
-    bestFor: "Running out of breath, rushing through speech",
+    color: "text-amber-500",
+    bg: "bg-amber-500/10",
+    description: "Insert natural pauses between phrases. Reduces time pressure and gives you time to plan.",
+    when: "Use in conversations, presentations, or any time you feel rushed.",
+    evidence: "Reduces anticipatory anxiety and allows better speech motor planning. Interrupts the cognitive 'word-scanning' cycle.",
+    science: "The brain's constant scanning for difficult words increases communicative pressure. Pausing interrupts this cycle and allows the speech motor system to reset.",
   },
   {
-    title: "Cancellation",
-    icon: RotateCcw,
+    name: "Cancellation",
     category: "Stuttering Modification",
-    evidence: "Strong",
-    description: "After a stutter, pause deliberately, then restart the word using a modification technique. Breaks the cycle of struggle.",
-    howTo: "When you stutter: 1) Stop completely. 2) Pause 2-3 seconds. 3) Replay the stutter mentally. 4) Say the word again with light contact or prolongation.",
-    bestFor: "Building awareness, reducing avoidance",
+    icon: Undo2,
+    color: "text-red-500",
+    bg: "bg-red-500/10",
+    description: "After stuttering on a word, pause, then say it again using a modification technique.",
+    when: "Use after a stutter to build awareness and practice voluntary control.",
+    evidence: "Evidence-based stuttering modification approach. Builds desensitization and voluntary control over speech motor patterns.",
+    science: "Neuroplasticity research shows that consciously re-attempting a word with a new motor plan strengthens alternative neural pathways in the left hemisphere.",
   },
   {
-    title: "Pull-Out",
-    icon: ArrowRight,
+    name: "Pull-Out",
     category: "Stuttering Modification",
-    evidence: "Strong",
-    description: "Modify the stutter while it's happening by easing out of the tension. Shows you can control the stutter mid-moment.",
-    howTo: "When you feel yourself stuttering: 1) Don't stop. 2) Slowly reduce the tension. 3) Stretch the sound out smoothly. 4) Continue into the next sound.",
-    bestFor: "Prolongations, blocks, reducing severity",
+    icon: ArrowUpRight,
+    color: "text-orange-500",
+    bg: "bg-orange-500/10",
+    description: "While in a stutter, consciously slow down and ease out of the block smoothly.",
+    when: "Use mid-stutter. Requires awareness of when you are stuttering in real-time.",
+    evidence: "More advanced than cancellation. Gives real-time control over stuttering moments without stopping speech.",
+    science: "Trains the brain to shift from right-hemisphere compensation back to left-hemisphere speech motor control in real-time.",
   },
   {
-    title: "Preparatory Set",
-    icon: Target,
+    name: "Preparatory Set",
     category: "Stuttering Modification",
-    evidence: "Strong",
-    description: "Before saying a word you expect to stutter on, pre-plan how you'll say it using a modification technique.",
-    howTo: "1) Identify the feared word. 2) Decide which technique to use (gentle onset, light contact, prolongation). 3) Mentally rehearse. 4) Execute with the planned technique.",
-    bestFor: "Feared words, anticipatory anxiety",
+    icon: Shield,
+    color: "text-indigo-500",
+    bg: "bg-indigo-500/10",
+    description: "Before saying a feared word, pre-plan your articulatory position and use gentle onset.",
+    when: "Use when you anticipate a stutter on an upcoming word.",
+    evidence: "The most proactive modification technique. Prevents stuttering before it occurs by pre-setting the speech motor plan.",
+    science: "Addresses why people stutter more on their own name — names can't be substituted, increasing communicative pressure. Preparatory set provides an alternative motor plan.",
   },
   {
-    title: "DAF (Delayed Auditory Feedback)",
-    icon: Volume2,
-    category: "Altered Auditory Feedback",
-    evidence: "Strong",
-    description: "Hear your voice with a 50-70ms delay through headphones. Naturally slows speech rate and reduces stuttering by 60-80%.",
-    howTo: "Use the StutterLab Audio Lab with headphones. Start at 70ms delay, practice reading aloud. Gradually reduce delay as fluency improves.",
-    bestFor: "Speed control, establishing fluency baseline",
+    name: "Voluntary Stuttering",
+    category: "Desensitization",
+    icon: Zap,
+    color: "text-yellow-500",
+    bg: "bg-yellow-500/10",
+    description: "Intentionally stutter on easy words to reduce fear, shame, and avoidance behaviors.",
+    when: "Use in low-stress situations first, then gradually in more challenging settings.",
+    evidence: "Reduces the emotional impact of stuttering (d = 0.56–0.65) and breaks the avoidance cycle.",
+    science: "Lack of social judgment reduces the brain's threat response — that's why you can talk to pets without stuttering. Voluntary stuttering deliberately lowers this threat signal.",
   },
   {
-    title: "CBT for Speech Anxiety",
-    icon: Brain,
-    category: "Psychological",
-    evidence: "Strong",
-    description: "Cognitive Behavioral Therapy helps identify and challenge negative thoughts about speaking that increase anxiety and stuttering.",
-    howTo: "Use thought records to identify automatic negative thoughts (e.g., 'Everyone will judge me'). Challenge them with evidence. Build balanced alternative thoughts.",
-    bestFor: "Social anxiety, avoidance behavior, feared situations",
-  },
-  {
-    title: "Acceptance & Commitment Therapy",
-    icon: Heart,
-    category: "Psychological",
-    evidence: "Emerging (Strong)",
-    description: "Focus on accepting stuttering as part of your experience while committing to valued actions. Reduces struggle and avoidance.",
-    howTo: "Practice mindful awareness of stuttering without judgment. Define what matters to you in communication. Take valued action despite discomfort.",
-    bestFor: "Reducing shame, increasing authentic communication",
+    name: "DAF / FAF",
+    category: "Auditory Feedback",
+    icon: AudioWaveform,
+    color: "text-blue-500",
+    bg: "bg-blue-500/10",
+    description: "Altered auditory feedback disrupts the feedback loop that maintains stuttering, triggering a choral effect that increases fluency.",
+    when: "Use during practice sessions or real-world speaking with headphones.",
+    evidence: "DAF alone reduces stuttering 60-80%. Combined DAF+FAF can reach 80%+ reduction.",
+    science: "A slight delay or pitch shift triggers the 'choral effect' — the brain processes your altered voice as another speaker, engaging unison-speech pathways that bypass the stuttering circuit.",
   },
 ];
 
-const evidenceColors: Record<string, string> = {
-  Strong: "bg-green-500/10 text-green-600",
-  Moderate: "bg-yellow-500/10 text-yellow-700",
-  "Emerging (Strong)": "bg-blue-500/10 text-blue-600",
-};
-
 export default function TechniquesPage() {
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
-          <NotebookPen className="h-6 w-6 text-primary" />
+          <Wrench className="h-6 w-6 text-primary" />
           Technique Reference
         </h1>
         <p className="text-muted-foreground mt-1">
-          Evidence-based techniques for managing stuttering. Learn when and how to use each one.
+          Quick reference for all evidence-based speech techniques
         </p>
       </div>
 
       <div className="space-y-4">
-        {techniques.map((technique) => (
-          <Card key={technique.title}>
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="p-2.5 rounded-lg bg-primary/10 shrink-0">
-                  <technique.icon className="h-5 w-5 text-primary" />
+        {techniques.map((tech) => (
+          <Card key={tech.name}>
+            <CardContent className="pt-5 pb-4">
+              <div className="flex items-start gap-3">
+                <div className={`p-2 rounded-lg ${tech.bg} flex-shrink-0 mt-0.5`}>
+                  <tech.icon className={`h-5 w-5 ${tech.color}`} />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="font-semibold">{technique.title}</h3>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-medium text-sm">{tech.name}</h3>
                     <Badge variant="secondary" className="text-[10px]">
-                      {technique.category}
-                    </Badge>
-                    <Badge
-                      variant="secondary"
-                      className={`text-[10px] ${evidenceColors[technique.evidence]}`}
-                    >
-                      Evidence: {technique.evidence}
+                      {tech.category}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {technique.description}
-                  </p>
-                  <div className="mt-3 p-3 rounded-lg bg-muted/30">
-                    <p className="text-xs font-medium mb-1">How to practice:</p>
-                    <p className="text-xs text-muted-foreground">{technique.howTo}</p>
+                  <p className="text-sm text-muted-foreground mb-2">{tech.description}</p>
+                  <div className="space-y-1">
+                    <p className="text-xs">
+                      <span className="font-medium">When to use: </span>
+                      <span className="text-muted-foreground">{tech.when}</span>
+                    </p>
+                    <p className="text-xs">
+                      <span className="font-medium">Evidence: </span>
+                      <span className="text-muted-foreground">{tech.evidence}</span>
+                    </p>
+                    {tech.science && (
+                      <p className="text-xs mt-1.5 p-2 rounded bg-primary/5 border border-primary/10">
+                        <span className="font-medium text-primary">The science: </span>
+                        <span className="text-muted-foreground">{tech.science}</span>
+                      </p>
+                    )}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    <span className="font-medium">Best for:</span> {technique.bestFor}
-                  </p>
                 </div>
               </div>
             </CardContent>

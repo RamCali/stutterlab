@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import {
   Settings,
@@ -18,24 +17,53 @@ import {
   Trash2,
   Check,
   Loader2,
+  Crown,
+  ExternalLink,
 } from "lucide-react";
 
-export default function SettingsPage() {
+interface SettingsPageProps {
+  searchParams: Promise<{ upgraded?: string }>;
+}
+
+export default function SettingsPage({ searchParams: _searchParams }: SettingsPageProps) {
   const [displayName, setDisplayName] = useState("");
   const [email] = useState("");
   const [bio, setBio] = useState("");
   const [severity, setSeverity] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [subLoading, setSubLoading] = useState(false);
+
+  // TODO: Fetch from server — hardcoded for now
+  const [currentPlan] = useState<"free" | "pro">("free");
 
   const [notifications, setNotifications] = useState({
     dailyReminders: true,
     weeklyProgress: true,
-    communityActivity: false,
     newExercises: true,
   });
 
-  const [showProfile, setShowProfile] = useState(false);
+  async function handleUpgrade() {
+    setSubLoading(true);
+    try {
+      const res = await fetch("/api/stripe/checkout", { method: "POST" });
+      const { url } = await res.json();
+      if (url) window.location.href = url;
+    } finally {
+      setSubLoading(false);
+    }
+  }
+
+  async function handleManageSubscription() {
+    setSubLoading(true);
+    try {
+      const res = await fetch("/api/stripe/portal", { method: "POST" });
+      const { url } = await res.json();
+      if (url) window.location.href = url;
+    } finally {
+      setSubLoading(false);
+    }
+  }
 
   async function handleSaveProfile() {
     setSaving(true);
@@ -138,7 +166,6 @@ export default function SettingsPage() {
           {([
             { key: "dailyReminders" as const, label: "Daily practice reminders", description: "Get reminded to practice each day" },
             { key: "weeklyProgress" as const, label: "Weekly progress summary", description: "Receive a weekly report of your progress" },
-            { key: "communityActivity" as const, label: "Community activity", description: "Notifications for replies and mentions" },
             { key: "newExercises" as const, label: "New exercise alerts", description: "Know when new exercises are added" },
           ]).map((setting) => (
             <div key={setting.key} className="flex items-center justify-between">
@@ -169,12 +196,38 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Current Plan</p>
-              <Badge className="mt-1">Free</Badge>
+              <Badge className={`mt-1 ${currentPlan === "pro" ? "bg-primary" : ""}`}>
+                {currentPlan === "pro" ? "Pro" : "Free"}
+              </Badge>
             </div>
-            <Button>Upgrade to Pro</Button>
+            {currentPlan === "pro" ? (
+              <Button
+                variant="outline"
+                onClick={handleManageSubscription}
+                disabled={subLoading}
+              >
+                {subLoading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                )}
+                Manage Subscription
+              </Button>
+            ) : (
+              <Button onClick={handleUpgrade} disabled={subLoading}>
+                {subLoading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Crown className="h-4 w-4 mr-2" />
+                )}
+                Upgrade to Pro
+              </Button>
+            )}
           </div>
           <p className="text-xs text-muted-foreground mt-3">
-            Pro unlocks full Audio Lab, AI conversations, voice journal analysis, and 50+ premium exercises.
+            {currentPlan === "pro"
+              ? "You have full access to all StutterLab features."
+              : "Start your 7-day free trial to unlock all features — daily guided practice, AI simulators, clinical assessments, and more."}
           </p>
         </CardContent>
       </Card>
@@ -188,14 +241,6 @@ export default function SettingsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium">Show profile in community</p>
-              <p className="text-xs text-muted-foreground">Allow others to see your practice stats</p>
-            </div>
-            <Switch checked={showProfile} onCheckedChange={setShowProfile} />
-          </div>
-          <Separator />
           <div className="flex items-center gap-3">
             <Button variant="outline" size="sm">
               <Download className="h-4 w-4 mr-2" />

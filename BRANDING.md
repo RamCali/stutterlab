@@ -310,4 +310,6 @@ Inspired by a data-dense dashboard layout. Each card leads with the number.
 
 ---
 
+*Marketing strategy has been moved to [MARKETING.md](MARKETING.md).*
+
 *StutterLab — Where science meets the joy of speaking freely.*

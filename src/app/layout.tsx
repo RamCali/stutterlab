@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Roboto, Montserrat } from "next/font/google";
+import { Providers } from "@/components/providers";
 import "./globals.css";
 
 const inter = Inter({
@@ -23,10 +24,37 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://stutterlab.com";
+
 export const metadata: Metadata = {
-  title: "StutterLab - Evidence-Based Stuttering Treatment",
+  title: {
+    default: "StutterLab - Evidence-Based Stuttering Treatment",
+    template: "%s | StutterLab",
+  },
   description:
     "The first browser-based platform combining DAF, FAF, AI speech analysis, and real-world conversation practice for stuttering treatment.",
+  metadataBase: new URL(SITE_URL),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "StutterLab",
+    title: "StutterLab - Evidence-Based Stuttering Treatment",
+    description:
+      "AI-powered stuttering treatment with DAF, FAF, speech analysis, and daily structured practice. Browser-based, no downloads.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "StutterLab - Evidence-Based Stuttering Treatment",
+    description:
+      "AI-powered stuttering treatment with DAF, FAF, speech analysis, and daily structured practice.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
 };
 
 export default function RootLayout({
@@ -53,7 +81,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${roboto.variable} ${montserrat.variable} antialiased`}
       >
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

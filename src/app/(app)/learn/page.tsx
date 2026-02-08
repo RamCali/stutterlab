@@ -1,289 +1,283 @@
-import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+"use client";
+
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Activity,
-  Atom,
-  BookOpen,
-  Brain,
-  ChevronRight,
-  FileText,
   GraduationCap,
-  Heart,
-  Lightbulb,
-  MessageCircle,
-  Microscope,
-  Puzzle,
-  Shield,
-  Sparkles,
+  Brain,
+  AudioWaveform,
+  Wind,
+  Hand,
+  Timer,
   Users,
-  Volume2,
-  Zap,
+  Heart,
+  Mic,
+  BookOpen,
+  ChevronRight,
+  ChevronDown,
+  Crown,
+  HelpCircle,
 } from "lucide-react";
 
-/* ─── Educational Content Modules ─── */
 const modules = [
   {
-    id: "what-is-stuttering",
-    title: "What Is Stuttering?",
-    description:
-      "Understand the basics: types of disfluency, prevalence, and why stuttering is not your fault.",
-    icon: Lightbulb,
-    color: "bg-primary/10 text-primary",
-    lessons: 4,
-    readTime: "12 min",
-    free: true,
-  },
-  {
-    id: "brain-science",
-    title: "The Brain Science of Stuttering",
-    description:
-      "How the basal ganglia, supplementary motor area, and auditory feedback loops relate to disfluency.",
+    id: 1,
+    title: "Understanding Stuttering",
+    description: "What causes stuttering, how it develops, and why it varies day to day.",
     icon: Brain,
-    color: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
-    lessons: 5,
-    readTime: "15 min",
-    free: true,
-  },
-  {
-    id: "speech-anatomy",
-    title: "Speech Anatomy & Mechanics",
-    description:
-      "Learn how your diaphragm, larynx, vocal folds, tongue, and lips work together to produce speech.",
-    icon: Microscope,
-    color: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
-    lessons: 6,
-    readTime: "18 min",
-    free: false,
-  },
-  {
-    id: "types-of-stuttering",
-    title: "Types of Stuttering",
-    description:
-      "Blocks, prolongations, repetitions (part-word and whole-word), interjections, and revisions explained.",
-    icon: Puzzle,
-    color: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    color: "text-purple-500",
+    bg: "bg-purple-500/10",
     lessons: 4,
-    readTime: "10 min",
-    free: true,
+    isPremium: false,
   },
   {
-    id: "daf-faf-science",
-    title: "How DAF & FAF Work",
-    description:
-      "The science behind Delayed and Frequency Altered Feedback — why hearing your voice differently reduces stuttering by 60-80%.",
-    icon: Volume2,
-    color: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
+    id: 2,
+    title: "The Audio Lab Explained",
+    description: "How DAF, FAF, choral speaking, and metronome work to reduce stuttering.",
+    icon: AudioWaveform,
+    color: "text-blue-500",
+    bg: "bg-blue-500/10",
     lessons: 3,
-    readTime: "8 min",
-    free: true,
+    isPremium: false,
   },
   {
-    id: "fluency-shaping",
-    title: "Fluency Shaping Techniques",
-    description:
-      "Gentle onset, continuous phonation, light articulatory contact, and prolonged speech — the core techniques explained.",
-    icon: Activity,
-    color: "bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary",
-    lessons: 6,
-    readTime: "20 min",
-    free: false,
+    id: 3,
+    title: "Breathing for Speech",
+    description: "Diaphragmatic breathing, airflow management, and pre-speech preparation.",
+    icon: Wind,
+    color: "text-cyan-500",
+    bg: "bg-cyan-500/10",
+    lessons: 3,
+    isPremium: false,
   },
   {
-    id: "stuttering-modification",
-    title: "Stuttering Modification (Van Riper)",
-    description:
-      "Cancellation, pull-out, and preparatory set — learn to modify moments of stuttering rather than avoid them.",
-    icon: Shield,
-    color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-    lessons: 5,
-    readTime: "15 min",
-    free: false,
+    id: 4,
+    title: "Gentle Onset & Light Contact",
+    description: "Reduce tension at the start of words. The foundation of fluency shaping.",
+    icon: Hand,
+    color: "text-green-500",
+    bg: "bg-green-500/10",
+    lessons: 3,
+    isPremium: false,
   },
   {
-    id: "anxiety-connection",
-    title: "The Anxiety-Stuttering Connection",
-    description:
-      "How speaking anxiety and anticipation amplify disfluency — and what CBT, ACT, and mindfulness can do about it.",
+    id: 5,
+    title: "Pacing & Pausing",
+    description: "Slow down, use natural pauses, and reduce time pressure during speech.",
+    icon: Timer,
+    color: "text-amber-500",
+    bg: "bg-amber-500/10",
+    lessons: 2,
+    isPremium: false,
+  },
+  {
+    id: 6,
+    title: "Stuttering Modification",
+    description: "Cancellation, pull-out, and preparatory set — learn to stutter more easily and openly.",
+    icon: Mic,
+    color: "text-red-500",
+    bg: "bg-red-500/10",
+    lessons: 4,
+    isPremium: true,
+  },
+  {
+    id: 7,
+    title: "Managing Speech Anxiety",
+    description: "CBT techniques, thought records, and building confidence in speaking situations.",
     icon: Heart,
-    color: "bg-brand-amber/10 text-brand-amber dark:bg-brand-amber/15 dark:text-brand-amber",
-    lessons: 4,
-    readTime: "12 min",
-    free: false,
+    color: "text-pink-500",
+    bg: "bg-pink-500/10",
+    lessons: 5,
+    isPremium: true,
   },
   {
-    id: "social-dynamics",
-    title: "Social Dynamics & Disclosure",
-    description:
-      "When and how to disclose your stutter, handling listener reactions, and building speaking confidence in social settings.",
+    id: 8,
+    title: "Desensitization & Acceptance",
+    description: "Voluntary stuttering, self-disclosure, and ACT-based acceptance approaches.",
     icon: Users,
-    color: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
-    lessons: 4,
-    readTime: "10 min",
-    free: false,
+    color: "text-indigo-500",
+    bg: "bg-indigo-500/10",
+    lessons: 3,
+    isPremium: true,
   },
   {
-    id: "covert-stuttering",
-    title: "Covert (Hidden) Stuttering",
-    description:
-      "Word substitution, avoidance behaviors, and the exhausting effort of hiding a stutter. You are not alone.",
-    icon: MessageCircle,
-    color: "bg-teal-500/10 text-teal-600 dark:text-teal-400",
+    id: 9,
+    title: "Real-World Practice",
+    description: "Transferring techniques from practice to phone calls, meetings, and conversations.",
+    icon: BookOpen,
+    color: "text-orange-500",
+    bg: "bg-orange-500/10",
+    lessons: 4,
+    isPremium: true,
+  },
+  {
+    id: 10,
+    title: "Maintenance & Relapse Prevention",
+    description: "How to keep your gains, handle setbacks, and build a long-term speaking plan.",
+    icon: GraduationCap,
+    color: "text-emerald-500",
+    bg: "bg-emerald-500/10",
     lessons: 3,
-    readTime: "8 min",
-    free: true,
+    isPremium: true,
   },
 ];
 
-/* ─── Quick Facts ─── */
-const quickFacts = [
-  { stat: "1%", label: "of the world population stutters" },
-  { stat: "70M+", label: "people who stutter worldwide" },
-  { stat: "80%", label: "reduction with DAF + FAF therapy" },
-  { stat: "5:1", label: "male-to-female ratio in adults" },
+// Lesson content for expandable modules
+const lessonContent: Record<number, { title: string; content: string }[]> = {
+  1: [
+    {
+      title: "It's Neurological, Not Psychological",
+      content: "Stuttering is a neurodevelopmental disorder — not caused by anxiety, nervousness, or parenting styles. Approximately 70% of the variance is attributed to genetics. Specific gene mutations (GNPTAB, GNPTG, NAGPA) affect brain cell trafficking. Neuroimaging (fMRI, PET scans) consistently shows structural and functional differences in the brains of people who stutter.",
+    },
+    {
+      title: "What's Happening in Your Brain",
+      content: "People who stutter show reduced white matter integrity in the left rolandic operculum — the area connecting speech planning and execution. There's also hyperactivity in the right hemisphere, which researchers believe is a compensatory mechanism. Additionally, elevated dopamine levels in the striatum disrupt speech motor timing. Understanding this removes blame and shame — it's brain wiring, not willpower.",
+    },
+    {
+      title: "The ABC Model of Stuttering",
+      content: "Clinicians describe stuttering's impact through three dimensions: Affective (feelings of shame, guilt, frustration), Behavioral (blocks, repetitions, prolongations, plus secondary behaviors like eye blinking or jaw tension), and Cognitive (negative self-talk and constant 'scanning' for difficult words to swap for easier ones). Effective treatment addresses all three, not just the physical stuttering.",
+    },
+    {
+      title: "Prevalence & Recovery",
+      content: "About 5-8% of children experience stuttering during development. 75-80% recover naturally — especially girls (the childhood ratio is 2:1 boys to girls, but the adult ratio shifts to 4:1 because girls recover more often). About 1% of the global adult population — roughly 70 million people — stutter chronically. Key persistence risk factors: family history, male gender, and stuttering for more than 12 months.",
+    },
+  ],
+};
+
+const faqs = [
+  { q: "Is stuttering caused by nervousness or anxiety?", a: "No. Stuttering is a neurodevelopmental disorder with ~70% genetic basis. However, stress can increase muscle tension which may temporarily worsen disfluency." },
+  { q: "Can stuttering be cured?", a: "There is no 'cure' in the medical sense, but evidence-based treatments show significant efficacy. Speech restructuring shows large effect sizes (d = 0.75–1.63), and many adults achieve substantial improvement." },
+  { q: "Why can I sing without stuttering?", a: "Singing uses different neural pathways — continuous airflow and a steady rhythm bypass the basal ganglia timing disruption that causes disfluency." },
+  { q: "Why do I stutter more on my name?", a: "Names cannot be substituted for synonyms, which increases 'communicative pressure.' The brain can't fall back on word-swapping strategies." },
+  { q: "Why can I talk to my pet without stuttering?", a: "Lack of social judgment reduces the 'threat' response in the brain. The amygdala's fear circuit is less activated, which reduces the tension that triggers blocks." },
+  { q: "Does alcohol help with stuttering?", a: "No. It may reduce inhibition but usually impairs motor control. It's not a treatment strategy." },
+  { q: "Is stuttering related to intelligence?", a: "Absolutely not. Research shows zero correlation between IQ and stuttering." },
+  { q: "Should people finish my sentences for me?", a: "No. This increases communicative pressure and can be frustrating. Maintaining eye contact and giving time is more helpful." },
+  { q: "Can stuttering start in adulthood?", a: "Yes, usually due to brain injury or stroke (called 'neurogenic stuttering'). This is distinct from childhood-onset stuttering." },
+  { q: "Does talking more help or hurt?", a: "Talking more helps. Avoidant behavior — avoiding calls, swapping words, staying silent — usually worsens the emotional impact of stuttering over time." },
+  { q: "Does caffeine affect stuttering?", a: "Some people report increased tension due to caffeine's stimulant nature, which can temporarily increase disfluency. It varies person to person." },
+  { q: "Do most children outgrow it?", a: "Yes — 75-80% recover naturally, especially with early intervention. Persistence risk factors include family history, male gender, and stuttering beyond 12 months." },
 ];
 
 export default function LearnPage() {
+  const [expandedModule, setExpandedModule] = useState<number | null>(null);
+  const [showAllFaqs, setShowAllFaqs] = useState(false);
+
   return (
-    <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-6">
-      {/* Header */}
+    <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <GraduationCap className="h-6 w-6 text-primary" />
-          Understand Your Stuttering
+          Learn
         </h1>
         <p className="text-muted-foreground mt-1">
-          Knowledge is power. Learn the science behind stuttering and the
-          techniques that help — written by speech-language pathologists.
+          10 evidence-based modules covering everything from breathing to real-world confidence
         </p>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {quickFacts.map((fact) => (
-          <Card key={fact.label} className="border-0">
-            <CardContent className="pt-4 pb-3 text-center">
-              <p className="text-xl md:text-2xl font-bold text-primary">
-                {fact.stat}
-              </p>
-              <p className="text-[10px] md:text-xs text-muted-foreground leading-tight">
-                {fact.label}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Featured Module */}
-      <Card className="border-0 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5">
-        <CardContent className="pt-5 pb-4">
-          <div className="flex items-start gap-3">
-            <div className="h-12 w-12 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <Sparkles className="h-6 w-6 text-primary" />
-            </div>
-            <div className="flex-1">
-              <Badge
-                variant="secondary"
-                className="bg-primary/10 text-primary border-0 text-[10px] mb-2"
-              >
-                Start Here
-              </Badge>
-              <h3 className="font-semibold">
-                New to StutterLab? Start with &ldquo;What Is Stuttering?&rdquo;
-              </h3>
-              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                Understanding your stuttering is the first step toward managing
-                it. This 12-minute module covers the basics every adult who
-                stutters should know.
-              </p>
-            </div>
-            <ChevronRight className="h-5 w-5 text-muted-foreground/50 flex-shrink-0 mt-2" />
-          </div>
+      {/* Science banner */}
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="py-3">
+          <p className="text-xs text-muted-foreground">
+            <span className="font-medium text-foreground">Backed by neuroscience.</span>{" "}
+            Stuttering is a neurodevelopmental disorder with ~70% genetic basis. fMRI studies show
+            structural differences in speech motor areas. Every technique in this app targets these
+            specific neural pathways.
+          </p>
         </CardContent>
       </Card>
 
-      {/* Module Grid */}
-      <div>
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          Educational Modules
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {modules.map((mod) => {
-            const Icon = mod.icon;
-            return (
-              <Card
-                key={mod.id}
-                className="border-0 hover:border-primary/30 transition-shadow group cursor-pointer"
-              >
-                <CardContent className="pt-5 pb-4">
-                  <div className="flex items-start gap-3">
-                    <div
-                      className={`h-10 w-10 rounded-md flex items-center justify-center flex-shrink-0 ${mod.color} group-hover:scale-105 transition-transform`}
-                    >
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-sm">{mod.title}</h3>
-                        {mod.free ? (
-                          <Badge
-                            variant="secondary"
-                            className="text-[10px] px-1.5 py-0 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                          >
-                            Free
-                          </Badge>
-                        ) : (
-                          <Badge
-                            variant="secondary"
-                            className="text-[10px] px-1.5 py-0"
-                          >
-                            Pro
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                        {mod.description}
-                      </p>
-                      <div className="flex items-center gap-3 mt-2 text-[10px] text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <FileText className="h-3 w-3" />
-                          {mod.lessons} lessons
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <BookOpen className="h-3 w-3" />
-                          {mod.readTime} read
-                        </span>
-                      </div>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground/50 group-hover:text-primary transition-colors flex-shrink-0 mt-1" />
+      <div className="space-y-3">
+        {modules.map((mod) => {
+          const lessons = lessonContent[mod.id];
+          const isExpanded = expandedModule === mod.id;
+
+          return (
+            <Card
+              key={mod.id}
+              className={`transition-colors ${isExpanded ? "border-primary/50" : "hover:border-primary/50"} ${lessons ? "cursor-pointer" : ""}`}
+            >
+              <CardContent className="py-4">
+                <div
+                  className="flex items-center gap-4"
+                  onClick={() => lessons && setExpandedModule(isExpanded ? null : mod.id)}
+                >
+                  <div className={`p-2.5 rounded-lg ${mod.bg} flex-shrink-0`}>
+                    <mod.icon className={`h-5 w-5 ${mod.color}`} />
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">Module {mod.id}</span>
+                      {mod.isPremium && (
+                        <Badge variant="outline" className="text-[10px]">
+                          <Crown className="h-2.5 w-2.5 mr-0.5" />
+                          PRO
+                        </Badge>
+                      )}
+                    </div>
+                    <h3 className="font-medium text-sm">{mod.title}</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">{mod.description}</p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className="text-xs text-muted-foreground">{mod.lessons} lessons</span>
+                    {lessons ? (
+                      <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                    ) : (
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </div>
+                </div>
+
+                {/* Expanded lesson content */}
+                {isExpanded && lessons && (
+                  <div className="mt-4 pl-14 space-y-3">
+                    {lessons.map((lesson, i) => (
+                      <div key={i} className="p-3 rounded-lg bg-muted/30">
+                        <p className="text-xs font-medium mb-1">
+                          Lesson {i + 1}: {lesson.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          {lesson.content}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
-      {/* Research References */}
-      <Card className="border-0">
-        <CardContent className="pt-5 pb-4">
-          <div className="flex items-start gap-3">
-            <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
-              <Atom className="h-5 w-5 text-muted-foreground" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-sm">
-                Evidence-Based & Research-Backed
-              </h3>
-              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                All educational content is reviewed by licensed SLPs and
-                references peer-reviewed research from the Journal of Fluency
-                Disorders, ASHA, and the Stuttering Foundation.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* FAQ Section */}
+      <div className="pt-4">
+        <h2 className="text-lg font-bold flex items-center gap-2 mb-3">
+          <HelpCircle className="h-5 w-5 text-primary" />
+          Frequently Asked Questions
+        </h2>
+        <p className="text-xs text-muted-foreground mb-4">
+          Science-backed answers to common questions about stuttering
+        </p>
+        <div className="space-y-2">
+          {(showAllFaqs ? faqs : faqs.slice(0, 5)).map((faq, i) => (
+            <Card key={i}>
+              <CardContent className="py-3">
+                <p className="text-sm font-medium mb-1">{faq.q}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{faq.a}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        {faqs.length > 5 && (
+          <button
+            onClick={() => setShowAllFaqs(!showAllFaqs)}
+            className="mt-3 text-xs text-primary hover:underline"
+          >
+            {showAllFaqs ? "Show less" : `Show all ${faqs.length} questions`}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

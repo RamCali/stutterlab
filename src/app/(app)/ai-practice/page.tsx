@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +16,9 @@ import {
   Headphones,
   MessageSquare,
   Sparkles,
+  Star,
 } from "lucide-react";
+import { getPrioritizedScenarioIds } from "@/lib/onboarding/feared-situations";
 
 const scenarios = [
   {
@@ -117,12 +120,28 @@ const difficultyColors: Record<string, string> = {
 };
 
 export default function AIPracticePage() {
+  const sortedScenarios = useMemo(() => {
+    const prioritized = getPrioritizedScenarioIds();
+    if (prioritized.length === 0) return scenarios;
+
+    const prioritySet = new Set(prioritized);
+    const top = scenarios.filter((s) => prioritySet.has(s.id));
+    const rest = scenarios.filter((s) => !prioritySet.has(s.id));
+
+    // Sort top by priority order
+    top.sort((a, b) => prioritized.indexOf(a.id) - prioritized.indexOf(b.id));
+
+    return [...top, ...rest];
+  }, []);
+
+  const prioritizedIds = useMemo(() => new Set(getPrioritizedScenarioIds()), []);
+
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Brain className="h-6 w-6 text-primary" />
-          AI Conversation Practice
+          AI Situation Simulators
         </h1>
         <p className="text-muted-foreground mt-1">
           Practice real-world speaking scenarios with an AI partner that adapts
@@ -156,10 +175,19 @@ export default function AIPracticePage() {
       </Card>
 
       {/* Scenarios Grid */}
+      {prioritizedIds.size > 0 && (
+        <p className="text-xs text-muted-foreground flex items-center gap-1">
+          <Star className="h-3 w-3 text-amber-500" />
+          Scenarios marked with a star are prioritized based on your profile
+        </p>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {scenarios.map((scenario) => (
+        {sortedScenarios.map((scenario) => (
           <Link key={scenario.id} href={`/ai-practice/${scenario.id}`}>
-            <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
+            <Card className={`hover:border-primary/50 transition-colors cursor-pointer h-full ${
+              prioritizedIds.has(scenario.id) ? "border-amber-500/30" : ""
+            }`}>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-3">
                   <div className={`p-2.5 rounded-lg ${scenario.bg} shrink-0`}>
@@ -168,6 +196,9 @@ export default function AIPracticePage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold text-sm">{scenario.title}</h3>
+                      {prioritizedIds.has(scenario.id) && (
+                        <Star className="h-3 w-3 text-amber-500 fill-amber-500 flex-shrink-0" />
+                      )}
                       {scenario.isPhoneSimulator && (
                         <Badge variant="outline" className="text-[10px]">
                           Phone Sim
@@ -191,22 +222,6 @@ export default function AIPracticePage() {
         ))}
       </div>
 
-      {/* Custom Scenario */}
-      <Card className="border-dashed">
-        <CardContent className="pt-6 text-center">
-          <Sparkles className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-          <h3 className="font-semibold">Create Custom Scenario</h3>
-          <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
-            Describe your own feared speaking situation and the AI will create a
-            personalized practice scenario just for you.
-          </p>
-          <Link href="/ai-practice/custom">
-            <Badge className="mt-4 cursor-pointer" variant="outline">
-              Coming Soon
-            </Badge>
-          </Link>
-        </CardContent>
-      </Card>
     </div>
   );
 }

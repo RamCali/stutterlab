@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { getUserId } from "@/lib/auth/helpers";
+import { db } from "@/lib/db/client";
+import { profiles } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -28,13 +32,62 @@ const SCENARIO_PROMPTS: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
-    const { scenario, messages, userMessage } = await req.json();
+    const { scenario, messages, userMessage, voiceMode, speechMetrics } = await req.json();
 
     if (!process.env.ANTHROPIC_API_KEY) {
       return NextResponse.json(
         { error: "AI service not configured. Add ANTHROPIC_API_KEY to .env" },
         { status: 503 }
       );
+    }
+
+    // Fetch user goal context from DB
+    let goalContext = "";
+    try {
+      const userId = await getUserId();
+      if (userId) {
+        const result = await db
+          .select({ treatmentPath: profiles.treatmentPath })
+          .from(profiles)
+          .where(eq(profiles.userId, userId))
+          .limit(1);
+
+        if (result.length > 0 && result[0].treatmentPath) {
+          const tp = result[0].treatmentPath as Record<string, unknown>;
+          const challenges = (tp.speechChallenges as string[]) || [];
+          const northStar = (tp.northStarGoal as string) || "";
+          if (challenges.length > 0 || northStar) {
+            goalContext = `
+
+GOAL CONTEXT (DO NOT mention any of this to the user — use it to adapt naturally):
+${challenges.length > 0 ? `- Main challenges: ${challenges.join(", ")}` : ""}
+${northStar ? `- Personal goal: "${northStar}"` : ""}
+
+Adapt naturally: if they're practicing a feared situation, be extra patient and supportive. Never mention their goals or challenges explicitly — stay fully in character.`;
+          }
+        }
+      }
+    } catch {
+      // Goal fetch is non-critical — continue without it
+    }
+
+    // Build adaptive context from real-time speech metrics
+    let adaptiveContext = "";
+    if (speechMetrics) {
+      adaptiveContext = `
+
+ADAPTIVE BEHAVIOR (based on real-time speech data — DO NOT mention any of this to the user):
+- Speaking rate: ${speechMetrics.currentSPM} syllables/min
+- Vocal tension: ${Math.round((speechMetrics.vocalEffort || 0) * 100)}%
+- Recent disfluencies: ${speechMetrics.recentDisfluencies || 0}
+- Techniques used: ${speechMetrics.detectedTechniques?.join(", ") || "none yet"}
+
+Rules:
+- If speaking rate > 220: Respond slowly. You may naturally say "Sorry, could you say that again?" once.
+- If vocal tension > 70%: Keep your response calm and brief. Don't rush them.
+- If many disfluencies: Give extra time. Use simple, direct language. Do NOT finish their sentences.
+- If good techniques detected: Respond naturally and warmly. Let conversation flow.
+- NEVER mention stuttering, speech rate, tension, or techniques. Stay fully in character.`;
     }
 
     const systemPrompt = `You are helping someone who stutters practice real-world speaking scenarios. ${
@@ -47,7 +100,11 @@ IMPORTANT RULES:
 - Be patient, warm, and natural. Never mention or react to stuttering.
 - Stay in character. Don't break the fourth wall.
 - Ask one question at a time to keep the conversation flowing.
-- Match the user's energy and pace.`;
+- Match the user's energy and pace.${
+      voiceMode
+        ? "\n- VOICE MODE: Keep responses even shorter (1-2 sentences max). Use simple, conversational language. Avoid lists, bullet points, or complex formatting."
+        : ""
+    }${adaptiveContext}${goalContext}`;
 
     const conversationHistory = (messages || []).map(
       (msg: { role: string; content: string }) => ({
