@@ -212,11 +212,12 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
     const recognition = new SpeechRecognitionAPI();
     recognition.lang = "en-US";
     recognition.interimResults = true;
-    recognition.continuous = false;
+    recognition.continuous = true;
     recognition.maxAlternatives = 1;
     recognitionRef.current = recognition;
 
     let finalTranscript = "";
+    let hadError = false;
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let interim = "";
@@ -238,32 +239,34 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
 
       if (text) {
         sendToAI(text, messages);
-      } else {
+      } else if (!hadError) {
         setStatusText("Didn't catch that — tap the mic to try again");
       }
     };
 
     recognition.onerror = (event) => {
+      hadError = true;
       setListening(false);
       setTranscript("");
 
       const errorMap: Record<string, string> = {
         "not-allowed": "Mic blocked — click the lock icon in the address bar to allow microphone",
-        "no-speech": "No speech detected — tap the mic and speak",
+        "no-speech": "No speech detected — tap the mic and speak clearly",
         "network": "Network error — check your connection",
         "audio-capture": "No microphone found — connect a mic and try again",
         "service-not-allowed": "Speech service unavailable — please use Chrome",
+        "aborted": "Listening stopped",
       };
 
       const errorCode = (event as ErrorEvent & { error?: string }).error || "";
-      const msg = errorMap[errorCode] || `Mic error — tap to try again`;
+      const msg = errorMap[errorCode] || `Mic error (${errorCode}) — tap to try again`;
       setStatusText(msg);
     };
 
     recognition.start();
     setListening(true);
     setTranscript("");
-    setStatusText("Listening...");
+    setStatusText("Listening — speak now...");
   }
 
   function stopListening() {
