@@ -17,7 +17,9 @@ export const userRoleEnum = pgEnum("user_role", ["user", "slp"]);
 export const severityEnum = pgEnum("severity", ["mild", "moderate", "severe"]);
 export const subscriptionPlanEnum = pgEnum("subscription_plan", [
   "free",
+  "core",
   "pro",
+  "elite",
   "slp",
 ]);
 export const subscriptionStatusEnum = pgEnum("subscription_status", [
@@ -247,6 +249,7 @@ export const aiConversations = pgTable("ai_conversations", {
   disfluencyMoments: jsonb("disfluency_moments"),
   techniquesUsed: jsonb("techniques_used"),
   durationSeconds: integer("duration_seconds"),
+  stressLevel: integer("stress_level"), // null = calm, 1-3 = stress levels
   completedAt: timestamp("completed_at").defaultNow().notNull(),
 });
 
@@ -393,7 +396,33 @@ export const monthlyReports = pgTable("monthly_reports", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// ==================== AUDIO LAB PRESETS ====================
+// ==================== WEEKLY CLINICAL AUDITS ====================
+
+export const weeklyAudits = pgTable("weekly_audits", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull(),
+  weekNumber: text("week_number").notNull(), // ISO week: "2026-W07"
+  prompt: text("prompt").notNull(),
+  transcription: text("transcription").notNull(),
+  durationSeconds: integer("duration_seconds"),
+  // Core clinical metrics
+  percentSS: real("percent_ss"),
+  severityRating: severityRatingEnum("severity_rating"),
+  fluencyScore: integer("fluency_score"),
+  speakingRate: real("speaking_rate"),
+  totalSyllables: integer("total_syllables"),
+  stutteredSyllables: integer("stuttered_syllables"),
+  // Structured analysis (JSONB)
+  disfluencyBreakdown: jsonb("disfluency_breakdown"),
+  techniqueAnalysis: jsonb("technique_analysis"),
+  rateAnalysis: jsonb("rate_analysis"),
+  weekOverWeekChange: jsonb("week_over_week_change"),
+  insights: jsonb("insights"),
+  phonemeHeatmap: jsonb("phoneme_heatmap"),
+  // Sharing
+  shareToken: text("share_token").unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
 
 // ==================== COMMUNITY VICTORIES (I DID IT) ====================
 

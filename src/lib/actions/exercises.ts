@@ -6,6 +6,7 @@ import {
   userStats,
   sessions,
   techniqueOutcomes,
+  aiConversations,
 } from "@/lib/db/schema";
 import { eq, sql, desc, and, gte } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth/helpers";
@@ -141,6 +142,82 @@ export async function getTodayCompletions() {
  * Creates a session, records technique outcome for A/B analysis,
  * and updates user stats (XP, streak, practice time).
  */
+/**
+ * Save AI conversation session to DB.
+ * Persists metrics from VoiceConversation + awards XP + updates streak.
+ */
+export async function saveAIConversation(data: {
+  scenarioType: string;
+  messages: { role: string; content: string }[];
+  turns: {
+    role: "user" | "assistant";
+    text: string;
+    disfluencyCount: number;
+    speakingRate: number;
+    techniquesUsed?: string[];
+    vocalEffort?: number;
+    spmZone?: "slow" | "target" | "fast";
+  }[];
+  durationSeconds: number;
+  stressLevel?: number;
+}) {
+  const user = await requireAuth();
+  await ensureUserStats(user.id);
+
+  const userTurns = data.turns.filter((t) => t.role === "user");
+  const totalDisfluencies = userTurns.reduce((s, t) => s + t.disfluencyCount, 0);
+  const fluencyScore = Math.max(0, Math.round(100 - totalDisfluencies * 6));
+  const techniquesUsed = [
+    ...new Set(userTurns.flatMap((t) => t.techniquesUsed || [])),
+  ];
+
+  // Insert AI conversation record
+  await db.insert(aiConversations).values({
+    userId: user.id,
+    scenarioType: data.scenarioType,
+    messages: data.messages.map((m) => ({
+      role: m.role,
+      content: m.content,
+      timestamp: Date.now(),
+    })),
+    fluencyScore,
+    disfluencyMoments: userTurns.filter((t) => t.disfluencyCount > 0),
+    techniquesUsed,
+    durationSeconds: data.durationSeconds,
+    stressLevel: data.stressLevel ?? null,
+  });
+
+  // Also create a session row for streak/XP tracking
+  await db.insert(sessions).values({
+    userId: user.id,
+    exerciseType: `ai-conversation:${data.scenarioType}`,
+    durationSeconds: data.durationSeconds,
+    aiFluencyScore: fluencyScore,
+    endedAt: new Date(),
+  });
+
+  // Award XP (AI conversations get bonus XP, stress mode multiplier)
+  const baseXp = Math.max(25, Math.round((data.durationSeconds / 60) * 15));
+  const stressMultiplier = data.stressLevel
+    ? { 1: 1.25, 2: 1.5, 3: 2.0 }[data.stressLevel] ?? 1
+    : 1;
+  const xp = Math.round(baseXp * stressMultiplier);
+
+  await db
+    .update(userStats)
+    .set({
+      totalXp: sql`${userStats.totalXp} + ${xp}`,
+      totalExercisesCompleted: sql`${userStats.totalExercisesCompleted} + 1`,
+      totalPracticeSeconds: sql`${userStats.totalPracticeSeconds} + ${data.durationSeconds}`,
+      lastPracticeDate: new Date(),
+    })
+    .where(eq(userStats.userId, user.id));
+
+  await updateStreak(user.id);
+
+  return { xp, fluencyScore };
+}
+
 export async function completeSession(data: {
   techniqueId: string;
   techniqueCategory: TechniqueCategory;

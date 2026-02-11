@@ -57,14 +57,18 @@ export class VoiceConversation {
 
   private metricsProvider?: () => SpeechQualityMetrics | null;
 
+  private stressLevel?: number;
+
   constructor(
     scenario: string,
     callbacks: VoiceConversationCallbacks,
-    metricsProvider?: () => SpeechQualityMetrics | null
+    metricsProvider?: () => SpeechQualityMetrics | null,
+    stressLevel?: number
   ) {
     this.scenario = scenario;
     this.callbacks = callbacks;
     this.metricsProvider = metricsProvider;
+    this.stressLevel = stressLevel;
   }
 
   async start(): Promise<boolean> {
@@ -257,6 +261,7 @@ export class VoiceConversation {
           userMessage: this.conversationHistory.length === 0 ? userMessage : undefined,
           voiceMode: true,
           speechMetrics,
+          stressLevel: this.stressLevel,
         }),
       });
 

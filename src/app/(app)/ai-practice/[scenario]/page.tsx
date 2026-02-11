@@ -16,6 +16,7 @@ import {
   Sparkles,
   Clock,
   Square,
+  Shield,
 } from "lucide-react";
 import Link from "next/link";
 import { VoiceConversation, type VoiceState, type TurnMetrics } from "@/lib/audio/VoiceConversation";
@@ -23,6 +24,10 @@ import { VoiceOrb } from "@/components/ai-conversations/voice-orb";
 import { VoiceModeToggle } from "@/components/ai-conversations/voice-mode-toggle";
 import { PerformanceReport } from "@/components/ai-conversations/performance-report";
 import { LiveCoachOverlay } from "@/components/coaching/LiveCoachOverlay";
+import { checkAISimUsage } from "@/lib/auth/premium";
+import type { PlanTier } from "@/lib/auth/premium";
+import { saveAIConversation } from "@/lib/actions/exercises";
+import { StressEngine, type StressLevel } from "@/lib/audio/StressEngine";
 
 type Message = {
   role: "user" | "assistant";
@@ -62,11 +67,22 @@ export default function AIConversationPage() {
   const [voiceTranscript, setVoiceTranscript] = useState("");
   const [voiceTurns, setVoiceTurns] = useState<TurnMetrics[]>([]);
   const [showReport, setShowReport] = useState(false);
+  const [earnedXp, setEarnedXp] = useState<number | undefined>();
   const voiceConvRef = useRef<VoiceConversation | null>(null);
   const [voiceAnalyserNode, setVoiceAnalyserNode] = useState<AnalyserNode | null>(null);
 
-  // TODO: Replace with actual premium check from server
-  const isPro = true;
+  // Stress mode state
+  const [stressMode, setStressMode] = useState(false);
+  const [stressLevel, setStressLevel] = useState<StressLevel>(1);
+  const [countdownSeconds, setCountdownSeconds] = useState<number | null>(null);
+  const stressEngineRef = useRef<StressEngine | null>(null);
+
+  // Usage gate
+  const [usage, setUsage] = useState<{ canStart: boolean; plan: PlanTier } | null>(null);
+  useEffect(() => {
+    checkAISimUsage().then(setUsage).catch(() => {});
+  }, []);
+  const isPro = usage?.canStart ?? false;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -76,6 +92,7 @@ export default function AIConversationPage() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
       voiceConvRef.current?.stop();
+      stressEngineRef.current?.stop();
     };
   }, []);
 
@@ -166,6 +183,19 @@ export default function AIConversationPage() {
       // Continue without coaching overlay
     }
 
+    // Start stress engine if stress mode enabled
+    if (stressMode) {
+      const engine = new StressEngine(stressLevel);
+      engine.setCallbacks({
+        onRequestInterruption: () => {
+          // The AI conversation route handles stress-level-aware behavior
+        },
+        onCountdownTick: (seconds) => setCountdownSeconds(seconds),
+      });
+      engine.start();
+      stressEngineRef.current = engine;
+    }
+
     const voiceConv = new VoiceConversation(scenario, {
       onStateChange: setVoiceState,
       onUserTranscript: (text) => setVoiceTranscript(text),
@@ -180,23 +210,55 @@ export default function AIConversationPage() {
         }
       },
       onError: (err) => console.error("Voice error:", err),
-    });
+    }, undefined, stressMode ? stressLevel : undefined);
 
     voiceConvRef.current = voiceConv;
     await voiceConv.start();
   }
 
-  function endConversation() {
+  async function endConversation() {
     if (timerRef.current) clearInterval(timerRef.current);
 
     if (isVoiceMode && voiceConvRef.current) {
       const turns = voiceConvRef.current.stop();
       setVoiceTurns(turns);
       voiceConvRef.current = null;
+      stressEngineRef.current?.stop();
+      stressEngineRef.current = null;
+      setCountdownSeconds(null);
       if (turns.filter((t) => t.role === "user").length > 0) {
+        // Persist to DB and capture XP
+        saveAIConversation({
+          scenarioType: scenario,
+          messages: messages.map((m) => ({ role: m.role, content: m.content })),
+          turns: turns.map((t) => ({
+            role: t.role,
+            text: t.text,
+            disfluencyCount: t.disfluencyCount,
+            speakingRate: t.speakingRate,
+            techniquesUsed: t.techniquesUsed,
+            vocalEffort: t.vocalEffort,
+            spmZone: t.spmZone,
+          })),
+          durationSeconds: elapsedSeconds,
+          stressLevel: stressMode ? stressLevel : undefined,
+        })
+          .then((result) => setEarnedXp(result.xp))
+          .catch((err) => console.error("Failed to save AI conversation:", err));
         setShowReport(true);
         return;
       }
+    }
+
+    // Text mode: also save if there were messages
+    if (messages.length > 1) {
+      saveAIConversation({
+        scenarioType: scenario,
+        messages: messages.map((m) => ({ role: m.role, content: m.content })),
+        turns: [],
+        durationSeconds: elapsedSeconds,
+        stressLevel: stressMode ? stressLevel : undefined,
+      }).catch((err) => console.error("Failed to save AI conversation:", err));
     }
 
     router.push("/ai-practice");
@@ -216,6 +278,8 @@ export default function AIConversationPage() {
           scenario={title}
           durationSeconds={elapsedSeconds}
           onBack={() => router.push("/ai-practice")}
+          xpEarned={earnedXp}
+          stressLevel={stressMode ? stressLevel : undefined}
         />
       </div>
     );
@@ -254,6 +318,11 @@ export default function AIConversationPage() {
             <Badge variant="secondary" className="text-xs">
               <Clock className="h-3 w-3 mr-1" />
               {formatTime(elapsedSeconds)}
+            </Badge>
+          )}
+          {countdownSeconds !== null && (
+            <Badge variant="outline" className="text-xs border-red-500/30 text-red-400 animate-pulse">
+              {countdownSeconds}s
             </Badge>
           )}
           {started && (
@@ -300,6 +369,56 @@ export default function AIConversationPage() {
                 </Badge>
               )}
             </div>
+            {/* Stress Simulator Toggle (premium + voice mode only) */}
+            {isVoiceMode && isPro && (
+              <div className="mt-4 p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 max-w-md w-full">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-amber-500" />
+                    <span className="text-sm font-semibold">Stress Simulator</span>
+                    <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-500">BETA</Badge>
+                  </div>
+                  <button
+                    onClick={() => setStressMode(!stressMode)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      stressMode ? "bg-amber-500" : "bg-muted"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        stressMode ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+                {stressMode && (
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground">
+                      Adds ambient noise, interruptions, and time pressure for desensitization training.
+                    </p>
+                    <div className="flex gap-2">
+                      {([1, 2, 3] as StressLevel[]).map((level) => (
+                        <button
+                          key={level}
+                          onClick={() => setStressLevel(level)}
+                          className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                            stressLevel === level
+                              ? level === 1
+                                ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                                : level === 2
+                                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                                  : "bg-red-500/20 text-red-400 border border-red-500/30"
+                              : "bg-muted/50 text-muted-foreground"
+                          }`}
+                        >
+                          {level === 1 ? "Mild" : level === 2 ? "Moderate" : "Intense"}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             <Button
               className="mt-6"
               size="lg"
@@ -322,6 +441,14 @@ export default function AIConversationPage() {
           /* Voice mode UI */
           <div className="flex flex-col items-center justify-center h-full gap-6">
             <VoiceOrb state={voiceState} />
+
+            {stressMode && (
+              <Badge variant="outline" className="border-amber-500/30 text-amber-400 text-xs">
+                <Shield className="h-3 w-3 mr-1" />
+                Stress Level {stressLevel}
+                {countdownSeconds !== null && ` — ${countdownSeconds}s`}
+              </Badge>
+            )}
 
             {/* Live Coach Overlay */}
             <LiveCoachOverlay

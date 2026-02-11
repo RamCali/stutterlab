@@ -16,6 +16,10 @@ import {
   CheckCircle2,
   Activity,
   Gauge,
+  Lightbulb,
+  Zap,
+  Star,
+  Shield,
 } from "lucide-react";
 import type { TurnMetrics } from "@/lib/audio/VoiceConversation";
 
@@ -24,6 +28,8 @@ interface PerformanceReportProps {
   scenario: string;
   durationSeconds: number;
   onBack: () => void;
+  xpEarned?: number;
+  stressLevel?: number;
 }
 
 export function PerformanceReport({
@@ -31,6 +37,8 @@ export function PerformanceReport({
   scenario,
   durationSeconds,
   onBack,
+  xpEarned,
+  stressLevel,
 }: PerformanceReportProps) {
   const userTurns = turns.filter((t) => t.role === "user");
   const totalDisfluencies = userTurns.reduce(
@@ -89,6 +97,87 @@ export function PerformanceReport({
   }
   const totalZoned = zoneCount.slow + zoneCount.target + zoneCount.fast;
 
+  // Speaking rate trend (rate stability)
+  const rateVariance = userTurns.length > 1
+    ? Math.round(
+        Math.sqrt(
+          userTurns.reduce((s, t) => s + Math.pow(t.speakingRate - avgRate, 2), 0) /
+            userTurns.length
+        )
+      )
+    : 0;
+
+  // Fluency progression: did they improve from first half to second half?
+  const halfIdx = Math.floor(userTurns.length / 2);
+  const firstHalfDisfluencies = userTurns
+    .slice(0, halfIdx)
+    .reduce((s, t) => s + t.disfluencyCount, 0);
+  const secondHalfDisfluencies = userTurns
+    .slice(halfIdx)
+    .reduce((s, t) => s + t.disfluencyCount, 0);
+  const improvedOverSession =
+    userTurns.length >= 4 && secondHalfDisfluencies < firstHalfDisfluencies;
+
+  // Generate coaching insights
+  const coachingInsights: { icon: string; text: string }[] = [];
+
+  if (fluencyScore >= 80) {
+    coachingInsights.push({
+      icon: "star",
+      text: "Excellent fluency! You maintained strong speech control throughout.",
+    });
+  } else if (fluencyScore >= 60) {
+    coachingInsights.push({
+      icon: "thumbsup",
+      text: "Good session. Some disfluencies are completely normal — focus on the techniques that worked.",
+    });
+  } else {
+    coachingInsights.push({
+      icon: "growth",
+      text: "Challenging scenario. Every conversation builds your skills — consistency is what matters.",
+    });
+  }
+
+  if (improvedOverSession) {
+    coachingInsights.push({
+      icon: "trending",
+      text: "You improved as the conversation went on. Your techniques kicked in and your fluency increased.",
+    });
+  }
+
+  if (avgEffort != null && avgEffort > 0.6) {
+    coachingInsights.push({
+      icon: "relax",
+      text: "Your vocal effort was high. Try focusing on diaphragmatic breathing before your next session.",
+    });
+  } else if (avgEffort != null && avgEffort < 0.3) {
+    coachingInsights.push({
+      icon: "star",
+      text: "Great vocal relaxation! Low vocal effort means your speech muscles stayed loose.",
+    });
+  }
+
+  if (rateVariance > 40) {
+    coachingInsights.push({
+      icon: "pace",
+      text: "Your speaking rate varied significantly. Try using pacing techniques for more consistent delivery.",
+    });
+  }
+
+  if (zoneCount.fast > zoneCount.target && totalZoned > 2) {
+    coachingInsights.push({
+      icon: "slow",
+      text: "You spoke faster than target pace most of the time. Slowing down gives your techniques more time to work.",
+    });
+  }
+
+  if (!hasTechniques && totalDisfluencies > 2) {
+    coachingInsights.push({
+      icon: "technique",
+      text: "No fluency techniques were detected. Try using gentle onset or prolonged speech in your next conversation.",
+    });
+  }
+
   const formatTime = (s: number) =>
     `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
 
@@ -98,6 +187,69 @@ export function PerformanceReport({
         <ArrowLeft className="h-4 w-4 mr-1" />
         Back to Scenarios
       </Button>
+
+      {/* XP Earned Banner */}
+      {xpEarned && xpEarned > 0 && (
+        <Card className="border-primary/30 bg-primary/5">
+          <CardContent className="py-3 flex items-center justify-center gap-2">
+            <Star className="h-4 w-4 text-amber-500" />
+            <span className="text-sm font-semibold">
+              +{xpEarned} XP earned
+            </span>
+            <span className="text-xs text-muted-foreground">
+              from this conversation
+            </span>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Stress Resilience Section */}
+      {stressLevel != null && stressLevel > 0 && (
+        <Card className="border-amber-500/20 bg-amber-500/5">
+          <CardContent className="py-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Shield className="h-4 w-4 text-amber-500" />
+              <span className="text-sm font-semibold">Stress Resilience</span>
+              <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-400">
+                Level {stressLevel}
+              </Badge>
+            </div>
+
+            {/* Resilience score: fluency adjusted for stress level */}
+            {(() => {
+              const stressBonus = stressLevel === 1 ? 5 : stressLevel === 2 ? 10 : 15;
+              const resilienceScore = Math.min(100, fluencyScore + stressBonus);
+              const multiplierLabel = stressLevel === 1 ? "1.25x" : stressLevel === 2 ? "1.5x" : "2x";
+              return (
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="text-center p-2.5 rounded-lg bg-background/50">
+                    <p className="text-xl font-bold text-amber-400">{resilienceScore}</p>
+                    <p className="text-[10px] text-muted-foreground">Resilience Score</p>
+                  </div>
+                  <div className="text-center p-2.5 rounded-lg bg-background/50">
+                    <p className="text-xl font-bold text-amber-400">{multiplierLabel}</p>
+                    <p className="text-[10px] text-muted-foreground">XP Multiplier</p>
+                  </div>
+                  <div className="text-center p-2.5 rounded-lg bg-background/50">
+                    <p className="text-xl font-bold">{fluencyScore}</p>
+                    <p className="text-[10px] text-muted-foreground">Base Fluency</p>
+                  </div>
+                </div>
+              );
+            })()}
+
+            <div className="p-2.5 rounded-lg bg-background/50 border border-amber-500/10">
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                {fluencyScore >= 80
+                  ? `Excellent performance under Level ${stressLevel} stress! You maintained strong fluency despite ambient noise and pressure — this shows real-world readiness.`
+                  : fluencyScore >= 60
+                    ? `Good resilience at Level ${stressLevel}. You managed stress well — with more practice, your fluency under pressure will continue to improve.`
+                    : `Practicing under Level ${stressLevel} stress is building your resilience. Each session strengthens your ability to handle real-world pressure.`}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>
@@ -174,6 +326,46 @@ export function PerformanceReport({
               </div>
               <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
                 <span>Turn 1</span>
+                <span>Turn {userTurns.length}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Speaking rate trend */}
+          {userTurns.length > 1 && (
+            <div>
+              <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                <Gauge className="h-3 w-3" />
+                Speaking Rate per Turn (syl/min)
+              </p>
+              <div className="flex items-end gap-1 h-16">
+                {userTurns.map((turn, i) => {
+                  const maxRate = Math.max(...userTurns.map((t) => t.speakingRate), 1);
+                  const heightPct = (turn.speakingRate / maxRate) * 100;
+                  const inTarget = turn.spmZone === "target";
+                  return (
+                    <div
+                      key={i}
+                      className="flex-1 rounded-t transition-all"
+                      style={{
+                        height: `${heightPct}%`,
+                        backgroundColor: inTarget
+                          ? "#00E676"
+                          : turn.spmZone === "fast"
+                            ? "#FF5252"
+                            : "#3B82F6",
+                        opacity: 0.7,
+                      }}
+                      title={`Turn ${i + 1}: ${turn.speakingRate} syl/min${turn.spmZone ? ` (${turn.spmZone})` : ""}`}
+                    />
+                  );
+                })}
+              </div>
+              <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                <span>Turn 1</span>
+                <span className="text-muted-foreground/60">
+                  {rateVariance > 0 ? `±${rateVariance} variance` : "Steady rate"}
+                </span>
                 <span>Turn {userTurns.length}</span>
               </div>
             </div>
@@ -300,6 +492,27 @@ export function PerformanceReport({
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Coaching Insights */}
+          {coachingInsights.length > 0 && (
+            <div>
+              <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                <Lightbulb className="h-3 w-3" />
+                SLP Coaching Insights
+              </p>
+              <div className="space-y-2">
+                {coachingInsights.map((insight, i) => (
+                  <div
+                    key={i}
+                    className="flex items-start gap-2 p-2.5 rounded-lg bg-primary/5 border border-primary/10"
+                  >
+                    <Zap className="h-3.5 w-3.5 text-primary mt-0.5 flex-shrink-0" />
+                    <p className="text-xs leading-relaxed">{insight.text}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

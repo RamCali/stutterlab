@@ -32,7 +32,7 @@ const SCENARIO_PROMPTS: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
-    const { scenario, messages, userMessage, voiceMode, speechMetrics } = await req.json();
+    const { scenario, messages, userMessage, voiceMode, speechMetrics, stressLevel } = await req.json();
 
     if (!process.env.ANTHROPIC_API_KEY) {
       return NextResponse.json(
@@ -90,6 +90,25 @@ Rules:
 - NEVER mention stuttering, speech rate, tension, or techniques. Stay fully in character.`;
     }
 
+    // Build stress context based on optional stress level
+    let stressContext = "";
+    if (stressLevel === 1) {
+      stressContext = `
+
+STRESS SIMULATION (Level 1 — Mild):
+Occasionally ask clarifying questions like "Sorry, what was that?" Show very slight impatience after long pauses. Ask occasional unexpected follow-ups. STILL be fundamentally respectful.`;
+    } else if (stressLevel === 2) {
+      stressContext = `
+
+STRESS SIMULATION (Level 2 — Moderate):
+Sometimes interrupt the user mid-sentence. Express mild impatience like "We're running short on time..." Ask unexpected follow-ups. Show distraction. STILL be respectful — never mock.`;
+    } else if (stressLevel === 3) {
+      stressContext = `
+
+STRESS SIMULATION (Level 3 — High):
+Frequently interrupt mid-sentence. Express urgency. Change topics suddenly. Ask rapid-fire questions. Show impatience with pauses. CRITICAL: NEVER mock stuttering. You are a realistic but safe practice partner.`;
+    }
+
     const systemPrompt = `You are helping someone who stutters practice real-world speaking scenarios. ${
       SCENARIO_PROMPTS[scenario] ||
       "You are a friendly conversation partner. Have a natural conversation with the user."
@@ -104,7 +123,7 @@ IMPORTANT RULES:
       voiceMode
         ? "\n- VOICE MODE: Keep responses even shorter (1-2 sentences max). Use simple, conversational language. Avoid lists, bullet points, or complex formatting."
         : ""
-    }${adaptiveContext}${goalContext}`;
+    }${adaptiveContext}${goalContext}${stressContext}`;
 
     const conversationHistory = (messages || []).map(
       (msg: { role: string; content: string }) => ({
