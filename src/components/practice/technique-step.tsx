@@ -59,30 +59,31 @@ export function TechniqueStep({
     ? { activeTechniques: ["pacing", "rate_compliance"], targetSPM: { min: 120, max: 180 } }
     : undefined;
 
-  // Waveform animation loop — driven by isRecording state
+  // Waveform visualization — setInterval is more reliable than rAF for React state updates
   useEffect(() => {
     if (!isRecording) return;
 
-    let frameId: number;
-
-    function tick() {
+    const interval = setInterval(() => {
       const analyser = analyserRef.current;
-      if (analyser) {
-        const data = new Uint8Array(analyser.fftSize);
-        analyser.getByteTimeDomainData(data);
-        const step = Math.floor(data.length / 40);
-        const newBars = Array.from({ length: 40 }, (_, i) => {
-          const val = data[i * step] ?? 128;
-          return Math.min(100, (Math.abs(val - 128) / 128) * 300);
-        });
-        setBars(newBars);
-      }
-      frameId = requestAnimationFrame(tick);
-    }
+      if (!analyser) return;
 
-    frameId = requestAnimationFrame(tick);
+      const data = new Float32Array(analyser.fftSize);
+      analyser.getFloatTimeDomainData(data);
 
-    return () => cancelAnimationFrame(frameId);
+      // Calculate peak amplitude per bar segment
+      const segSize = Math.floor(data.length / 40);
+      const newBars = Array.from({ length: 40 }, (_, i) => {
+        let peak = 0;
+        for (let j = i * segSize; j < (i + 1) * segSize && j < data.length; j++) {
+          peak = Math.max(peak, Math.abs(data[j]));
+        }
+        // Scale: 0.01 (whisper) → ~5%, 0.1 (normal) → ~50%, 0.3 (loud) → 100%
+        return Math.min(100, peak * 400);
+      });
+      setBars(newBars);
+    }, 50); // ~20fps
+
+    return () => clearInterval(interval);
   }, [isRecording]);
 
   async function startRecording() {
@@ -99,7 +100,7 @@ export function TechniqueStep({
       const source = ctx.createMediaStreamSource(stream);
       sourceRef.current = source;
       const analyser = ctx.createAnalyser();
-      analyser.fftSize = 256;
+      analyser.fftSize = 2048;
       source.connect(analyser);
       analyserRef.current = analyser;
 
@@ -266,7 +267,7 @@ export function TechniqueStep({
 
       {/* Waveform + Record */}
       <div className="border-t pt-4">
-        <div className="flex items-end justify-center gap-[2px] h-10 mb-3">
+        <div className="flex items-end justify-center gap-[2px] h-16 mb-3">
           {bars.map((height, i) => (
             <div
               key={i}
