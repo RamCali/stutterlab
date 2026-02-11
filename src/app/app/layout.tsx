@@ -63,8 +63,8 @@ function AppShell({ children }: { children: React.ReactNode }) {
       <aside className="hidden md:flex w-64 flex-col border-r border-border/60 bg-sidebar">
         {/* Logo */}
         <div className="flex items-center px-5 py-4 border-b border-border/60">
-          <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={150} height={38} className="h-8 w-auto dark:hidden" />
-          <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={150} height={38} className="h-8 w-auto hidden dark:block" />
+          <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={180} height={45} className="h-9 w-auto dark:hidden" />
+          <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={180} height={45} className="h-9 w-auto hidden dark:block" />
         </div>
 
         {/* Streak indicator */}
@@ -118,8 +118,8 @@ function AppShell({ children }: { children: React.ReactNode }) {
         {/* Mobile top bar */}
         <header className="flex md:hidden items-center justify-between border-b border-border/60 px-4 py-3 bg-card">
           <div className="flex items-center">
-            <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={130} height={32} className="h-7 w-auto dark:hidden" />
-            <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={130} height={32} className="h-7 w-auto hidden dark:block" />
+            <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={160} height={40} className="h-8 w-auto dark:hidden" />
+            <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={160} height={40} className="h-8 w-auto hidden dark:block" />
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 bg-primary/5 dark:bg-primary/10 rounded-lg px-2 py-1">

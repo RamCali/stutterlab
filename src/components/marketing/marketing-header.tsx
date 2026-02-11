@@ -15,8 +15,8 @@ export function MarketingHeader() {
     <header className="border-b border-border/60 bg-background/95 backdrop-blur sticky top-0 z-50">
       <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center">
-          <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={160} height={40} className="h-9 w-auto dark:hidden" />
-          <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={160} height={40} className="h-9 w-auto hidden dark:block" />
+          <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={200} height={50} className="h-10 w-auto dark:hidden" />
+          <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={200} height={50} className="h-10 w-auto hidden dark:block" />
         </Link>
         <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (

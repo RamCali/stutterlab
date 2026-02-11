@@ -6,7 +6,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AudioWaveform, Loader2, Check } from "lucide-react";
+import Image from "next/image";
+import { Loader2, Check } from "lucide-react";
 
 const benefits = [
   "Daily guided practice sessions",
@@ -26,9 +27,9 @@ export default function SignupPage() {
   return (
     <div className="w-full max-w-sm mx-auto px-4">
       <div className="text-center mb-8">
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <AudioWaveform className="h-8 w-8 text-primary" />
-          <span className="text-2xl font-bold">StutterLab</span>
+        <div className="flex items-center justify-center mb-4">
+          <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={200} height={50} className="h-10 w-auto dark:hidden" />
+          <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={200} height={50} className="h-10 w-auto hidden dark:block" />
         </div>
         <p className="text-muted-foreground text-sm">
           Start your free 7-day trial today

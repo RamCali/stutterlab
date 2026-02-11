@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AudioWaveform } from "lucide-react";
+import Image from "next/image";
 
 const footerLinks = {
   Product: [
@@ -26,11 +26,9 @@ export function MarketingFooter() {
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="h-7 w-7 rounded-lg bg-primary flex items-center justify-center">
-                <AudioWaveform className="h-3.5 w-3.5 text-primary-foreground" />
-              </div>
-              <span className="font-bold text-lg">StutterLab</span>
+            <Link href="/" className="flex items-center">
+              <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={160} height={40} className="h-8 w-auto dark:hidden" />
+              <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={160} height={40} className="h-8 w-auto hidden dark:block" />
             </Link>
             <p className="text-sm text-muted-foreground mt-2 max-w-xs">
               Evidence-based stuttering treatment, powered by AI, accessible
