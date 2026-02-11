@@ -176,18 +176,20 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
   /* ─── Set up mic analyser for live coaching ─── */
   async function setupCoachAnalyser() {
     if (coachAnalyser) return;
+    // Create AudioContext synchronously in user-gesture context
+    const ctx = new AudioContext();
+    coachAudioCtxRef.current = ctx;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const ctx = new AudioContext();
       if (ctx.state === "suspended") await ctx.resume();
-      coachAudioCtxRef.current = ctx;
       const source = ctx.createMediaStreamSource(stream);
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 256;
       source.connect(analyser);
       setCoachAnalyser(analyser);
     } catch {
-      // Continue without coaching overlay
+      ctx.close();
+      coachAudioCtxRef.current = null;
     }
   }
 
@@ -240,15 +242,20 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
       const text = finalTranscript.trim();
 
       // Chrome can randomly end recognition even with continuous=true.
-      // Auto-restart if user didn't tap stop and we have no text yet.
-      if (!stoppedIntentionallyRef.current && !text && !hadError && restartCount < 5) {
+      // Auto-restart with a delay if user didn't tap stop and we have no text yet.
+      if (!stoppedIntentionallyRef.current && !text && !hadError && restartCount < 8) {
         restartCount++;
-        try {
-          recognition.start();
-          return; // Keep "Listening" state — don't update UI
-        } catch {
-          // Can't restart — fall through to end
-        }
+        // Delay restart — Chrome rejects rapid re-starts
+        setTimeout(() => {
+          if (stoppedIntentionallyRef.current) return;
+          try {
+            recognition.start();
+          } catch {
+            setListening(false);
+            setStatusText("Mic unavailable — tap to try again");
+          }
+        }, 300);
+        return; // Keep "Listening" state — don't update UI
       }
 
       setListening(false);

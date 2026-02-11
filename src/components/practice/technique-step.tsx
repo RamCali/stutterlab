@@ -87,6 +87,11 @@ export function TechniqueStep({
   }, [isRecording]);
 
   async function startRecording() {
+    // Create AudioContext synchronously in the user-gesture context
+    // (Chrome suspends it if created after an await)
+    const ctx = new AudioContext();
+    audioCtxRef.current = ctx;
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
@@ -94,9 +99,7 @@ export function TechniqueStep({
       mediaRecorderRef.current = mediaRecorder;
       mediaRecorder.start();
 
-      const ctx = new AudioContext();
       if (ctx.state === "suspended") await ctx.resume();
-      audioCtxRef.current = ctx;
       const source = ctx.createMediaStreamSource(stream);
       sourceRef.current = source;
       const analyser = ctx.createAnalyser();
@@ -117,7 +120,9 @@ export function TechniqueStep({
         dafGainRef.current = gain;
       }
     } catch {
-      // Continue without mic — still allow practice
+      // Cleanup AudioContext if mic access failed
+      ctx.close();
+      audioCtxRef.current = null;
     }
     setIsRecording(true);
     setElapsedSeconds(0);
