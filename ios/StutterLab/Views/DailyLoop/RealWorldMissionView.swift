@@ -45,6 +45,8 @@ struct RealWorldMissionView: View {
                     .foregroundColor(.sunsetAmber)
             }
             .padding(.horizontal, SLSpacing.s6)
+            .slCardAccent(.sunsetAmber)
+            .padding(.horizontal, SLSpacing.s4)
             .opacity(appear ? 1 : 0)
             .animation(.easeIn(duration: 0.4).delay(0.4), value: appear)
 
@@ -54,14 +56,9 @@ struct RealWorldMissionView: View {
             VStack(spacing: SLSpacing.s3) {
                 Button(action: onAccept) {
                     Text("Challenge Accepted")
-                        .font(.slBase)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.obsidianNight)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, SLSpacing.s3)
-                        .background(Color.sunsetAmber)
-                        .cornerRadius(SLRadius.md)
                 }
+                .buttonStyle(SLPrimaryButtonStyle(color: .sunsetAmber))
+                .slHaptic(.heavy)
 
                 Button(action: onSkip) {
                     Text("Skip for Today")

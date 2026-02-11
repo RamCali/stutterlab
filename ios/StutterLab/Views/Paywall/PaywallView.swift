@@ -60,14 +60,9 @@ struct PaywallView: View {
                             }
                         }) {
                             Text("Try 7 Days Free")
-                                .font(.slBase)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.obsidianNight)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, SLSpacing.s4)
-                                .background(Color.clarityTeal)
-                                .cornerRadius(SLRadius.md)
                         }
+                        .buttonStyle(SLPrimaryButtonStyle())
+                        .slHaptic(.heavy)
                         .padding(.horizontal, SLSpacing.s4)
                         .disabled(storeKit.purchaseInProgress)
                     }
@@ -109,9 +104,7 @@ struct PaywallView: View {
             featureRow("Detailed progress charts", free: false, pro: true)
             featureRow("Panic Button (always free)", free: true, pro: true)
         }
-        .padding(SLSpacing.s4)
-        .background(Color.elevation1)
-        .cornerRadius(SLRadius.md)
+        .slCard()
         .padding(.horizontal, SLSpacing.s4)
     }
 
@@ -162,12 +155,10 @@ struct PaywallView: View {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .foregroundColor(isSelected ? .clarityTeal : .textTertiary)
             }
-            .padding(SLSpacing.s4)
-            .background(Color.elevation1)
-            .cornerRadius(SLRadius.md)
-            .overlay(
-                RoundedRectangle(cornerRadius: SLRadius.md)
-                    .stroke(isSelected ? Color.clarityTeal : Color.border, lineWidth: isSelected ? 2 : 1)
+            .padding(0) // padding handled by card modifier
+            .modifier(isSelected
+                ? SLCardAccentModifier(accentColor: .clarityTeal)
+                : SLCardAccentModifier(accentColor: .clear)
             )
         }
     }

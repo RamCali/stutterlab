@@ -158,8 +158,12 @@ struct ConversationView: View {
                 .foregroundColor(.textPrimary)
                 .padding(.horizontal, SLSpacing.s4)
                 .padding(.vertical, SLSpacing.s3)
-                .background(Color.elevation1)
+                .background(Color.cardSurface)
                 .cornerRadius(SLRadius.md)
+                .overlay(
+                    RoundedRectangle(cornerRadius: SLRadius.md)
+                        .stroke(Color.borderSubtle, lineWidth: 1)
+                )
                 .focused($inputFocused)
 
             Button(action: { viewModel.sendMessage() }) {

@@ -64,8 +64,26 @@ enum SLSpacing {
 // MARK: - Border Radius
 
 enum SLRadius {
-    static let sm: CGFloat = 4    // Subtle
-    static let md: CGFloat = 8    // Cards, buttons
-    static let lg: CGFloat = 16   // Modals, sheets
+    static let sm: CGFloat = 6    // Subtle — pills, inner elements
+    static let md: CGFloat = 16   // Standard cards, buttons
+    static let lg: CGFloat = 20   // Hero cards, modals
+    static let xl: CGFloat = 24   // Large hero sections
     static let full: CGFloat = 999 // Pills, circles
+}
+
+// MARK: - Card Padding
+
+enum SLPadding {
+    static let cardInner: CGFloat = 20    // Standard card content padding
+    static let cardInnerLarge: CGFloat = 24 // Hero card content padding
+    static let sectionGap: CGFloat = 28   // Gap between major sections
+}
+
+// MARK: - Letter Spacing
+
+enum SLLetterSpacing {
+    static let tight: CGFloat = -0.3   // Large headings
+    static let normal: CGFloat = 0     // Body text
+    static let wide: CGFloat = 1.2     // Uppercase labels / badges
+    static let wider: CGFloat = 2.0    // Section headers uppercase
 }

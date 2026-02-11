@@ -52,16 +52,10 @@ struct TechniqueCard: View {
                         .foregroundColor(.sunsetAmber)
                 }
             }
-            .padding(SLSpacing.s4)
-            .background(Color.obsidianNight)
-            .overlay(Color.elevation1)
-            .cornerRadius(SLRadius.md)
-            .overlay(
-                RoundedRectangle(cornerRadius: SLRadius.md)
-                    .stroke(Color.border, lineWidth: 1)
-            )
+            .slCard()
         }
         .buttonStyle(.plain)
+        .slHaptic(.light)
     }
 
     private var iconName: String {

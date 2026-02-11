@@ -40,9 +40,7 @@ struct ExerciseView: View {
                             .foregroundColor(.textSecondary)
                             .lineSpacing(4)
                     }
-                    .padding(SLSpacing.s4)
-                    .background(Color.elevation1)
-                    .cornerRadius(SLRadius.md)
+                    .slCard()
                 }
                 .padding(SLSpacing.s4)
             }

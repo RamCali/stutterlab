@@ -727,11 +727,11 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               <h3 className="text-lg font-bold mb-3">Your 90-Day Fluency Roadmap</h3>
               <div className="space-y-2">
                 {[
-                  { phase: 1, weeks: "1-2", focus: "Breathing + Gentle Onset" },
-                  { phase: 2, weeks: "3-4", focus: "Light Contact + FAF Feedback" },
-                  { phase: 3, weeks: "5-7", focus: "Technique Integration + CBT" },
-                  { phase: 4, weeks: "8-10", focus: "AI Conversations + Phone Sims" },
-                  { phase: 5, weeks: "11-13", focus: "Mastery + Independence" },
+                  { phase: 1, weeks: "1-2", focus: "DAF Demo + AI Chat + First Challenge" },
+                  { phase: 2, weeks: "3-4", focus: "Light Contact + FAF + Deeper Practice" },
+                  { phase: 3, weeks: "5-7", focus: "Modification Techniques + CBT" },
+                  { phase: 4, weeks: "8-10", focus: "Real Conversations + Phone Sims" },
+                  { phase: 5, weeks: "11-13", focus: "Self-Directed + Graduation" },
                 ].map((item) => (
                   <div
                     key={item.phase}

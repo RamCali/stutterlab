@@ -15,7 +15,7 @@ final class DailyLoopViewModel: ObservableObject {
     @Published var showPhaseUnlock = false
     @Published var phaseInfo: PhaseInfo?
 
-    private let firestoreService = FirestoreService()
+    private let apiService = APIService()
 
     var currentTask: DailyTask? {
         guard let plan = currentPlan, currentTaskIndex < plan.tasks.count else { return nil }
@@ -61,7 +61,6 @@ final class DailyLoopViewModel: ObservableObject {
         }
 
         if isLastTask {
-            // Show Real World Mission card
             showMission = true
         } else {
             currentTaskIndex += 1
@@ -96,12 +95,21 @@ final class DailyLoopViewModel: ObservableObject {
         isSessionActive = false
     }
 
-    // MARK: - Save Session
+    // MARK: - Save Session (via BFF API)
 
     func saveSession(userId: String) async {
         guard let session else { return }
         do {
-            try await firestoreService.saveSession(session, userId: userId)
+            let request = SessionSaveRequest(
+                exerciseType: "daily_session",
+                durationSeconds: session.durationSeconds ?? 0,
+                fluencyScore: session.fluencyScore,
+                confidenceBefore: session.confidenceBefore,
+                confidenceAfter: session.confidenceAfter,
+                exercisesCompleted: session.exercisesCompleted,
+                notes: session.notes
+            )
+            _ = try await apiService.saveSession(request)
         } catch {
             print("Failed to save session: \(error)")
         }

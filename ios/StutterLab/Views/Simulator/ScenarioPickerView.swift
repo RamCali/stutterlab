@@ -25,8 +25,9 @@ struct ScenarioPickerView: View {
                             .foregroundColor(.textSecondary)
 
                         LazyVGrid(columns: columns, spacing: SLSpacing.s4) {
-                            ForEach(ScenarioType.allCases) { scenario in
+                            ForEach(Array(ScenarioType.allCases.enumerated()), id: \.element) { index, scenario in
                                 scenarioTile(scenario)
+                                    .slEntrance(delay: Double(index) * 0.05)
                             }
                         }
                     }
@@ -71,15 +72,7 @@ struct ScenarioPickerView: View {
                     .foregroundColor(difficultyColor(scenario.difficulty))
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, SLSpacing.s4)
-            .padding(.horizontal, SLSpacing.s2)
-            .background(Color.obsidianNight)
-            .overlay(Color.elevation1)
-            .cornerRadius(SLRadius.md)
-            .overlay(
-                RoundedRectangle(cornerRadius: SLRadius.md)
-                    .stroke(Color.border, lineWidth: 1)
-            )
+            .slCard(padding: SLSpacing.s4)
         }
     }
 

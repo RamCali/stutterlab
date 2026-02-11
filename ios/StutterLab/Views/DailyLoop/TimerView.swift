@@ -15,13 +15,28 @@ struct TimerView: View {
         VStack(spacing: SLSpacing.s4) {
             // Circular timer
             ZStack {
+                // Pulse ring
+                Circle()
+                    .stroke(Color.clarityTeal.opacity(0.15), lineWidth: 12)
+                    .frame(width: 176, height: 176)
+                    .scaleEffect(isRunning ? 1.08 : 1.0)
+                    .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: isRunning)
+
                 Circle()
                     .stroke(Color.elevation2, lineWidth: 6)
                     .frame(width: 160, height: 160)
 
                 Circle()
                     .trim(from: 0, to: progress)
-                    .stroke(Color.clarityTeal, style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                    .stroke(
+                        AngularGradient(
+                            colors: [.clarityTeal, .fluencyGreen, .clarityTeal],
+                            center: .center,
+                            startAngle: .degrees(-90),
+                            endAngle: .degrees(270)
+                        ),
+                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                    )
                     .frame(width: 160, height: 160)
                     .rotationEffect(.degrees(-90))
                     .animation(.linear(duration: 1), value: progress)
@@ -49,20 +64,15 @@ struct TimerView: View {
                     stop()
                     onComplete()
                 }
-                .font(.slSM)
-                .foregroundColor(.textSecondary)
+                .buttonStyle(SLSecondaryButtonStyle())
+                .frame(maxWidth: 120)
 
                 if timeRemaining == 0 && totalSeconds > 0 {
                     Button("Done") {
                         onComplete()
                     }
-                    .font(.slSM)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.obsidianNight)
-                    .padding(.horizontal, SLSpacing.s6)
-                    .padding(.vertical, SLSpacing.s2)
-                    .background(Color.fluencyGreen)
-                    .cornerRadius(SLRadius.md)
+                    .buttonStyle(SLPrimaryButtonStyle(color: .fluencyGreen))
+                    .frame(maxWidth: 120)
                 }
             }
         }

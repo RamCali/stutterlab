@@ -3,7 +3,7 @@ import Foundation
 // MARK: - User Profile
 
 struct UserProfile: Codable, Identifiable {
-    let id: String // Firebase UID
+    let id: String
     var name: String
     var email: String
     var avatarURL: String?
@@ -19,6 +19,10 @@ struct UserProfile: Codable, Identifiable {
     var totalXP: Int
     var totalPracticeSeconds: Int
     var totalExercisesCompleted: Int
+
+    // North Star (from onboarding)
+    var northStarGoal: String?
+    var speechChallenges: [String]
 
     // Subscription
     var subscriptionPlan: SubscriptionPlan
@@ -54,6 +58,8 @@ struct UserProfile: Codable, Identifiable {
             totalXP: 0,
             totalPracticeSeconds: 0,
             totalExercisesCompleted: 0,
+            northStarGoal: nil,
+            speechChallenges: [],
             subscriptionPlan: .free,
             subscriptionStatus: .active,
             createdAt: Date()

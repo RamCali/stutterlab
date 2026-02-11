@@ -11,7 +11,7 @@ final class SimulatorViewModel: ObservableObject {
     @Published var error: String?
 
     private let aiService = AIService()
-    private let firestoreService = FirestoreService()
+    private let apiService = APIService()
 
     var messages: [ChatMessage] {
         conversation?.messages ?? []
@@ -67,7 +67,7 @@ final class SimulatorViewModel: ObservableObject {
         }
     }
 
-    // MARK: - End Conversation
+    // MARK: - End Conversation (save via BFF API)
 
     func endConversation(userId: String) async {
         guard var conv = conversation else { return }
@@ -75,8 +75,19 @@ final class SimulatorViewModel: ObservableObject {
         if let start = conv.messages.first?.timestamp {
             conv.durationSeconds = Int(Date().timeIntervalSince(start))
         }
+
+        // Save as a session on the backend
         do {
-            try await firestoreService.saveConversation(conv, userId: userId)
+            let request = SessionSaveRequest(
+                exerciseType: "ai_conversation",
+                durationSeconds: conv.durationSeconds ?? 0,
+                fluencyScore: conv.fluencyScore,
+                confidenceBefore: nil,
+                confidenceAfter: nil,
+                exercisesCompleted: 1,
+                notes: "AI: \(conv.scenario.displayName)"
+            )
+            _ = try await apiService.saveSession(request)
         } catch {
             print("Failed to save conversation: \(error)")
         }

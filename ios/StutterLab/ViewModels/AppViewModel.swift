@@ -16,10 +16,10 @@ final class AppViewModel: ObservableObject {
     // MARK: Services
 
     let authService = AuthService()
-    let firestoreService = FirestoreService()
     let storeKitService = StoreKitService()
     let speechAnalysisService = SpeechAnalysisService()
 
+    private let apiService = APIService()
     private var cancellables = Set<AnyCancellable>()
 
     init() {
@@ -27,8 +27,8 @@ final class AppViewModel: ObservableObject {
         authService.$isAuthenticated
             .sink { [weak self] isAuth in
                 self?.isAuthenticated = isAuth
-                if isAuth, let uid = self?.authService.currentUser?.uid {
-                    Task { await self?.loadProfile(userId: uid) }
+                if isAuth, let user = self?.authService.currentUser {
+                    Task { await self?.loadProfile(userId: user.id) }
                 } else {
                     self?.userProfile = nil
                     self?.onboardingCompleted = false
@@ -47,100 +47,114 @@ final class AppViewModel: ObservableObject {
 
     private func loadProfile(userId: String) async {
         do {
-            if let profile = try await firestoreService.getProfile(userId: userId) {
-                userProfile = profile
-                onboardingCompleted = profile.onboardingCompleted
-            } else {
-                // New user — create default profile
-                let user = authService.currentUser
-                let profile = UserProfile.new(
-                    id: userId,
-                    name: user?.displayName ?? "User",
-                    email: user?.email ?? ""
-                )
-                try await firestoreService.saveProfile(profile)
-                userProfile = profile
-                onboardingCompleted = false
-            }
+            let profile = try await apiService.getProfile()
+            userProfile = UserProfile(
+                id: profile.id,
+                name: profile.name ?? "User",
+                email: profile.email ?? "",
+                avatarURL: profile.image,
+                severity: Severity(rawValue: profile.severity ?? ""),
+                goals: profile.goals ?? [],
+                onboardingCompleted: profile.onboardingCompleted,
+                currentDay: profile.currentDay,
+                currentStreak: profile.currentStreak,
+                longestStreak: profile.longestStreak,
+                lastPracticeDate: nil,
+                totalXP: profile.totalXp,
+                totalPracticeSeconds: profile.totalPracticeSeconds,
+                totalExercisesCompleted: profile.totalExercisesCompleted,
+                northStarGoal: profile.northStarGoal,
+                speechChallenges: profile.speechChallenges ?? [],
+                subscriptionPlan: SubscriptionPlan(rawValue: profile.subscriptionPlan) ?? .free,
+                subscriptionStatus: SubscriptionStatus(rawValue: profile.subscriptionStatus) ?? .active,
+                createdAt: Date()
+            )
+            onboardingCompleted = profile.onboardingCompleted
         } catch {
             print("Failed to load profile: \(error)")
+            // Use cached auth user data as fallback
+            if let user = authService.currentUser {
+                #if DEBUG
+                // Offline dev mode — create a rich profile so the app is fully usable
+                let devProfile = UserProfile(
+                    id: user.id,
+                    name: user.name ?? "Dev Tester",
+                    email: user.email ?? "tester@stutterlab.dev",
+                    avatarURL: nil,
+                    severity: .moderate,
+                    goals: ["Reduce blocks", "Phone calls", "Presentations"],
+                    onboardingCompleted: false, // Set to true to skip onboarding in dev mode
+                    currentDay: 5,
+                    currentStreak: 3,
+                    longestStreak: 5,
+                    lastPracticeDate: Date(),
+                    totalXP: 450,
+                    totalPracticeSeconds: 3600,
+                    totalExercisesCompleted: 12,
+                    northStarGoal: "Order coffee without avoiding any words",
+                    speechChallenges: ["Phone calls", "Ordering food", "Presentations"],
+                    subscriptionPlan: .pro,
+                    subscriptionStatus: .active,
+                    createdAt: Date()
+                )
+                userProfile = devProfile
+                onboardingCompleted = true
+                #else
+                userProfile = UserProfile.new(
+                    id: user.id,
+                    name: user.name ?? "User",
+                    email: user.email ?? ""
+                )
+                onboardingCompleted = false
+                #endif
+            }
         }
     }
 
-    func completeOnboarding(severity: Severity, goals: [String]) async {
+    func completeOnboarding(data: OnboardingPayload) async {
         guard var profile = userProfile else { return }
-        profile.severity = severity
-        profile.goals = goals
+        profile.severity = data.severity
+        profile.goals = data.speechChallenges
         profile.onboardingCompleted = true
 
         do {
-            try await firestoreService.saveProfile(profile)
-            userProfile = profile
-            onboardingCompleted = true
+            try await apiService.completeOnboarding(data: data)
         } catch {
-            print("Failed to save onboarding: \(error)")
+            print("Failed to save onboarding to server: \(error)")
         }
+        // Always update local state even if server call fails (offline support)
+        userProfile = profile
+        onboardingCompleted = true
     }
 
     // MARK: - Streak Management
 
     func updateStreak() async {
-        guard var profile = userProfile else { return }
-        let today = Calendar.current.startOfDay(for: Date())
-
-        if let lastPractice = profile.lastPracticeDate {
-            let lastDay = Calendar.current.startOfDay(for: lastPractice)
-            let dayDiff = Calendar.current.dateComponents([.day], from: lastDay, to: today).day ?? 0
-
-            if dayDiff == 1 {
-                // Consecutive day — increment streak
-                profile.currentStreak += 1
-            } else if dayDiff > 1 {
-                // Streak broken
-                profile.currentStreak = 1
-            }
-            // dayDiff == 0 means already practiced today — no change
-        } else {
-            profile.currentStreak = 1
-        }
-
-        profile.longestStreak = max(profile.longestStreak, profile.currentStreak)
-        profile.lastPracticeDate = today
-
-        do {
-            try await firestoreService.updateStreak(
-                userId: profile.id,
-                currentStreak: profile.currentStreak,
-                longestStreak: profile.longestStreak,
-                lastPracticeDate: today
-            )
-            userProfile = profile
-        } catch {
-            print("Failed to update streak: \(error)")
+        // Streak is now managed server-side when sessions are saved.
+        // Refresh profile to get latest streak data.
+        if let userId = userProfile?.id {
+            await loadProfile(userId: userId)
         }
     }
 
     func advanceDay() async {
         guard var profile = userProfile, profile.currentDay < 90 else { return }
         profile.currentDay += 1
-        do {
-            try await firestoreService.incrementDay(userId: profile.id, newDay: profile.currentDay)
-            userProfile = profile
-        } catch {
-            print("Failed to advance day: \(error)")
-        }
+        userProfile = profile
     }
 
     func addXP(_ amount: Int) async {
         guard var profile = userProfile else { return }
         profile.totalXP += amount
         profile.totalExercisesCompleted += 1
-        do {
-            try await firestoreService.addXP(userId: profile.id, xp: amount)
-            userProfile = profile
-        } catch {
-            print("Failed to add XP: \(error)")
-        }
+        userProfile = profile
+    }
+
+    // MARK: - Refresh Profile
+
+    func refreshProfile() async {
+        guard let userId = userProfile?.id else { return }
+        await loadProfile(userId: userId)
     }
 
     // MARK: - Premium Check

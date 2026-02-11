@@ -46,7 +46,7 @@ struct Exercise: Codable, Identifiable {
     }
 }
 
-// MARK: - AnyCodable (lightweight wrapper for Firestore JSON)
+// MARK: - AnyCodable (lightweight JSON wrapper)
 
 struct AnyCodable: Codable {
     let value: Any

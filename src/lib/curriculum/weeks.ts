@@ -3,7 +3,7 @@
  * Maps days 1-90 to weeks 1-13 for program navigation UI.
  */
 
-import { getDailyPlan, getPhaseInfo, PHASE_LABELS, PHASE_RANGES } from "./daily-plans";
+import { getDailyPlan, getPhaseInfo, PHASE_LABELS } from "./daily-plans";
 
 export interface WeekInfo {
   weekNumber: number;
@@ -27,35 +27,35 @@ export interface DayInfo {
 }
 
 const WEEK_TITLES: Record<number, string> = {
-  1: "Getting Started",
-  2: "Building Your Foundation",
+  1: "Your First Wins",
+  2: "Building Momentum",
   3: "New Techniques",
   4: "Finding Your Flow",
-  5: "Combining Skills",
-  6: "Deepening Practice",
-  7: "Advanced Techniques",
-  8: "Facing the Real World",
-  9: "Confidence in Action",
-  10: "Pushing Boundaries",
-  11: "Mastery Begins",
-  12: "Strengthening Gains",
+  5: "Going Deeper",
+  6: "The Mental Game",
+  7: "All Techniques Combined",
+  8: "Facing Real Scenarios",
+  9: "Pushing Boundaries",
+  10: "Owning Your Voice",
+  11: "Leading Your Practice",
+  12: "Strengthening Independence",
   13: "Graduation",
 };
 
 const WEEK_MILESTONES: Record<number, string> = {
-  1: "Breathing mastered, gentle onset introduced",
-  2: "Foundation checkpoint — ready for new techniques",
-  3: "Light contact & prolonged speech unlocked",
-  4: "FAF introduced, building blocks solidifying",
+  1: "DAF demo, first AI chat, first real-world challenge",
+  2: "Gentle onset + pausing mastered, feared words introduced",
+  3: "Light contact & FAF unlocked, technique depth begins",
+  4: "Multiple techniques combined, AI practice regular",
   5: "Cancellation & pull-out techniques learned",
-  6: "Preparatory set & voluntary stuttering practiced",
-  7: "All core techniques integrated",
-  8: "First AI conversation completed",
-  9: "Phone simulation conquered",
-  10: "Feared words practice underway",
-  11: "Advanced scenarios with confidence",
-  12: "Community engagement & independence",
-  13: "Program complete — maintenance mode unlocked",
+  6: "CBT thought records, voluntary stuttering practiced",
+  7: "All modification + shaping techniques integrated",
+  8: "Job interviews, phone calls, presentations in AI",
+  9: "Real-world challenges conquering feared situations",
+  10: "Disclosure practice, extended conversations mastered",
+  11: "Self-directed practice, maintenance routine designed",
+  12: "Teaching techniques, relapse prevention planned",
+  13: "Program complete — adaptive maintenance unlocked",
 };
 
 /** Get the week number for a given day (1-13 for days 1-90, 14+ for 91+) */

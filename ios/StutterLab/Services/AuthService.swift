@@ -1,69 +1,171 @@
 import AuthenticationServices
 import CryptoKit
-import FirebaseAuth
 import Foundation
 
-// MARK: - Auth Service
+// MARK: - Auth Service (BFF — no Firebase)
 
 @MainActor
 final class AuthService: ObservableObject {
 
-    @Published var currentUser: FirebaseAuth.User?
+    @Published var currentUser: AuthUser?
     @Published var isAuthenticated = false
     @Published var isLoading = true
 
-    private var authStateListener: AuthStateDidChangeListenerHandle?
     private var currentNonce: String?
 
+    // MARK: - Auth User
+
+    struct AuthUser: Codable {
+        let id: String
+        let name: String?
+        let email: String?
+        let image: String?
+    }
+
+    // MARK: - Init
+
     init() {
-        authStateListener = Auth.auth().addStateDidChangeListener { [weak self] _, user in
-            Task { @MainActor in
-                self?.currentUser = user
-                self?.isAuthenticated = user != nil
-                self?.isLoading = false
-            }
+        Task {
+            await checkExistingSession()
+            isLoading = false
         }
     }
 
-    deinit {
-        if let listener = authStateListener {
-            Auth.auth().removeStateDidChangeListener(listener)
+    // MARK: - Check Existing Session
+
+    private func checkExistingSession() async {
+        guard APIClient.shared.isAuthenticated else { return }
+
+        // Load cached user while we validate the token
+        if let cached: AuthUser = KeychainService.loadCodable(forKey: SLConfig.userKey) {
+            currentUser = cached
+            isAuthenticated = true
+        }
+
+        // Validate token by fetching profile
+        do {
+            let profile: ProfileResponse = try await APIClient.shared.get("/api/mobile/profile")
+            let user = AuthUser(
+                id: profile.id,
+                name: profile.name,
+                email: profile.email,
+                image: profile.image
+            )
+            currentUser = user
+            isAuthenticated = true
+            KeychainService.saveCodable(user, forKey: SLConfig.userKey)
+        } catch {
+            #if DEBUG
+            // In debug, keep cached session if server is unreachable (offline dev mode)
+            if currentUser != nil {
+                print("⚠️ Server unreachable — keeping cached dev session")
+                return
+            }
+            #endif
+            // Token expired or invalid — clear session
+            APIClient.shared.clearAuth()
+            currentUser = nil
+            isAuthenticated = false
         }
     }
 
     // MARK: - Apple Sign-In
 
-    /// Prepare a nonce for Apple Sign-In.
+    /// Prepare a SHA256 nonce for Apple Sign-In.
     func prepareAppleSignIn() -> String {
         let nonce = randomNonceString()
         currentNonce = nonce
         return sha256(nonce)
     }
 
-    /// Complete Apple Sign-In with the ASAuthorization credential.
+    /// Complete Apple Sign-In by sending the identity token to our backend.
     func signInWithApple(authorization: ASAuthorization) async throws {
         guard let appleCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
               let identityToken = appleCredential.identityToken,
-              let tokenString = String(data: identityToken, encoding: .utf8),
-              let nonce = currentNonce
+              let tokenString = String(data: identityToken, encoding: .utf8)
         else {
             throw AuthError.invalidCredential
         }
 
-        let credential = OAuthProvider.appleCredential(
-            withIDToken: tokenString,
-            rawNonce: nonce,
-            fullName: appleCredential.fullName
+        // Apple only provides the name on FIRST sign-in
+        let fullName = appleCredential.fullName
+        let name = [fullName?.givenName, fullName?.familyName]
+            .compactMap { $0 }
+            .joined(separator: " ")
+
+        try await authenticateWithBackend(
+            provider: "apple",
+            identityToken: tokenString,
+            name: name.isEmpty ? nil : name
+        )
+    }
+
+    // MARK: - Dev Login (DEBUG only)
+
+    #if DEBUG
+    func devLogin() async throws {
+        // Try server first; fall back to offline mock if unreachable
+        do {
+            let response: AuthResponse = try await APIClient.shared.post(
+                "/api/mobile/auth",
+                body: DevAuthRequest(provider: "dev", identityToken: "dev", name: "Dev Tester", email: "tester@stutterlab.dev")
+            )
+            APIClient.shared.token = response.token
+            currentUser = response.user
+            isAuthenticated = true
+            KeychainService.saveCodable(response.user, forKey: SLConfig.userKey)
+        } catch {
+            print("⚠️ Server unreachable — using offline dev login")
+            let mockUser = AuthUser(
+                id: "dev-\(UUID().uuidString.prefix(8))",
+                name: "Dev Tester",
+                email: "tester@stutterlab.dev",
+                image: nil
+            )
+            // Use a stable offline token so APIClient.isAuthenticated returns true
+            APIClient.shared.token = "offline-dev-token"
+            currentUser = mockUser
+            isAuthenticated = true
+            KeychainService.saveCodable(mockUser, forKey: SLConfig.userKey)
+        }
+    }
+    #endif
+
+    // MARK: - Google Sign-In (future)
+
+    func signInWithGoogle(identityToken: String, name: String? = nil) async throws {
+        try await authenticateWithBackend(
+            provider: "google",
+            identityToken: identityToken,
+            name: name
+        )
+    }
+
+    // MARK: - Backend Authentication
+
+    private func authenticateWithBackend(
+        provider: String,
+        identityToken: String,
+        name: String?
+    ) async throws {
+        let response: AuthResponse = try await APIClient.shared.post(
+            "/api/mobile/auth",
+            body: AuthRequest(provider: provider, identityToken: identityToken, name: name)
         )
 
-        let result = try await Auth.auth().signIn(with: credential)
-        currentUser = result.user
+        // Store JWT token
+        APIClient.shared.token = response.token
+
+        // Update state
+        currentUser = response.user
+        isAuthenticated = true
+        KeychainService.saveCodable(response.user, forKey: SLConfig.userKey)
     }
 
     // MARK: - Sign Out
 
-    func signOut() throws {
-        try Auth.auth().signOut()
+    func signOut() {
+        APIClient.shared.clearAuth()
         currentUser = nil
         isAuthenticated = false
     }
@@ -91,10 +193,52 @@ final class AuthService: ObservableObject {
         case invalidCredential
 
         var errorDescription: String? {
-            switch self {
-            case .invalidCredential:
-                return "Invalid Apple Sign-In credential."
-            }
+            "Invalid Apple Sign-In credential."
         }
     }
+}
+
+// MARK: - API DTOs
+
+struct AuthRequest: Encodable {
+    let provider: String
+    let identityToken: String
+    let name: String?
+}
+
+#if DEBUG
+struct DevAuthRequest: Encodable {
+    let provider: String
+    let identityToken: String
+    let name: String
+    let email: String
+}
+#endif
+
+struct AuthResponse: Decodable {
+    let token: String
+    let expiresAt: String
+    let user: AuthService.AuthUser
+}
+
+struct ProfileResponse: Decodable {
+    let id: String
+    let name: String?
+    let email: String?
+    let image: String?
+    let onboardingCompleted: Bool
+    let severity: String?
+    let goals: [String]?
+    let currentDay: Int
+    let currentStreak: Int
+    let longestStreak: Int
+    let totalXp: Int
+    let level: Int
+    let totalPracticeSeconds: Int
+    let totalExercisesCompleted: Int
+    let subscriptionPlan: String
+    let subscriptionStatus: String
+    let lastPracticeDate: String?
+    let northStarGoal: String?
+    let speechChallenges: [String]?
 }

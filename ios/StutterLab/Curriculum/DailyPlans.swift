@@ -25,6 +25,16 @@ enum DailyPlanGenerator {
         "I deserve to be heard, just like everyone else.",
         "Today, I practice not for perfection, but for progress.",
         "I am building new neural pathways with every exercise.",
+        "Stuttering is neurology, not a character flaw. I practice to rewire, not to fix who I am.",
+        "fMRI studies prove that practice changes brain structure. Every session is literally reshaping my speech circuits.",
+        "70 million people stutter worldwide. I'm not alone, and I'm doing something about it.",
+        "Avoidance makes stuttering harder. Speaking up — even imperfectly — is the path forward.",
+        "The same brain that stutters also compensates, adapts, and grows. Neuroplasticity is on my side.",
+        "Talking more helps, not hurts. Every conversation is practice, and every practice strengthens new pathways.",
+        "My stutter has zero correlation with my intelligence. Research confirms this — repeatedly.",
+        "Stress doesn't cause stuttering — it just raises tension temporarily. I have techniques for that.",
+        "I speak not because it's easy, but because what I have to say matters.",
+        "Singing and reading aloud use different neural pathways. I'm building those alternative circuits right now.",
     ]
 
     // MARK: - Phase Titles

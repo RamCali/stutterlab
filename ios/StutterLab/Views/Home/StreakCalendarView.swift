@@ -59,14 +59,7 @@ struct StreakCalendarView: View {
                 }
             }
         }
-        .padding(SLSpacing.s4)
-        .background(Color.obsidianNight)
-        .overlay(Color.elevation1)
-        .cornerRadius(SLRadius.md)
-        .overlay(
-            RoundedRectangle(cornerRadius: SLRadius.md)
-                .stroke(Color.border, lineWidth: 1)
-        )
+        .slCard()
     }
 
     private func last35Days() -> [Date] {

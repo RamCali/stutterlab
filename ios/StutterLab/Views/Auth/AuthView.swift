@@ -6,74 +6,105 @@ import SwiftUI
 struct AuthView: View {
     @EnvironmentObject var appViewModel: AppViewModel
     @State private var error: String?
+    @State private var glowPulse = false
 
     var body: some View {
         ZStack {
-            Color.obsidianNight.ignoresSafeArea()
+            // Gradient background
+            LinearGradient(
+                colors: [Color(hex: "0F2027"), Color.obsidianNight],
+                startPoint: .top,
+                endPoint: .bottom
+            ).ignoresSafeArea()
 
             VStack(spacing: SLSpacing.s8) {
                 Spacer()
 
-                // Logo
-                VStack(spacing: SLSpacing.s3) {
-                    Image(systemName: "waveform.path")
-                        .font(.system(size: 64))
-                        .foregroundColor(.clarityTeal)
+                // Logo with glow
+                VStack(spacing: SLSpacing.s4) {
+                    ZStack {
+                        GlowCircle(color: .clarityTeal, size: 140, blur: 40)
+
+                        Image(systemName: "waveform.path")
+                            .font(.system(size: 64))
+                            .foregroundStyle(Color.tealGradient)
+                    }
 
                     Text("StutterLab")
                         .font(.sl3XL)
                         .foregroundColor(.textPrimary)
+                        .tracking(SLLetterSpacing.tight)
 
                     Text("The Science of Happy Talking.")
                         .font(.system(size: 16, weight: .light, design: .serif))
                         .italic()
                         .foregroundColor(.textSecondary)
                 }
+                .slEntrance(delay: 0.2)
 
                 Spacer()
 
-                // Evidence callout
-                VStack(spacing: SLSpacing.s2) {
-                    Text("Evidence-based stuttering treatment")
-                        .font(.slSM)
-                        .foregroundColor(.textSecondary)
-                    Text("Effect sizes d = 0.75–1.63")
-                        .font(.slXS)
-                        .foregroundColor(.clarityTeal)
-                }
+                // Sign-in section
+                VStack(spacing: SLSpacing.s5) {
+                    // Evidence callout
+                    VStack(spacing: SLSpacing.s2) {
+                        Text("Evidence-based stuttering treatment")
+                            .font(.slSM)
+                            .foregroundColor(.textSecondary)
+                        Text("Effect sizes d = 0.75–1.63")
+                            .font(.slXS)
+                            .fontWeight(.medium)
+                            .foregroundColor(.clarityTeal)
+                    }
 
-                Spacer()
+                    // Sign In with Apple
+                    SignInWithAppleButton(.signIn) { request in
+                        request.requestedScopes = [.fullName, .email]
+                        let nonce = appViewModel.authService.prepareAppleSignIn()
+                        request.nonce = nonce
+                    } onCompletion: { result in
+                        switch result {
+                        case .success(let authorization):
+                            Task {
+                                do {
+                                    try await appViewModel.authService.signInWithApple(authorization: authorization)
+                                } catch {
+                                    self.error = error.localizedDescription
+                                }
+                            }
+                        case .failure(let err):
+                            self.error = err.localizedDescription
+                        }
+                    }
+                    .signInWithAppleButtonStyle(.white)
+                    .frame(height: 54)
+                    .cornerRadius(SLRadius.md)
 
-                // Sign In with Apple
-                SignInWithAppleButton(.signIn) { request in
-                    request.requestedScopes = [.fullName, .email]
-                    let nonce = appViewModel.authService.prepareAppleSignIn()
-                    request.nonce = nonce
-                } onCompletion: { result in
-                    switch result {
-                    case .success(let authorization):
+                    if let error {
+                        Text(error)
+                            .font(.slXS)
+                            .foregroundColor(.sunsetAmber)
+                    }
+
+                    #if DEBUG
+                    Button {
                         Task {
                             do {
-                                try await appViewModel.authService.signInWithApple(authorization: authorization)
+                                try await appViewModel.authService.devLogin()
                             } catch {
                                 self.error = error.localizedDescription
                             }
                         }
-                    case .failure(let err):
-                        self.error = err.localizedDescription
+                    } label: {
+                        Text("Dev Login (Debug Only)")
                     }
+                    .buttonStyle(SLSecondaryButtonStyle(color: .clarityTeal))
+                    .slHaptic(.light)
+                    #endif
                 }
-                .signInWithAppleButtonStyle(.white)
-                .frame(height: 50)
-                .cornerRadius(SLRadius.md)
+                .slCardElevated(radius: SLRadius.lg)
                 .padding(.horizontal, SLSpacing.s4)
-
-                if let error {
-                    Text(error)
-                        .font(.slXS)
-                        .foregroundColor(.sunsetAmber)
-                        .padding(.horizontal, SLSpacing.s4)
-                }
+                .slEntrance(delay: 0.5)
 
                 // Disclaimer
                 Text("By signing in, you agree to our Terms of Service and Privacy Policy.")
@@ -82,6 +113,7 @@ struct AuthView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, SLSpacing.s8)
                     .padding(.bottom, SLSpacing.s8)
+                    .slEntrance(delay: 0.7)
             }
         }
     }

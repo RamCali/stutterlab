@@ -12,7 +12,12 @@ struct PhaseUnlockView: View {
 
     var body: some View {
         ZStack {
-            Color.obsidianNight.ignoresSafeArea()
+            LinearGradient(
+                colors: [Color.obsidianNight, Color.obsidianNight.opacity(0.9), Color.clarityTeal.opacity(0.1)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
 
             // Confetti particles
             if confettiActive {
@@ -71,14 +76,9 @@ struct PhaseUnlockView: View {
 
                 Button(action: onContinue) {
                     Text("Let's Go!")
-                        .font(.slBase)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.obsidianNight)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, SLSpacing.s3)
-                        .background(Color.fluencyGreen)
-                        .cornerRadius(SLRadius.md)
                 }
+                .buttonStyle(SLPrimaryButtonStyle(color: .fluencyGreen))
+                .slHaptic(.heavy)
                 .padding(.horizontal, SLSpacing.s4)
                 .padding(.bottom, SLSpacing.s8)
                 .opacity(appear ? 1 : 0)

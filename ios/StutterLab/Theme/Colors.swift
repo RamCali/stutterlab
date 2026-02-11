@@ -26,12 +26,53 @@ extension Color {
     static let elevation16 = Color.white.opacity(0.15) // 16dp — modal sheets
     static let elevation24 = Color.white.opacity(0.16) // 24dp — dialogs
 
+    // MARK: Card Surfaces
+
+    static let cardSurface = Color(hex: "151A22")
+    static let cardSurfaceElevated = Color(hex: "1D2330")
+
     // MARK: Semantic Colors
 
     static let textPrimary = Color.white
     static let textSecondary = Color.white.opacity(0.6)
     static let textTertiary = Color.white.opacity(0.4)
-    static let border = Color.white.opacity(0.06)
+    static let border = Color.white.opacity(0.10)
+    static let borderSubtle = Color.white.opacity(0.06)
+    static let borderAccent = Color.white.opacity(0.15)
+
+    // MARK: Shadows
+
+    static let shadowColor = Color.black.opacity(0.4)
+
+    // MARK: Tool Tint Colors
+
+    static let tintPurple = Color(hex: "A78BFA")
+    static let tintPink = Color(hex: "F472B6")
+    static let tintBlue = Color(hex: "60A5FA")
+    static let tintRed = Color(hex: "FF6B6B")
+
+    // MARK: Gradients
+
+    static let tealGradient = LinearGradient(
+        colors: [Color(hex: "48C6B3"), Color(hex: "3AA8D8")],
+        startPoint: .topLeading, endPoint: .bottomTrailing
+    )
+    static let amberGradient = LinearGradient(
+        colors: [Color(hex: "FFB347"), Color(hex: "FFD700")],
+        startPoint: .topLeading, endPoint: .bottomTrailing
+    )
+    static let premiumGradient = LinearGradient(
+        colors: [Color(hex: "FFB347"), Color(hex: "FF8C00")],
+        startPoint: .leading, endPoint: .trailing
+    )
+    static let heroGradient = LinearGradient(
+        colors: [Color(hex: "48C6B3").opacity(0.15), Color(hex: "0B0E14")],
+        startPoint: .topLeading, endPoint: .bottomTrailing
+    )
+    static let sessionGradient = LinearGradient(
+        colors: [Color(hex: "1A1F26"), Color(hex: "0B0E14")],
+        startPoint: .top, endPoint: .bottom
+    )
 }
 
 // MARK: - Hex Initializer
