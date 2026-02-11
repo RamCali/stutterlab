@@ -43,6 +43,9 @@ export function TechniqueStep({
   const audioCtxRef = useRef<AudioContext | null>(null);
   const animFrameRef = useRef<number | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const delayNodeRef = useRef<DelayNode | null>(null);
+  const dafGainRef = useRef<GainNode | null>(null);
+  const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
 
   const items = propItems ?? readingContent[contentLevel];
   const currentItem = items[currentIndex];
@@ -59,12 +62,13 @@ export function TechniqueStep({
 
   function updateBars() {
     if (!analyserRef.current) return;
-    const data = new Uint8Array(analyserRef.current.frequencyBinCount);
-    analyserRef.current.getByteFrequencyData(data);
+    const data = new Uint8Array(analyserRef.current.fftSize);
+    analyserRef.current.getByteTimeDomainData(data);
     const step = Math.floor(data.length / 40);
     const newBars = Array(40).fill(0).map((_, i) => {
-      const val = data[i * step] ?? 0;
-      return (val / 255) * 100;
+      // Time domain: 128 = silence, 0/255 = max amplitude
+      const val = data[i * step] ?? 128;
+      return Math.min(100, (Math.abs(val - 128) / 128) * 200);
     });
     setBars(newBars);
     animFrameRef.current = requestAnimationFrame(updateBars);
@@ -82,10 +86,25 @@ export function TechniqueStep({
       if (ctx.state === "suspended") await ctx.resume();
       audioCtxRef.current = ctx;
       const source = ctx.createMediaStreamSource(stream);
+      sourceRef.current = source;
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 256;
       source.connect(analyser);
       analyserRef.current = analyser;
+
+      // DAF: route mic audio through a delay node to speakers
+      if (dafEnabled) {
+        const delay = ctx.createDelay(0.5);
+        delay.delayTime.value = 0.07; // 70ms
+        const gain = ctx.createGain();
+        gain.gain.value = 0.85;
+        source.connect(delay);
+        delay.connect(gain);
+        gain.connect(ctx.destination);
+        delayNodeRef.current = delay;
+        dafGainRef.current = gain;
+      }
+
       animFrameRef.current = requestAnimationFrame(updateBars);
     } catch {
       // Continue without mic — still allow practice
@@ -100,6 +119,15 @@ export function TechniqueStep({
   function stopRecording() {
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     analyserRef.current = null;
+    if (delayNodeRef.current) {
+      delayNodeRef.current.disconnect();
+      delayNodeRef.current = null;
+    }
+    if (dafGainRef.current) {
+      dafGainRef.current.disconnect();
+      dafGainRef.current = null;
+    }
+    sourceRef.current = null;
     if (audioCtxRef.current) {
       audioCtxRef.current.close();
       audioCtxRef.current = null;
