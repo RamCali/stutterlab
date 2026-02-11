@@ -1,192 +1,258 @@
 "use client";
 
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   Zap,
   Trophy,
-  Clock,
   Target,
-  Phone,
-  BookOpen,
-  Mic,
-  Brain,
   CheckCircle2,
-  Crown,
+  Flame,
+  Star,
+  Phone,
+  Coffee,
+  MapPin,
+  ShoppingBag,
+  Users,
+  Briefcase,
+  BookOpen,
+  Loader2,
+  Sparkles,
 } from "lucide-react";
+import { getUserGamificationStats, type LevelInfo } from "@/lib/gamification/engine";
+import { getAchievementStatus } from "@/lib/gamification/achievements";
+import {
+  getTodayChallenge,
+  completeDailyChallenge,
+  type DailyChallenge,
+} from "@/lib/actions/challenges";
 
-const weeklyChallenges = [
-  {
-    id: "1",
-    title: "Phone Call Hero",
-    description: "Complete 3 phone call simulations this week",
-    icon: Phone,
-    color: "text-blue-500",
-    bg: "bg-blue-500/10",
-    xp: 150,
-    progress: 1,
-    total: 3,
-    isPremium: false,
-  },
-  {
-    id: "2",
-    title: "Daily Dedication",
-    description: "Practice every day for 7 days straight",
-    icon: Target,
-    color: "text-orange-500",
-    bg: "bg-orange-500/10",
-    xp: 200,
-    progress: 3,
-    total: 7,
-    isPremium: false,
-  },
-  {
-    id: "3",
-    title: "Reading Marathon",
-    description: "Complete 10 reading exercises at sentence level or higher",
-    icon: BookOpen,
-    color: "text-green-500",
-    bg: "bg-green-500/10",
-    xp: 100,
-    progress: 4,
-    total: 10,
-    isPremium: false,
-  },
-  {
-    id: "4",
-    title: "Mindful Speaker",
-    description: "Do 5 breathing exercises before speaking situations",
-    icon: Brain,
-    color: "text-purple-500",
-    bg: "bg-purple-500/10",
-    xp: 120,
-    progress: 2,
-    total: 5,
-    isPremium: true,
-  },
-  {
-    id: "5",
-    title: "Voice Journaler",
-    description: "Record 4 voice journal entries this week",
-    icon: Mic,
-    color: "text-pink-500",
-    bg: "bg-pink-500/10",
-    xp: 100,
-    progress: 0,
-    total: 4,
-    isPremium: true,
-  },
-];
+const CATEGORY_ICONS: Record<string, typeof Phone> = {
+  phone: Phone,
+  social: Users,
+  ordering: Coffee,
+  work: Briefcase,
+  general: BookOpen,
+};
 
-const achievements = [
-  { title: "First Steps", emoji: "🎯", description: "Complete your first exercise", unlocked: true },
-  { title: "Dedicated", emoji: "🔥", description: "7-day practice streak", unlocked: false },
-  { title: "Consistent", emoji: "⭐", description: "30-day practice streak", unlocked: false },
-  { title: "Audio Explorer", emoji: "🎧", description: "Try all Audio Lab tools", unlocked: false },
-  { title: "Brave Caller", emoji: "📞", description: "Complete a phone call sim", unlocked: true },
-  { title: "Journaler", emoji: "📝", description: "Record 7 voice journals", unlocked: false },
-  { title: "Century", emoji: "💯", description: "Complete 100 exercises", unlocked: false },
-  { title: "Social Butterfly", emoji: "🦋", description: "Join a practice room", unlocked: false },
-];
+const DIFFICULTY_COLORS: Record<string, string> = {
+  easy: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+  medium: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+  hard: "bg-red-500/10 text-red-500 border-red-500/20",
+};
+
+type GamificationStats = Awaited<ReturnType<typeof getUserGamificationStats>>;
+type AchievementItem = Awaited<ReturnType<typeof getAchievementStatus>>[number];
 
 export default function ChallengesPage() {
+  const [stats, setStats] = useState<GamificationStats | null>(null);
+  const [achievements, setAchievements] = useState<AchievementItem[]>([]);
+  const [todayData, setTodayData] = useState<{
+    challenge: DailyChallenge;
+    completed: boolean;
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [completing, setCompleting] = useState(false);
+
+  useEffect(() => {
+    Promise.all([
+      getUserGamificationStats(""),
+      getAchievementStatus(""),
+      getTodayChallenge(),
+    ])
+      .then(([gamStats, achStatus, today]) => {
+        setStats(gamStats);
+        setAchievements(achStatus);
+        setTodayData({ challenge: today.challenge, completed: today.completed });
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  async function handleCompleteChallenge() {
+    if (!todayData || todayData.completed || completing) return;
+    setCompleting(true);
+    try {
+      const result = await completeDailyChallenge(todayData.challenge.id);
+      setTodayData((prev) => prev ? { ...prev, completed: true } : null);
+      // Refresh stats
+      const [newStats, newAch] = await Promise.all([
+        getUserGamificationStats(""),
+        getAchievementStatus(""),
+      ]);
+      setStats(newStats);
+      setAchievements(newAch);
+    } catch {
+      // Handle error silently
+    } finally {
+      setCompleting(false);
+    }
+  }
+
+  const unlockedCount = achievements.filter((a) => a.unlocked).length;
+  const level = stats?.level;
+  const CategoryIcon = todayData
+    ? CATEGORY_ICONS[todayData.challenge.category] || Target
+    : Target;
+
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Zap className="h-6 w-6 text-primary" />
-          Challenges
+          Challenges & Achievements
         </h1>
         <p className="text-muted-foreground mt-1">
-          Weekly challenges and achievements to keep you motivated
+          Real-world practice missions to build lasting confidence
         </p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* Stats Banner */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card>
           <CardContent className="pt-5 pb-4 text-center">
             <Trophy className="h-5 w-5 text-yellow-500 mx-auto mb-1" />
-            <p className="text-2xl font-bold">240</p>
+            <p className="text-2xl font-bold">{loading ? "..." : stats?.totalXp ?? 0}</p>
             <p className="text-[10px] text-muted-foreground">Total XP</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5 pb-4 text-center">
+            <Star className="h-5 w-5 text-primary mx-auto mb-1" />
+            <p className="text-2xl font-bold">{loading ? "..." : level?.level ?? 1}</p>
+            <p className="text-[10px] text-muted-foreground">{level?.title ?? "Beginner"}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-5 pb-4 text-center">
+            <Flame className="h-5 w-5 text-orange-500 mx-auto mb-1" />
+            <p className="text-2xl font-bold">{loading ? "..." : stats?.currentStreak ?? 0}</p>
+            <p className="text-[10px] text-muted-foreground">Day Streak</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-5 pb-4 text-center">
             <CheckCircle2 className="h-5 w-5 text-emerald-500 mx-auto mb-1" />
-            <p className="text-2xl font-bold">2/8</p>
+            <p className="text-2xl font-bold">
+              {loading ? "..." : `${unlockedCount}/${achievements.length}`}
+            </p>
             <p className="text-[10px] text-muted-foreground">Achievements</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Weekly Challenges */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold">This Week&apos;s Challenges</h2>
-          <Badge variant="secondary" className="text-xs">
-            <Clock className="h-3 w-3 mr-1" />
-            5 days left
-          </Badge>
-        </div>
-        <div className="space-y-3">
-          {weeklyChallenges.map((challenge) => {
-            const pct = Math.round((challenge.progress / challenge.total) * 100);
-            const complete = challenge.progress >= challenge.total;
+      {/* Level Progress */}
+      {level && (
+        <Card>
+          <CardContent className="pt-5 pb-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium">Level {level.level}: {level.title}</span>
+              </div>
+              <span className="text-xs text-muted-foreground">
+                {level.currentXp} / {level.xpForNextLevel} XP
+              </span>
+            </div>
+            <Progress value={level.progress} className="h-2" />
+          </CardContent>
+        </Card>
+      )}
 
-            return (
-              <Card key={challenge.id} className={complete ? "opacity-60" : ""}>
-                <CardContent className="py-4">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${challenge.bg} flex-shrink-0`}>
-                      <challenge.icon className={`h-5 w-5 ${challenge.color}`} />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-medium text-sm">{challenge.title}</h3>
-                        {challenge.isPremium && (
-                          <Badge variant="outline" className="text-[10px]">
-                            <Crown className="h-2.5 w-2.5 mr-0.5" />
-                            PRO
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground">{challenge.description}</p>
-                      <div className="mt-2 flex items-center gap-2">
-                        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-primary rounded-full transition-all"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                        <span className="text-[10px] text-muted-foreground">
-                          {challenge.progress}/{challenge.total}
-                        </span>
-                      </div>
-                    </div>
-                    <Badge variant="secondary" className="text-[10px] flex-shrink-0">
-                      +{challenge.xp} XP
+      {/* Today's Real-World Challenge */}
+      <Card className={todayData?.completed ? "border-emerald-500/30 bg-emerald-500/5" : "border-primary/30 bg-primary/5"}>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Target className="h-4 w-4" />
+            Today&apos;s Real-World Challenge
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {todayData ? (
+            <div className="space-y-4">
+              <div className="flex items-start gap-4">
+                <div className="text-4xl">{todayData.challenge.icon}</div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-semibold">{todayData.challenge.title}</h3>
+                    <Badge
+                      variant="outline"
+                      className={`text-[10px] ${DIFFICULTY_COLORS[todayData.challenge.difficulty]}`}
+                    >
+                      {todayData.challenge.difficulty}
+                    </Badge>
+                    <Badge variant="secondary" className="text-[10px]">
+                      +{todayData.challenge.xpReward} XP
                     </Badge>
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      </div>
+                  <p className="text-sm text-muted-foreground">
+                    {todayData.challenge.description}
+                  </p>
+                </div>
+              </div>
+
+              {/* Tips */}
+              <div className="pl-14 space-y-1">
+                {todayData.challenge.tips.map((tip, i) => (
+                  <p key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                    <span className="text-primary mt-0.5">•</span>
+                    {tip}
+                  </p>
+                ))}
+              </div>
+
+              {todayData.completed ? (
+                <div className="pl-14 flex items-center gap-2 text-emerald-500">
+                  <CheckCircle2 className="h-5 w-5" />
+                  <span className="font-medium text-sm">Completed! +{todayData.challenge.xpReward} XP earned</span>
+                </div>
+              ) : (
+                <div className="pl-14">
+                  <Button
+                    onClick={handleCompleteChallenge}
+                    disabled={completing}
+                    size="lg"
+                    className="w-full sm:w-auto"
+                  >
+                    {completing ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                    )}
+                    I Did It!
+                  </Button>
+                  <p className="text-[10px] text-muted-foreground mt-2">
+                    Complete this challenge in real life, then tap &quot;I Did It&quot; to earn XP.
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
 
       {/* Achievements */}
       <div>
         <h2 className="text-lg font-semibold mb-3">Achievements</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {achievements.map((a) => (
-            <Card key={a.title} className={a.unlocked ? "" : "opacity-40"}>
+            <Card key={a.id} className={a.unlocked ? "border-primary/20" : "opacity-40"}>
               <CardContent className="pt-4 pb-3 text-center">
                 <span className="text-2xl">{a.emoji}</span>
                 <p className="font-medium text-xs mt-1">{a.title}</p>
                 <p className="text-[10px] text-muted-foreground mt-0.5">{a.description}</p>
+                {a.unlocked && (
+                  <Badge variant="secondary" className="mt-1.5 text-[9px]">
+                    +{a.xpReward} XP
+                  </Badge>
+                )}
               </CardContent>
             </Card>
           ))}

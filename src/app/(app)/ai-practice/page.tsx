@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Brain,
   Phone,
@@ -17,8 +18,13 @@ import {
   MessageSquare,
   Sparkles,
   Star,
+  Lock,
+  Crown,
+  Zap,
 } from "lucide-react";
 import { getPrioritizedScenarioIds } from "@/lib/onboarding/feared-situations";
+import { checkAISimUsage } from "@/lib/auth/premium";
+import type { PlanTier } from "@/lib/auth/premium";
 
 const scenarios = [
   {
@@ -120,6 +126,17 @@ const difficultyColors: Record<string, string> = {
 };
 
 export default function AIPracticePage() {
+  const [usage, setUsage] = useState<{
+    used: number;
+    limit: number;
+    canStart: boolean;
+    plan: PlanTier;
+  } | null>(null);
+
+  useEffect(() => {
+    checkAISimUsage().then(setUsage).catch(() => {});
+  }, []);
+
   const sortedScenarios = useMemo(() => {
     const prioritized = getPrioritizedScenarioIds();
     if (prioritized.length === 0) return scenarios;
@@ -136,6 +153,9 @@ export default function AIPracticePage() {
 
   const prioritizedIds = useMemo(() => new Set(getPrioritizedScenarioIds()), []);
 
+  const isLocked = usage !== null && !usage.canStart;
+  const needsUpgrade = usage !== null && (usage.plan === "free" || usage.plan === "core");
+
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       <div>
@@ -148,6 +168,16 @@ export default function AIPracticePage() {
           to your fluency level. Not scripted -- every conversation is unique.
         </p>
       </div>
+
+      {/* Usage Status Banner */}
+      {usage && (
+        <UsageBanner
+          plan={usage.plan}
+          used={usage.used}
+          limit={usage.limit}
+          canStart={usage.canStart}
+        />
+      )}
 
       {/* Phone Call Simulator Banner */}
       <Card className="border-red-500/30 bg-red-500/5">
@@ -183,11 +213,11 @@ export default function AIPracticePage() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {sortedScenarios.map((scenario) => (
-          <Link key={scenario.id} href={`/ai-practice/${scenario.id}`}>
-            <Card className={`hover:border-primary/50 transition-colors cursor-pointer h-full ${
-              prioritizedIds.has(scenario.id) ? "border-amber-500/30" : ""
-            }`}>
+        {sortedScenarios.map((scenario) => {
+          const card = (
+            <Card className={`transition-colors h-full ${
+              isLocked ? "opacity-60" : "hover:border-primary/50 cursor-pointer"
+            } ${prioritizedIds.has(scenario.id) ? "border-amber-500/30" : ""}`}>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-3">
                   <div className={`p-2.5 rounded-lg ${scenario.bg} shrink-0`}>
@@ -196,6 +226,7 @@ export default function AIPracticePage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold text-sm">{scenario.title}</h3>
+                      {isLocked && <Lock className="h-3 w-3 text-muted-foreground" />}
                       {prioritizedIds.has(scenario.id) && (
                         <Star className="h-3 w-3 text-amber-500 fill-amber-500 flex-shrink-0" />
                       )}
@@ -218,10 +249,126 @@ export default function AIPracticePage() {
                 </div>
               </CardContent>
             </Card>
-          </Link>
-        ))}
+          );
+
+          if (isLocked) {
+            return <div key={scenario.id}>{card}</div>;
+          }
+
+          return (
+            <Link key={scenario.id} href={`/ai-practice/${scenario.id}`}>
+              {card}
+            </Link>
+          );
+        })}
       </div>
 
+    </div>
+  );
+}
+
+function UsageBanner({
+  plan,
+  used,
+  limit,
+  canStart,
+}: {
+  plan: PlanTier;
+  used: number;
+  limit: number;
+  canStart: boolean;
+}) {
+  const [loading, setLoading] = useState(false);
+
+  async function handleUpgrade(targetPlan: PlanTier) {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: targetPlan }),
+      });
+      const { url } = await res.json();
+      if (url) window.location.href = url;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Free/Core users: no access at all
+  if (plan === "free" || plan === "core") {
+    return (
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="py-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Lock className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">AI Simulations require Pro or Elite</p>
+                <p className="text-xs text-muted-foreground">
+                  Pro: 1 session/week. Elite: unlimited sessions.
+                </p>
+              </div>
+            </div>
+            <Button size="sm" onClick={() => handleUpgrade("pro")} disabled={loading}>
+              <Crown className="h-4 w-4 mr-1" />
+              Upgrade
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Elite/SLP: unlimited
+  if (limit === Infinity) {
+    return (
+      <div className="flex items-center gap-2">
+        <Badge variant="secondary" className="text-xs">
+          <Zap className="h-3 w-3 mr-1" />
+          Unlimited Simulations
+        </Badge>
+      </div>
+    );
+  }
+
+  // Pro: show usage
+  const remaining = Math.max(0, limit - used);
+
+  if (!canStart) {
+    return (
+      <Card className="border-amber-500/20 bg-amber-500/5">
+        <CardContent className="py-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-amber-500/10">
+                <Lock className="h-5 w-5 text-amber-500" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">Weekly limit reached</p>
+                <p className="text-xs text-muted-foreground">
+                  You&apos;ve used your {limit} simulation{limit !== 1 ? "s" : ""} this week. Resets Monday.
+                </p>
+              </div>
+            </div>
+            <Button size="sm" variant="outline" onClick={() => handleUpgrade("elite")} disabled={loading}>
+              <Zap className="h-4 w-4 mr-1" />
+              Go Elite
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <Badge variant="secondary" className="text-xs">
+        <Brain className="h-3 w-3 mr-1" />
+        {remaining} of {limit} simulation{limit !== 1 ? "s" : ""} remaining this week
+      </Badge>
     </div>
   );
 }

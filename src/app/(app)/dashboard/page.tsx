@@ -11,6 +11,7 @@ import { MilestoneCard } from "@/components/dashboard/milestone-card";
 import { WeekProgressStrip } from "@/components/dashboard/week-progress-strip";
 import { NorthStarCard } from "@/components/dashboard/north-star";
 import { Badge } from "@/components/ui/badge";
+import { SLPAuthorityBadge } from "@/components/slp-authority-badge";
 
 export default function DashboardPage() {
   const [onboarded, setOnboarded] = useState(() => isOnboardingComplete());
@@ -87,6 +88,9 @@ export default function DashboardPage() {
 
       {/* North Star Goal */}
       <NorthStarCard />
+
+      {/* SLP Authority */}
+      <SLPAuthorityBadge variant="card" />
     </div>
   );
 }

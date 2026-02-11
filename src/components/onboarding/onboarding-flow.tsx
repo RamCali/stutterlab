@@ -215,6 +215,9 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 className="mt-1.5"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && name.trim()) setStep(1);
+                }}
                 autoFocus
               />
             </div>

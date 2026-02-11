@@ -94,7 +94,7 @@ const features = [
 
 const stats = [
   { value: "80%", label: "Stuttering reduction with DAF+FAF" },
-  { value: "90", label: "Days of structured curriculum" },
+  { value: "90", label: "Days of SLP-designed curriculum" },
   { value: "100%", label: "Browser-based — zero downloads" },
   { value: "24/7", label: "AI-powered practice anytime" },
 ];
@@ -104,7 +104,7 @@ const pricingTiers = [
     name: "Free",
     price: "$0",
     period: "forever",
-    description: "Get started with core tools",
+    description: "Explore the core tools",
     features: [
       "DAF tool in Audio Lab",
       "3 exercises per day",
@@ -115,42 +115,26 @@ const pricingTiers = [
     highlighted: false,
   },
   {
-    name: "Pro",
+    name: "Premium",
     price: "$99",
-    period: "per year",
-    monthlyNote: "Just $8.25/month",
-    description: "The complete stuttering treatment toolkit",
+    period: "per month",
+    yearlyNote: "$999/year — save $189",
+    description: "The complete SLP-designed treatment program",
     features: [
       "Full Audio Lab (DAF + FAF + Choral + Metronome)",
-      "90-day structured daily curriculum",
-      "AI Stutter Fingerprint analysis",
-      "AI Conversation & Phone Call Simulator",
-      "Voice Journal with fluency tracking",
-      "Feared Words Trainer",
+      "90-day SLP-designed curriculum",
+      "Unlimited AI Conversation & Phone Call Simulator",
+      "AI Stutter Fingerprint with disfluency analysis",
+      "Real-world daily challenges with XP & achievements",
+      "Feared Words Trainer with level progression",
+      "Voice Journal with fluency scoring",
       "CBT & Mindfulness module",
-      "Real-World Challenges",
       "Full community + practice partners",
-      "Weekly AI coaching report",
+      "Clinical progress reports (SSI-4 scoring)",
       "7-day free trial",
     ],
     cta: "Start 7-Day Free Trial",
     highlighted: true,
-  },
-  {
-    name: "SLP",
-    price: "$79",
-    period: "per seat/month",
-    description: "For Speech-Language Pathologists",
-    features: [
-      "Everything in Pro",
-      "Patient management dashboard",
-      "Prescribe exercises & homework",
-      "Progress reports (PDF export)",
-      "Telehealth video sessions",
-      "SOAP note templates",
-    ],
-    cta: "Contact Sales",
-    highlighted: false,
   },
 ];
 
@@ -187,8 +171,8 @@ export default function LandingPage() {
             variant="secondary"
             className="mb-5 bg-primary/10 text-primary border-0 px-4 py-1.5"
           >
-            <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-            The First Browser-Based Stuttering Treatment Platform
+            <Shield className="h-3.5 w-3.5 mr-1.5" />
+            SLP-Designed Stuttering Treatment Program
           </Badge>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1]">
             Speak Without Fear{" "}
@@ -371,6 +355,54 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ═══ Founder Story / Clinical Authority ═══ */}
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Photo placeholder */}
+            <div className="flex justify-center">
+              <div className="w-72 h-72 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/10 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="h-20 w-20 rounded-full bg-primary/10 mx-auto flex items-center justify-center">
+                    <Shield className="h-10 w-10 text-primary" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-3">Founder Photo</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Story */}
+            <div>
+              <Badge variant="secondary" className="mb-4 bg-primary/10 text-primary border-0">
+                <Shield className="h-3 w-3 mr-1" />
+                From the Founder
+              </Badge>
+              <h2 className="text-2xl md:text-3xl font-bold">
+                Designed by a Licensed Speech-Language Pathologist
+              </h2>
+              <p className="text-muted-foreground mt-4 leading-relaxed">
+                &ldquo;I built StutterLab because I saw what was missing. My clients would make incredible progress in our sessions together — then struggle to practice between appointments. They needed a tool that felt like having their SLP in their pocket.&rdquo;
+              </p>
+              <p className="text-muted-foreground mt-3 leading-relaxed">
+                &ldquo;Every exercise, every AI conversation prompt, every progression in this 90-day curriculum is built on evidence-based fluency shaping and stuttering modification techniques. This isn&apos;t a generic app — it&apos;s a clinical treatment program.&rdquo;
+              </p>
+              <div className="mt-6 space-y-2">
+                <p className="font-semibold">
+                  {/* Replace with your real name */}
+                  Ram Gangisetty, M.S., CCC-SLP
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Licensed Speech-Language Pathologist
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Experience in fluency disorders and stuttering treatment
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ═══ Pricing ═══ */}
       <section id="pricing" className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
@@ -388,7 +420,7 @@ export default function LandingPage() {
               Start free. Upgrade when you&apos;re ready. Cancel anytime.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
             {pricingTiers.map((tier) => (
               <Card
                 key={tier.name}
@@ -401,7 +433,7 @@ export default function LandingPage() {
                 {tier.highlighted && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <Badge className="bg-primary text-primary-foreground shadow-sm">
-                      Most Popular
+                      Best Value
                     </Badge>
                   </div>
                 )}
@@ -413,9 +445,9 @@ export default function LandingPage() {
                       /{tier.period}
                     </span>
                   </div>
-                  {tier.monthlyNote && (
-                    <p className="text-xs text-primary font-medium mt-1">
-                      {tier.monthlyNote}
+                  {tier.yearlyNote && (
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-1">
+                      {tier.yearlyNote}
                     </p>
                   )}
                   <p className="text-sm text-muted-foreground mt-2">
@@ -444,6 +476,12 @@ export default function LandingPage() {
               </Card>
             ))}
           </div>
+
+          {/* Private SLP pricing callout */}
+          <p className="text-center text-sm text-muted-foreground mt-8">
+            One private SLP session costs $150-250.{" "}
+            <span className="font-medium text-foreground">StutterLab gives you SLP-designed practice every day for $99/month.</span>
+          </p>
         </div>
       </section>
 

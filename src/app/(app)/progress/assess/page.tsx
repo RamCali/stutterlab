@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ReadingAssessment } from "@/components/progress/reading-assessment";
 import { ReportCard } from "@/components/progress/report-card";
@@ -8,14 +8,20 @@ import { PremiumGate } from "@/components/premium-gate";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { checkAISimUsage } from "@/lib/auth/premium";
+import type { PlanTier } from "@/lib/auth/premium";
 
 export default function AssessmentPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [reportData, setReportData] = useState<Record<string, unknown> | null>(null);
+  const [currentPlan, setCurrentPlan] = useState<PlanTier>("free");
 
-  // TODO: Replace with actual premium check from server
-  const isPro = true;
+  useEffect(() => {
+    checkAISimUsage()
+      .then((usage) => setCurrentPlan(usage.plan))
+      .catch(() => {});
+  }, []);
 
   async function handleAssessmentComplete({
     passageId,
@@ -60,7 +66,8 @@ export default function AssessmentPage() {
       </div>
 
       <PremiumGate
-        isPremium={isPro}
+        requiredPlan="pro"
+        currentPlan={currentPlan}
         featureName="Clinical Progress Reports"
         description="Monthly standardized assessments with %SS scoring, trend tracking, and shareable PDF reports."
       >

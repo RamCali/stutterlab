@@ -14,6 +14,8 @@ import { PanicButton } from "@/components/panic-button";
 import { ProgramProvider, useProgram } from "@/components/navigation/program-context";
 import { ProgramSidebar } from "@/components/navigation/program-sidebar";
 import { MobileWeekNav } from "@/components/navigation/mobile-week-nav";
+import { SLPAuthorityBadge } from "@/components/slp-authority-badge";
+import { getProgressData } from "@/lib/actions/progress";
 
 function ThemeToggle() {
   const [dark, setDark] = useState(false);
@@ -43,6 +45,17 @@ function ThemeToggle() {
 
 function AppShell({ children }: { children: React.ReactNode }) {
   const { currentDay, loading } = useProgram();
+  const [streak, setStreak] = useState(0);
+  const [xp, setXp] = useState(0);
+
+  useEffect(() => {
+    getProgressData()
+      .then((data) => {
+        setStreak(data.stats.currentStreak);
+        setXp(data.stats.totalXp);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="flex h-screen bg-background">
@@ -59,9 +72,9 @@ function AppShell({ children }: { children: React.ReactNode }) {
         {/* Streak indicator */}
         <div className="flex items-center gap-2 mx-3 mt-3 px-3 py-2.5 rounded-md bg-primary/5 dark:bg-primary/10">
           <Flame className="h-4 w-4 text-orange-500" />
-          <span className="text-sm font-semibold">0 day streak</span>
+          <span className="text-sm font-semibold">{streak} day{streak !== 1 ? "s" : ""}</span>
           <span className="ml-auto text-xs text-muted-foreground font-medium">
-            0 XP
+            {xp.toLocaleString()} XP
           </span>
         </div>
 
@@ -96,6 +109,9 @@ function AppShell({ children }: { children: React.ReactNode }) {
             <span className="text-xs text-muted-foreground">Theme</span>
             <ThemeToggle />
           </div>
+          <div className="px-3 pt-2">
+            <SLPAuthorityBadge />
+          </div>
         </div>
       </aside>
 
@@ -114,7 +130,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 bg-primary/5 dark:bg-primary/10 rounded-lg px-2 py-1">
               <Flame className="h-3.5 w-3.5 text-orange-500" />
-              <span className="text-xs font-semibold">0</span>
+              <span className="text-xs font-semibold">{streak}</span>
             </div>
             <ThemeToggle />
           </div>
