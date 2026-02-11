@@ -79,6 +79,7 @@ export function TechniqueStep({
       mediaRecorder.start();
 
       const ctx = new AudioContext();
+      if (ctx.state === "suspended") await ctx.resume();
       audioCtxRef.current = ctx;
       const source = ctx.createMediaStreamSource(stream);
       const analyser = ctx.createAnalyser();

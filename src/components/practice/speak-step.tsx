@@ -178,6 +178,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const ctx = new AudioContext();
+      if (ctx.state === "suspended") await ctx.resume();
       coachAudioCtxRef.current = ctx;
       const source = ctx.createMediaStreamSource(stream);
       const analyser = ctx.createAnalyser();
