@@ -34,6 +34,10 @@ export const metadata: Metadata = {
   description:
     "The first browser-based platform combining DAF, FAF, AI speech analysis, and real-world conversation practice for stuttering treatment.",
   metadataBase: new URL(SITE_URL),
+  icons: {
+    icon: "/logo/StutterLab_favicon.svg",
+    apple: "/logo/StutterLab_favicon.svg",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",

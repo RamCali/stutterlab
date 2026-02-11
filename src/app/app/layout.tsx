@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
-  AudioWaveform,
   Flame,
   LineChart,
   Moon,
@@ -63,9 +63,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
       <aside className="hidden md:flex w-64 flex-col border-r border-border/60 bg-sidebar">
         {/* Logo */}
         <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border/60">
-          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-            <AudioWaveform className="h-4.5 w-4.5 text-primary-foreground" />
-          </div>
+          <Image src="/logo/StutterLab_favicon.svg" alt="StutterLab" width={32} height={32} className="h-8 w-8" />
           <span className="text-lg font-bold tracking-tight">StutterLab</span>
         </div>
 
@@ -120,9 +118,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
         {/* Mobile top bar */}
         <header className="flex md:hidden items-center justify-between border-b border-border/60 px-4 py-3 bg-card">
           <div className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-lg bg-primary flex items-center justify-center">
-              <AudioWaveform className="h-3.5 w-3.5 text-primary-foreground" />
-            </div>
+            <Image src="/logo/StutterLab_favicon.svg" alt="StutterLab" width={28} height={28} className="h-7 w-7" />
             <span className="text-lg font-bold tracking-tight">
               StutterLab
             </span>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowRight,
   AudioWaveform,
@@ -548,16 +549,13 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="flex justify-center">
-              <div className="w-72 h-72 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/10 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="h-20 w-20 rounded-full bg-primary/10 mx-auto flex items-center justify-center">
-                    <Stethoscope className="h-10 w-10 text-primary" />
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-3">
-                    Founder Photo
-                  </p>
-                </div>
-              </div>
+              <Image
+                src="/RamGangisetty.jpg"
+                alt="Ram Gangisetty, M.S., CCC-SLP — Founder of StutterLab"
+                width={288}
+                height={288}
+                className="w-72 h-72 rounded-2xl object-cover border border-primary/10"
+              />
             </div>
             <div>
               <Badge
