@@ -4,15 +4,12 @@ import { useState, useRef, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft,
-  Send,
   Phone,
   PhoneOff,
   Brain,
-  Loader2,
   Sparkles,
   Clock,
   Square,
@@ -24,7 +21,6 @@ import Link from "next/link";
 import { VoiceConversation, type VoiceState, type TurnMetrics, type TurnMode } from "@/lib/audio/VoiceConversation";
 import { useElevenLabsConversation } from "@/hooks/useElevenLabsConversation";
 import { VoiceOrb } from "@/components/ai-conversations/voice-orb";
-import { VoiceModeToggle } from "@/components/ai-conversations/voice-mode-toggle";
 import { PerformanceReport } from "@/components/ai-conversations/performance-report";
 import { LiveCoachOverlay } from "@/components/coaching/LiveCoachOverlay";
 import { checkAISimUsage } from "@/lib/auth/premium";
@@ -55,17 +51,13 @@ export default function AIConversationPage() {
   const scenario = params.scenario as string;
   const title = scenarioTitles[scenario] || "AI Conversation";
 
-  // Text mode state
+  // Conversation state
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
   const [started, setStarted] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval>>(null);
 
-  // Voice mode state
-  const [isVoiceMode, setIsVoiceMode] = useState(false);
+  // Voice state
   const [voiceState, setVoiceState] = useState<VoiceState>("idle");
   const [voiceTranscript, setVoiceTranscript] = useState("");
   const [voiceTurns, setVoiceTurns] = useState<TurnMetrics[]>([]);
@@ -112,10 +104,6 @@ export default function AIConversationPage() {
   const isPro = usage?.canStart ?? false;
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
       voiceConvRef.current?.stop();
@@ -123,70 +111,6 @@ export default function AIConversationPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // ==================== TEXT MODE ====================
-
-  async function startConversation() {
-    setStarted(true);
-    setLoading(true);
-    timerRef.current = setInterval(() => {
-      setElapsedSeconds((s) => s + 1);
-    }, 1000);
-
-    try {
-      const res = await fetch("/api/ai-conversation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ scenario, messages: [], userMessage: "Hi, let's start." }),
-      });
-      const data = await res.json();
-      if (data.message) {
-        setMessages([
-          { role: "user", content: "Hi, let's start." },
-          { role: "assistant", content: data.message },
-        ]);
-      } else if (data.error) {
-        setMessages([
-          { role: "assistant", content: `[System] ${data.error}` },
-        ]);
-      }
-    } catch {
-      setMessages([
-        { role: "assistant", content: "[System] Could not connect to AI. Check your ANTHROPIC_API_KEY in .env" },
-      ]);
-    }
-    setLoading(false);
-  }
-
-  async function sendMessage() {
-    if (!input.trim() || loading) return;
-    const userMsg = input.trim();
-    setInput("");
-
-    const newMessages: Message[] = [...messages, { role: "user", content: userMsg }];
-    setMessages(newMessages);
-    setLoading(true);
-
-    try {
-      const res = await fetch("/api/ai-conversation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ scenario, messages: newMessages }),
-      });
-      const data = await res.json();
-      if (data.message) {
-        setMessages([...newMessages, { role: "assistant", content: data.message }]);
-      }
-    } catch {
-      setMessages([
-        ...newMessages,
-        { role: "assistant", content: "[System] Failed to get response. Try again." },
-      ]);
-    }
-    setLoading(false);
-  }
-
-  // ==================== VOICE MODE ====================
 
   async function startVoiceConversation() {
     setStarted(true);
@@ -260,56 +184,43 @@ export default function AIConversationPage() {
   async function endConversation() {
     if (timerRef.current) clearInterval(timerRef.current);
 
-    if (isVoiceMode) {
-      // Stop the active voice engine (ElevenLabs or legacy)
-      let turns: TurnMetrics[];
-      if (usingElevenLabs) {
-        turns = elevenLabs.stop();
-      } else if (voiceConvRef.current) {
-        turns = voiceConvRef.current.stop();
-        voiceConvRef.current = null;
-      } else {
-        turns = [];
-      }
-
-      setVoiceTurns(turns);
-      stressEngineRef.current?.stop();
-      stressEngineRef.current = null;
-      setCountdownSeconds(null);
-
-      if (turns.filter((t) => t.role === "user").length > 0) {
-        // Persist to DB and capture XP
-        saveAIConversation({
-          scenarioType: scenario,
-          messages: messages.map((m) => ({ role: m.role, content: m.content })),
-          turns: turns.map((t) => ({
-            role: t.role,
-            text: t.text,
-            disfluencyCount: t.disfluencyCount,
-            speakingRate: t.speakingRate,
-            techniquesUsed: t.techniquesUsed,
-            vocalEffort: t.vocalEffort,
-            spmZone: t.spmZone,
-          })),
-          durationSeconds: elapsedSeconds,
-          stressLevel: stressMode ? stressLevel : undefined,
-        })
-          .then((result) => setEarnedXp(result.xp))
-          .catch((err) => console.error("Failed to save AI conversation:", err));
-        setShowReport(true);
-        return;
-      }
+    // Stop the active voice engine (ElevenLabs or legacy)
+    let turns: TurnMetrics[];
+    if (usingElevenLabs) {
+      turns = elevenLabs.stop();
+    } else if (voiceConvRef.current) {
+      turns = voiceConvRef.current.stop();
+      voiceConvRef.current = null;
+    } else {
+      turns = [];
     }
 
-    // Text mode: also save if there were messages
-    if (messages.length > 1) {
+    setVoiceTurns(turns);
+    stressEngineRef.current?.stop();
+    stressEngineRef.current = null;
+    setCountdownSeconds(null);
+
+    if (turns.filter((t) => t.role === "user").length > 0) {
+      // Persist to DB and capture XP
       saveAIConversation({
         scenarioType: scenario,
         messages: messages.map((m) => ({ role: m.role, content: m.content })),
-        turns: [],
+        turns: turns.map((t) => ({
+          role: t.role,
+          text: t.text,
+          disfluencyCount: t.disfluencyCount,
+          speakingRate: t.speakingRate,
+          techniquesUsed: t.techniquesUsed,
+          vocalEffort: t.vocalEffort,
+          spmZone: t.spmZone,
+        })),
         durationSeconds: elapsedSeconds,
         stressLevel: stressMode ? stressLevel : undefined,
-      }).catch((err) => console.error("Failed to save AI conversation:", err));
+      })
+        .then((result) => setEarnedXp(result.xp))
+        .catch((err) => console.error("Failed to save AI conversation:", err));
+      setShowReport(true);
+      return;
     }
 
     router.push("/app/ai-practice");
@@ -358,13 +269,6 @@ export default function AIConversationPage() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {!started && (
-            <VoiceModeToggle
-              isVoiceMode={isVoiceMode}
-              onToggle={setIsVoiceMode}
-              isPremium={isPro}
-            />
-          )}
           {started && (
             <Badge variant="secondary" className="text-xs">
               <Clock className="h-3 w-3 mr-1" />
@@ -403,25 +307,19 @@ export default function AIConversationPage() {
             </div>
             <h2 className="text-xl font-bold">{title}</h2>
             <p className="text-sm text-muted-foreground mt-2 max-w-md">
-              {isVoiceMode
-                ? "Speak naturally with the AI using your voice. Real-time fluency tracking included."
-                : isPhoneSim
-                  ? "The AI will simulate a phone call. Practice speaking naturally and using your techniques."
-                  : "Have a natural conversation with the AI. Every session is unique and adapts to you."}
+              Speak naturally with the AI using your voice. Real-time fluency tracking included.
             </p>
             <div className="flex items-center gap-2 mt-4">
               <Badge variant="outline" className="text-xs">
                 <Sparkles className="h-3 w-3 mr-1" />
                 Powered by Claude
               </Badge>
-              {isVoiceMode && (
-                <Badge variant="outline" className="text-xs bg-primary/5">
-                  Voice Mode
-                </Badge>
-              )}
+              <Badge variant="outline" className="text-xs bg-primary/5">
+                Voice Mode
+              </Badge>
             </div>
-            {/* Stress Simulator Toggle (premium + voice mode only) */}
-            {isVoiceMode && isPro && (
+            {/* Stress Simulator Toggle (premium only) */}
+            {isPro && (
               <div className="mt-4 p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 max-w-md w-full">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
@@ -470,67 +368,66 @@ export default function AIConversationPage() {
                 )}
               </div>
             )}
-            {/* Block-Aware Pacing (voice mode only) */}
-            {isVoiceMode && (
-              <div className="mt-4 p-4 rounded-xl border border-teal-500/20 bg-teal-500/5 max-w-md w-full">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Hand className="h-4 w-4 text-teal-500" />
-                    <span className="text-sm font-semibold">Block-Aware Pacing</span>
-                  </div>
-                  <button
-                    onClick={() => setBlockAwareMode(!blockAwareMode)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      blockAwareMode ? "bg-teal-500" : "bg-muted"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        blockAwareMode ? "translate-x-6" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
+            {/* Block-Aware Pacing */}
+            <div className="mt-4 p-4 rounded-xl border border-teal-500/20 bg-teal-500/5 max-w-md w-full">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Hand className="h-4 w-4 text-teal-500" />
+                  <span className="text-sm font-semibold">Block-Aware Pacing</span>
                 </div>
-                {blockAwareMode && (
-                  <div className="space-y-3">
-                    <p className="text-xs text-muted-foreground">
-                      Extra patience for blocks and prolongations. The AI waits longer before responding.
-                    </p>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setTurnMode("auto")}
-                        className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                          turnMode === "auto"
-                            ? "bg-teal-500/20 text-teal-400 border border-teal-500/30"
-                            : "bg-muted/50 text-muted-foreground"
-                        }`}
-                      >
-                        Auto (5s pause)
-                      </button>
-                      <button
-                        onClick={() => setTurnMode("push-to-talk")}
-                        className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                          turnMode === "push-to-talk"
-                            ? "bg-teal-500/20 text-teal-400 border border-teal-500/30"
-                            : "bg-muted/50 text-muted-foreground"
-                        }`}
-                      >
-                        Push-to-Talk
-                      </button>
-                    </div>
-                    <p className="text-[10px] text-muted-foreground/70">
-                      {turnMode === "auto"
-                        ? "Waits 5 seconds of silence (instead of 2) before responding. You can tap \"I'm not done\" for more time."
-                        : "You control when your turn ends. Tap \"Done Speaking\" when you're ready for the AI to respond."}
-                    </p>
-                  </div>
-                )}
+                <button
+                  onClick={() => setBlockAwareMode(!blockAwareMode)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    blockAwareMode ? "bg-teal-500" : "bg-muted"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      blockAwareMode ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
               </div>
-            )}
+              {blockAwareMode && (
+                <div className="space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    Extra patience for blocks and prolongations. The AI waits longer before responding.
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setTurnMode("auto")}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                        turnMode === "auto"
+                          ? "bg-teal-500/20 text-teal-400 border border-teal-500/30"
+                          : "bg-muted/50 text-muted-foreground"
+                      }`}
+                    >
+                      Auto (5s pause)
+                    </button>
+                    <button
+                      onClick={() => setTurnMode("push-to-talk")}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                        turnMode === "push-to-talk"
+                          ? "bg-teal-500/20 text-teal-400 border border-teal-500/30"
+                          : "bg-muted/50 text-muted-foreground"
+                      }`}
+                    >
+                      Push-to-Talk
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground/70">
+                    {turnMode === "auto"
+                      ? "Waits 5 seconds of silence (instead of 2) before responding. You can tap \"I'm not done\" for more time."
+                      : "You control when your turn ends. Tap \"Done Speaking\" when you're ready for the AI to respond."}
+                  </p>
+                </div>
+              )}
+            </div>
             <Button
               className="mt-6"
               size="lg"
-              onClick={isVoiceMode ? startVoiceConversation : startConversation}
+              onClick={startVoiceConversation}
+              disabled={!isPro}
             >
               {isPhoneSim ? (
                 <>
@@ -544,8 +441,13 @@ export default function AIConversationPage() {
                 </>
               )}
             </Button>
+            {!isPro && (
+              <p className="text-xs text-muted-foreground mt-2">
+                Premium required for voice conversations
+              </p>
+            )}
           </div>
-        ) : isVoiceMode ? (
+        ) : (
           /* Voice mode UI */
           <div className="flex flex-col items-center justify-center h-full gap-6">
             <VoiceOrb state={voiceState} />
@@ -640,69 +542,8 @@ export default function AIConversationPage() {
               </CardContent>
             </Card>
           </div>
-        ) : (
-          /* Text mode UI (original) */
-          <>
-            {/* Technique Reminder */}
-            <div className="mx-auto max-w-lg">
-              <Card className="border-0 bg-primary/5">
-                <CardContent className="py-2 px-3 text-center">
-                  <p className="text-xs text-muted-foreground">
-                    Remember: breathe, gentle onset, speak at your pace
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Chat Messages */}
-            {messages.map((msg, i) => (
-              <div
-                key={i}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-[80%] rounded-xl px-4 py-2.5 ${
-                    msg.role === "user"
-                      ? "bg-primary text-primary-foreground rounded-br-sm"
-                      : "bg-muted rounded-bl-sm"
-                  }`}
-                >
-                  <p className="text-sm leading-relaxed">{msg.content}</p>
-                </div>
-              </div>
-            ))}
-
-            {loading && (
-              <div className="flex justify-start">
-                <div className="bg-muted rounded-xl rounded-bl-sm px-4 py-3">
-                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                </div>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </>
         )}
       </div>
-
-      {/* Input Area (text mode only) */}
-      {started && !isVoiceMode && (
-        <div className="border-t p-4 bg-background">
-          <div className="flex gap-2 max-w-2xl mx-auto">
-            <Input
-              placeholder="Type your response..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-              disabled={loading}
-              className="flex-1"
-            />
-            <Button onClick={sendMessage} disabled={loading || !input.trim()}>
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
