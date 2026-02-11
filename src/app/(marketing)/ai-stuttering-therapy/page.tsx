@@ -4,6 +4,7 @@ import {
   AudioWaveform,
   Bot,
   Brain,
+  Check,
   Fingerprint,
   MessageSquare,
   Mic,
@@ -114,7 +115,10 @@ export default function AiStutteringTherapyPage() {
             className="mb-5 bg-primary/10 text-primary border-0 px-4 py-1.5"
           >
             <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-            AI-Powered Speech Therapy
+            AI-Powered Stuttering Help Program
+
+            <Check className="h-3.5 w-3.5 mr-1.5" />
+            Developed by Licensed Speech-Language Pathologists
           </Badge>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1]">
             Practice the Conversations{" "}
