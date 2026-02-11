@@ -24,7 +24,7 @@ export default function LoginPage() {
           <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={200} height={50} className="h-10 w-auto hidden dark:block" />
         </div>
         <p className="text-muted-foreground text-sm">
-          Evidence-based stuttering therapy, in your browser
+          Evidence-based stuttering training, in your browser
         </p>
       </div>
 

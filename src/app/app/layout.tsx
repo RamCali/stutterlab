@@ -9,6 +9,7 @@ import {
   Moon,
   Settings,
   Sun,
+  Zap,
 } from "lucide-react";
 import { PanicButton } from "@/components/panic-button";
 import { ProgramProvider, useProgram } from "@/components/navigation/program-context";
@@ -70,7 +71,10 @@ function AppShell({ children }: { children: React.ReactNode }) {
         {/* Streak indicator */}
         <div className="flex items-center gap-2 mx-3 mt-3 px-3 py-2.5 rounded-md bg-primary/5 dark:bg-primary/10">
           <Flame className="h-4 w-4 text-orange-500" />
-          <span className="text-sm font-semibold">{streak} day{streak !== 1 ? "s" : ""}</span>
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold leading-tight">{streak} day{streak !== 1 ? "s" : ""}</span>
+            <span className="text-[9px] text-muted-foreground/60 leading-tight">3 of 5 days to keep</span>
+          </div>
           <span className="ml-auto text-xs text-muted-foreground font-medium">
             {xp.toLocaleString()} XP
           </span>
@@ -89,6 +93,13 @@ function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Bottom pinned items */}
         <div className="border-t border-border/60 p-3 space-y-0.5">
+          <Link
+            href="/app/presentation-mode"
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all"
+          >
+            <Zap className="h-4 w-4 flex-shrink-0 text-amber-500" />
+            Presentation Mode
+          </Link>
           <Link
             href="/app/progress"
             className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all"

@@ -17,6 +17,7 @@ import {
   Play,
   Check,
   Sparkles,
+  HelpCircle,
 } from "lucide-react";
 import type { DailyPlan, TaskType } from "@/lib/curriculum/daily-plans";
 import {
@@ -43,6 +44,7 @@ interface TodaysTasksProps {
 
 export function TodaysTasks({ dailyPlan, currentDay }: TodaysTasksProps) {
   const [completedTypes, setCompletedTypes] = useState<Set<string>>(new Set());
+  const [expandedReason, setExpandedReason] = useState<number | null>(null);
 
   useEffect(() => {
     setCompletedTypes(getTodaysCompletions(currentDay));
@@ -81,35 +83,63 @@ export function TodaysTasks({ dailyPlan, currentDay }: TodaysTasksProps) {
           {dailyPlan.tasks.map((task, i) => {
             const Icon = TASK_TYPE_ICONS[task.type] || BookOpen;
             const isCompleted = completedTypes.has(task.type);
+            const isReasonExpanded = expandedReason === i;
 
             return (
-              <Link
-                key={`${task.type}-${i}`}
-                href={task.href}
-                onClick={() => handleToggleTask(task.type)}
-                className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/50 transition-colors group"
-              >
-                <div className={`h-7 w-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  isCompleted
-                    ? "bg-primary/10 text-primary"
-                    : "bg-muted text-muted-foreground group-hover:bg-muted/80"
-                }`}>
-                  {isCompleted ? (
-                    <Check className="h-3.5 w-3.5" />
-                  ) : (
-                    <Icon className="h-3.5 w-3.5" />
+              <div key={`${task.type}-${i}`}>
+                <div className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/50 transition-colors group">
+                  <Link
+                    href={task.href}
+                    onClick={() => handleToggleTask(task.type)}
+                    className="flex items-center gap-3 flex-1 min-w-0"
+                  >
+                    <div className={`h-7 w-7 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      isCompleted
+                        ? "bg-primary/10 text-primary"
+                        : "bg-muted text-muted-foreground group-hover:bg-muted/80"
+                    }`}>
+                      {isCompleted ? (
+                        <Check className="h-3.5 w-3.5" />
+                      ) : (
+                        <Icon className="h-3.5 w-3.5" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-medium ${isCompleted ? "line-through text-muted-foreground" : ""}`}>
+                        {task.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">{task.subtitle}</p>
+                    </div>
+                  </Link>
+                  <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded flex-shrink-0">
+                    {task.duration}
+                  </span>
+                  {task.reason && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setExpandedReason(isReasonExpanded ? null : i);
+                      }}
+                      className={`flex-shrink-0 p-1 rounded-md transition-colors ${
+                        isReasonExpanded
+                          ? "text-primary bg-primary/10"
+                          : "text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted"
+                      }`}
+                      title="Why this exercise?"
+                    >
+                      <HelpCircle className="h-3.5 w-3.5" />
+                    </button>
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-medium ${isCompleted ? "line-through text-muted-foreground" : ""}`}>
-                    {task.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground truncate">{task.subtitle}</p>
-                </div>
-                <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded flex-shrink-0">
-                  {task.duration}
-                </span>
-              </Link>
+                {isReasonExpanded && task.reason && (
+                  <div className="ml-12 mr-2 mb-1 p-2 rounded-md bg-primary/5 border border-primary/10">
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      <span className="font-semibold text-primary">Why this exercise:</span>{" "}
+                      {task.reason}
+                    </p>
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>

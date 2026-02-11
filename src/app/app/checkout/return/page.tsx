@@ -48,7 +48,7 @@ function CheckoutReturnContent() {
             <p className="text-muted-foreground">
               Your subscription is active. You now have full access to all
               premium features including AI coaching, advanced analytics, and
-              personalized treatment plans.
+              personalized training plans.
             </p>
             <Button onClick={() => router.push("/app/dashboard")} className="w-full">
               Go to Dashboard

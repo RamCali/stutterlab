@@ -1,5 +1,5 @@
 /**
- * 90-Day Structured Stuttering Treatment Curriculum
+ * 90-Day Structured Stuttering Training Curriculum
  *
  * Design principles:
  *   - 10 min average session (8-12 min range) — fits a busy professional's day
@@ -37,6 +37,8 @@ export interface DailyTask {
   href: string;
   /** True if task requires Pro subscription */
   premium?: boolean;
+  /** Explains why this specific exercise was assigned today (personalization transparency) */
+  reason?: string;
 }
 
 export interface DailyPlan {
@@ -148,7 +150,7 @@ function getDayTitle(day: number, phase: number): string {
       "Light Contact Introduction",    // Day 15: new technique unlocked
       "FAF First Full Session",        // Day 16: proper FAF training
       "Prolonged Speech Practice",     // Day 17: stretch those syllables
-      "DAF + FAF Combined",            // Day 18: dual audio therapy
+      "DAF + FAF Combined",            // Day 18: dual audio practice
       "Continuous Phonation",          // Day 19: smooth speech flow
       "AI Practice: Ordering Food",    // Day 20: safe scenario
       "Rate Control Basics",           // Day 21: speaking pace mastery
@@ -579,7 +581,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
       // Audio Lab day: FAF + combined
       tasks.push({
         title: dayInPhase <= 8 ? "FAF Training Session" : "DAF + FAF Combined",
-        subtitle: dayInPhase <= 8 ? "Practice with pitch-shifted feedback" : "Dual audio therapy reading",
+        subtitle: dayInPhase <= 8 ? "Practice with pitch-shifted feedback" : "Dual audio practice reading",
         duration: "5 min",
         type: "audio-lab",
         href: "/app/audio-lab",
@@ -1148,7 +1150,88 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
     }
   }
 
-  return tasks;
+  // Add personalization reasons to each task
+  return tasks.map((task) => ({
+    ...task,
+    reason: task.reason ?? getTaskReason(task.type, day, phase),
+  }));
+}
+
+/** Generates context-aware "why this exercise" reasons based on task type, day, and phase */
+function getTaskReason(type: TaskType, day: number, phase: number): string {
+  // Warmup — always relevant
+  if (type === "warmup") {
+    if (day <= 7) return "Diaphragmatic breathing lowers vocal tension before practice — building your foundation.";
+    if (phase <= 3) return "Starting with controlled breathing reduces muscle tension, which directly impacts fluency.";
+    return "Even advanced speakers benefit from a breathing reset — it primes your speech muscles for smooth onset.";
+  }
+
+  // Exercise — varies by phase
+  if (type === "exercise") {
+    if (phase === 1) {
+      if (day <= 3) return "Gentle onset is the highest-impact technique for reducing blocks — research shows 60-80% fewer blocks when mastered.";
+      if (day <= 7) return "You're building muscle memory for smooth speech initiation — repetition in week 1 creates automatic habits.";
+      return "Combining techniques you've learned this week strengthens neural pathways — variety prevents plateaus.";
+    }
+    if (phase === 2) return "Deeper technique work builds on your Phase 1 foundation — you're moving from words to connected speech.";
+    if (phase === 3) return "Stuttering modification gives you tools to manage moments of stuttering — reducing fear, not just disfluency.";
+    if (phase === 4) return "Transfer practice bridges the gap between controlled exercises and spontaneous real-world speech.";
+    return "Self-directed practice builds independence — choosing your own techniques is the goal of maintenance.";
+  }
+
+  // Audio Lab (DAF/FAF)
+  if (type === "audio-lab") {
+    if (day === 1) return "DAF on Day 1 gives you an immediate \"whoa\" moment — most people are 60-80% more fluent instantly.";
+    if (phase === 1) return "DAF creates a feedback loop that naturally slows and smooths your speech — building confidence for harder tasks.";
+    if (phase === 2) return "Combining audio tools with techniques deepens the fluency effect and builds transfer to unaided speech.";
+    if (phase >= 3) return "Audio tools support your technique practice — the goal is gradually reducing reliance as your skills strengthen.";
+    return "Audio feedback maintains your fluency gains while you work on harder real-world transfer.";
+  }
+
+  // AI Conversation
+  if (type === "ai") {
+    if (day <= 5) return "Your first AI conversation is low-pressure practice — research shows people stutter less talking to AI, building early confidence.";
+    if (phase === 2) return "Conversational practice activates different speech circuits than reading aloud — this builds real-world transfer.";
+    if (phase === 3) return "Medium-difficulty scenarios challenge your techniques in realistic contexts without real-world consequences.";
+    if (phase === 4) return "High-stakes scenarios (interviews, calls) desensitize you to the situations that trigger the most anxiety.";
+    return "Advanced conversations build endurance and confidence for the situations that matter most to you.";
+  }
+
+  // Journal
+  if (type === "journal") {
+    if (day <= 3) return "Voice journaling creates your baseline — comparing future entries shows progress you can't see day-to-day.";
+    if (phase <= 2) return "Reflection strengthens learning — articulating what worked helps your brain consolidate new speech patterns.";
+    if (phase === 3) return "Tracking thoughts and feelings about speech is a core CBT practice — awareness reduces anxiety spirals.";
+    return "Self-reflection builds metacognition about your speech — the ability to coach yourself long-term.";
+  }
+
+  // Mindfulness
+  if (type === "mindfulness") {
+    if (phase <= 2) return "Anxiety increases muscle tension, which directly worsens stuttering — mindfulness breaks that cycle.";
+    if (phase === 3) return "CBT-based mindfulness restructures the anxiety-stuttering loop — changing how you think about speaking.";
+    return "Maintaining a mindfulness practice is the #1 predictor of long-term fluency maintenance after program completion.";
+  }
+
+  // Feared Words
+  if (type === "feared-words") {
+    if (day <= 14) return "Identifying your trigger words removes avoidance behavior — facing them head-on is more effective than substituting.";
+    if (phase === 3) return "Practicing feared words with modification techniques reduces the emotional charge around specific sounds.";
+    return "Feared word mastery is personalized to your specific triggers — this is why your program is different from generic drills.";
+  }
+
+  // Challenge
+  if (type === "challenge") {
+    if (phase <= 2) return "Even small real-world challenges build massive confidence — ordering a coffee uses the same neural circuits as a presentation.";
+    if (phase === 3) return "Real-world challenges test your techniques where it matters — controlled exposure reduces avoidance over time.";
+    return "Advanced challenges push your comfort zone — each success rewires your brain's fear response to speaking situations.";
+  }
+
+  // Learn
+  if (type === "learn") {
+    return "Understanding the science behind your techniques increases confidence and compliance — knowing why it works helps you do it.";
+  }
+
+  return "This exercise is part of your structured 90-day program — each task builds on the previous one.";
 }
 
 /** Get plan for a specific day (days 1-90 use curated curriculum, 91+ use adaptive engine) */

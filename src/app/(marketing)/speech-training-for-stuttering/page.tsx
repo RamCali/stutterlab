@@ -21,10 +21,10 @@ import { CtaSection } from "@/components/marketing/cta-section";
 import { createMetadata, jsonLd } from "@/lib/seo";
 
 export const metadata = createMetadata({
-  title: "Speech Therapy for Stuttering - Complete Guide & Tools",
+  title: "Speech Training for Stuttering - Complete Guide & Tools",
   description:
-    "Everything you need to know about speech therapy for stuttering. Evidence-based techniques for kids and adults. Practice at home with StutterLab's browser-based tools.",
-  path: "/speech-therapy-for-stuttering",
+    "Everything you need to know about speech training for stuttering. Evidence-based techniques for kids and adults. Practice at home with StutterLab's browser-based tools.",
+  path: "/speech-training-for-stuttering",
 });
 
 const therapyTypes = [
@@ -86,7 +86,7 @@ const faq = [
     a: "Absolutely. Adults can significantly improve fluency and reduce speaking anxiety with the right combination of techniques and consistent practice.",
   },
   {
-    q: "Can I practice speech therapy at home?",
+    q: "Can I practice speech training at home?",
     a: "Yes. StutterLab provides all the tools you need — DAF/FAF, structured exercises, AI practice partners, and progress tracking — right in your browser.",
   },
   {
@@ -122,15 +122,15 @@ export default function SpeechTherapyForStutteringPage() {
             className="mb-5 bg-primary/10 text-primary border-0 px-4 py-1.5"
           >
             <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-            Complete Guide to Stuttering Speech Therapy
+            Complete Guide to Stuttering Speech Training
           </Badge>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1]">
-            Speech Therapy for Stuttering:{" "}
+            Speech Training for Stuttering:{" "}
             <span className="text-primary">What Works</span>
           </h1>
           <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Understand the evidence-based approaches to stuttering therapy, find
-            the right treatment for you or your child, and practice at home with
+            Understand the evidence-based approaches to stuttering, find
+            the right approach for you or your child, and practice at home with
             StutterLab.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -201,7 +201,7 @@ export default function SpeechTherapyForStutteringPage() {
               Treatment Approaches
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold">
-              Types of Speech Therapy for Stuttering
+              Types of Speech Training for Stuttering
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -238,12 +238,12 @@ export default function SpeechTherapyForStutteringPage() {
             <Stethoscope className="h-6 w-6 text-primary" />
           </div>
           <h2 className="text-2xl md:text-3xl font-bold">
-            Practice Speech Therapy at Home
+            Practice Speech Training at Home
           </h2>
           <p className="text-muted-foreground mt-4 max-w-xl mx-auto leading-relaxed">
             Between sessions with your SLP, consistent daily practice is what
             drives lasting improvement. StutterLab gives you professional-grade
-            tools in your browser — DAF/FAF audio therapy, structured exercises,
+            tools in your browser — DAF/FAF audio training, structured exercises,
             AI conversation practice, and objective progress tracking.
           </p>
           <Button size="lg" className="mt-6 px-8" asChild>
@@ -275,7 +275,7 @@ export default function SpeechTherapyForStutteringPage() {
       </section>
 
       <CtaSection
-        title="Start Speech Therapy Practice Today"
+        title="Start Speech Training Practice Today"
         description="Complement your SLP sessions with daily AI-powered practice. Free to start."
       />
     </>

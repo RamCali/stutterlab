@@ -59,6 +59,15 @@ export async function completeExercise(data: {
   return { xp, sessionId: session.id };
 }
 
+/**
+ * Flexible streak — allows up to 2-day gaps (effectively "3 of 5 days").
+ *
+ * Old behavior: miss 1 day → streak resets (daily-or-nothing)
+ * New behavior: miss 1-2 days → streak continues. Miss 3+ days → resets.
+ *
+ * This reduces pressure while maintaining accountability.
+ * Research shows flexible streaks improve long-term adherence.
+ */
 async function updateStreak(userId: string) {
   const [stats] = await db
     .select()
@@ -89,10 +98,11 @@ async function updateStreak(userId: string) {
     if (diffDays === 0) {
       // Already practiced today — no change
       return;
-    } else if (diffDays === 1) {
+    } else if (diffDays <= 2) {
+      // Flexible: 1-2 day gap keeps the streak alive
       newStreak = stats.currentStreak + 1;
     } else {
-      newStreak = 1; // Streak broken
+      newStreak = 1; // 3+ days gap — streak resets
     }
   }
 

@@ -8,7 +8,7 @@ import { createMetadata } from "@/lib/seo";
 export const metadata = createMetadata({
   title: "Stuttering Blog - Tips, Research & Exercises",
   description:
-    "Expert articles on stuttering treatment, speech therapy exercises, research updates, and tips for building fluency. Written with SLP guidance.",
+    "Expert articles on stuttering training, speech exercises, research updates, and tips for building fluency. Written with SLP guidance.",
   path: "/blog",
 });
 
@@ -25,7 +25,7 @@ export default function BlogIndexPage() {
             Stuttering Blog
           </h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-            Evidence-based articles on stuttering treatment, exercises, and
+            Evidence-based articles on stuttering training, exercises, and
             research — written with guidance from Speech-Language Pathologists.
           </p>
           {categories.length > 0 && (
@@ -51,7 +51,7 @@ export default function BlogIndexPage() {
             <div className="text-center py-20">
               <p className="text-muted-foreground">
                 Blog posts coming soon. Check back for articles on stuttering
-                treatment, exercises, and research.
+                training, exercises, and research.
               </p>
             </div>
           ) : (

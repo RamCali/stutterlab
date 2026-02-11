@@ -3,15 +3,15 @@ import Image from "next/image";
 
 const footerLinks = {
   Product: [
-    { href: "/stuttering-treatment", label: "Treatment" },
-    { href: "/stuttering-therapy-app", label: "Therapy App" },
+    { href: "/stuttering-program", label: "Program" },
+    { href: "/stuttering-practice-app", label: "Practice App" },
     { href: "/stuttering-exercises", label: "Exercises" },
-    { href: "/ai-stuttering-therapy", label: "AI Therapy" },
+    { href: "/ai-speech-training", label: "AI Training" },
     { href: "/#pricing", label: "Pricing" },
   ],
   Resources: [
     { href: "/blog", label: "Blog" },
-    { href: "/speech-therapy-for-stuttering", label: "Speech Therapy Guide" },
+    { href: "/speech-training-for-stuttering", label: "Speech Training Guide" },
     { href: "/#for-slps", label: "For SLPs" },
   ],
   Company: [
@@ -31,7 +31,7 @@ export function MarketingFooter() {
               <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={160} height={40} className="h-8 w-auto hidden dark:block" />
             </Link>
             <p className="text-sm text-muted-foreground mt-2 max-w-xs">
-              Evidence-based stuttering treatment, powered by AI, accessible
+              Evidence-based stuttering training, powered by AI, accessible
               from any browser.
             </p>
           </div>

@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-5-20250929",
       max_tokens: 1024,
-      system: `You are a speech therapy assistant generating practice content for someone who stutters. Your job is to create reading material that naturally incorporates a target word.
+      system: `You are a speech training assistant generating practice content for someone who stutters. Your job is to create reading material that naturally incorporates a target word.
 
 Rules:
 - Every phrase, sentence, and paragraph MUST contain the target word at least once

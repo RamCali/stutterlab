@@ -28,11 +28,11 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://stutterlab.com";
 
 export const metadata: Metadata = {
   title: {
-    default: "StutterLab - Evidence-Based Stuttering Treatment",
+    default: "StutterLab - Evidence-Based Stuttering Training",
     template: "%s | StutterLab",
   },
   description:
-    "The first browser-based platform combining DAF, FAF, AI speech analysis, and real-world conversation practice for stuttering treatment.",
+    "The first browser-based platform combining DAF, FAF, AI speech analysis, and real-world conversation practice for stuttering training.",
   metadataBase: new URL(SITE_URL),
   icons: {
     icon: "/logo/StutterLab_favicon.svg",
@@ -42,15 +42,15 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: "StutterLab",
-    title: "StutterLab - Evidence-Based Stuttering Treatment",
+    title: "StutterLab - Evidence-Based Stuttering Training",
     description:
-      "AI-powered stuttering treatment with DAF, FAF, speech analysis, and daily structured practice. Browser-based, no downloads.",
+      "AI-powered stuttering training with DAF, FAF, speech analysis, and daily structured practice. Browser-based, no downloads.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "StutterLab - Evidence-Based Stuttering Treatment",
+    title: "StutterLab - Evidence-Based Stuttering Training",
     description:
-      "AI-powered stuttering treatment with DAF, FAF, speech analysis, and daily structured practice.",
+      "AI-powered stuttering training with DAF, FAF, speech analysis, and daily structured practice.",
   },
   robots: {
     index: true,

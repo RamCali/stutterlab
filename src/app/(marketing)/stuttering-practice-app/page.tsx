@@ -24,15 +24,15 @@ import { CtaSection } from "@/components/marketing/cta-section";
 import { createMetadata, jsonLd } from "@/lib/seo";
 
 export const metadata = createMetadata({
-  title: "Best Stuttering Therapy App (AI-Powered)",
+  title: "Best Stuttering Practice App (AI-Powered)",
   description:
-    "StutterLab is the #1 AI-powered stuttering therapy app. Combines DAF, FAF, speech analysis, daily exercises, and phone call practice. Free to start.",
-  path: "/stuttering-therapy-app",
+    "StutterLab is the #1 AI-powered stuttering practice app. Combines DAF, FAF, speech analysis, daily exercises, and phone call practice. Free to start.",
+  path: "/stuttering-practice-app",
 });
 
 const comparisons = [
   {
-    feature: "DAF + FAF Audio Therapy",
+    feature: "DAF + FAF Audio Training",
     stutterlab: true,
     others: "Rare",
   },
@@ -120,7 +120,7 @@ const appFeatures = [
     icon: Stethoscope,
     title: "SLP Connection",
     description:
-      "Connect with Speech-Language Pathologists who can monitor and guide your therapy.",
+      "Connect with Speech-Language Pathologists who can monitor and guide your practice.",
   },
 ];
 
@@ -159,7 +159,7 @@ export default function StutteringTherapyAppPage() {
           applicationCategory: "HealthApplication",
           operatingSystem: "Web browser",
           description:
-            "AI-powered stuttering therapy app with DAF, FAF, speech analysis, and structured daily practice.",
+            "AI-powered stuttering practice app with DAF, FAF, speech analysis, and structured daily practice.",
           offers: {
             "@type": "Offer",
             price: "0",
@@ -182,7 +182,7 @@ export default function StutteringTherapyAppPage() {
             className="mb-5 bg-primary/10 text-primary border-0 px-4 py-1.5"
           >
             <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-            #1 AI-Powered Stuttering Therapy App
+            #1 AI-Powered Stuttering Practice App
           </Badge>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1]">
             Speak Without Fear{" "}
@@ -227,7 +227,7 @@ export default function StutteringTherapyAppPage() {
             </h2>
             <p className="text-muted-foreground mt-3 max-w-xl mx-auto">
               No more juggling multiple tools. StutterLab is the complete
-              stuttering therapy toolkit.
+              stuttering practice toolkit.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">

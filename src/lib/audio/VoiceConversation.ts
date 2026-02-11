@@ -1,5 +1,5 @@
 /**
- * VoiceConversation - Orchestrates voice-to-voice AI conversation sessions
+ * VoiceConversation - Legacy voice-to-voice AI conversation pipeline
  *
  * State machine: IDLE → LISTENING → PROCESSING → SPEAKING → LISTENING → ...
  *
@@ -8,9 +8,17 @@
  * 2. Transcript → /api/ai-conversation → AI response text
  * 3. AI response → /api/tts → audio blob → play through speaker
  * 4. Audio ends → resume listening
+ *
+ * Note: For lower-latency conversations, see useElevenLabsConversation hook
+ * which uses ElevenLabs Conversational AI (single WebSocket connection).
+ * This class is kept as a fallback when ElevenLabs is not configured.
  */
 
+import { countDisfluencies, estimateSyllables } from "@/lib/audio/speech-metrics";
+
 export type VoiceState = "idle" | "listening" | "processing" | "speaking";
+
+export type TurnMode = "auto" | "push-to-talk";
 
 export interface TurnMetrics {
   turnIndex: number;
@@ -31,12 +39,21 @@ export interface SpeechQualityMetrics {
   detectedTechniques: string[];
 }
 
+export interface BlockAwareConfig {
+  /** Silence timeout in ms before auto-submitting turn (default: 2000, block-aware: 5000) */
+  silenceTimeoutMs: number;
+  /** "auto" = silence-based turn detection, "push-to-talk" = manual submit only */
+  turnMode: TurnMode;
+}
+
 interface VoiceConversationCallbacks {
   onStateChange: (state: VoiceState) => void;
   onUserTranscript: (text: string, isFinal: boolean) => void;
   onAssistantMessage: (text: string) => void;
   onTurnComplete: (turn: TurnMetrics) => void;
   onError: (error: string) => void;
+  /** Called when silence timer resets (for UI countdown feedback) */
+  onSilenceReset?: () => void;
 }
 
 export class VoiceConversation {
@@ -59,16 +76,64 @@ export class VoiceConversation {
 
   private stressLevel?: number;
 
+  // Block-aware configuration
+  private blockAwareConfig: BlockAwareConfig;
+
   constructor(
     scenario: string,
     callbacks: VoiceConversationCallbacks,
     metricsProvider?: () => SpeechQualityMetrics | null,
-    stressLevel?: number
+    stressLevel?: number,
+    blockAwareConfig?: Partial<BlockAwareConfig>
   ) {
     this.scenario = scenario;
     this.callbacks = callbacks;
     this.metricsProvider = metricsProvider;
     this.stressLevel = stressLevel;
+    this.blockAwareConfig = {
+      silenceTimeoutMs: blockAwareConfig?.silenceTimeoutMs ?? 2000,
+      turnMode: blockAwareConfig?.turnMode ?? "auto",
+    };
+  }
+
+  /** "I'm not done" — resets the silence timer so the user gets more time */
+  extendSilence(): void {
+    if (this.state !== "listening" || !this.isRunning) return;
+    if (this.silenceTimeout) {
+      clearTimeout(this.silenceTimeout);
+      this.silenceTimeout = null;
+    }
+    // Only restart the timer in auto mode
+    if (this.blockAwareConfig.turnMode === "auto") {
+      this.silenceTimeout = setTimeout(() => {
+        if (this.currentTranscript.trim() && this.isRunning) {
+          this.finishUserTurn();
+        }
+      }, this.blockAwareConfig.silenceTimeoutMs);
+    }
+    this.callbacks.onSilenceReset?.();
+  }
+
+  /** Manual turn submission for push-to-talk mode */
+  submitTurn(): void {
+    if (this.state !== "listening" || !this.isRunning) return;
+    if (this.currentTranscript.trim()) {
+      if (this.silenceTimeout) {
+        clearTimeout(this.silenceTimeout);
+        this.silenceTimeout = null;
+      }
+      this.finishUserTurn();
+    }
+  }
+
+  /** Update block-aware config on the fly */
+  updateBlockAwareConfig(config: Partial<BlockAwareConfig>): void {
+    if (config.silenceTimeoutMs !== undefined) {
+      this.blockAwareConfig.silenceTimeoutMs = config.silenceTimeoutMs;
+    }
+    if (config.turnMode !== undefined) {
+      this.blockAwareConfig.turnMode = config.turnMode;
+    }
   }
 
   async start(): Promise<boolean> {
@@ -173,12 +238,15 @@ export class VoiceConversation {
         );
       }
 
-      // Set silence timeout: if user stops speaking for 2s, consider turn complete
+      // In push-to-talk mode, don't auto-submit — wait for manual submitTurn()
+      if (this.blockAwareConfig.turnMode === "push-to-talk") return;
+
+      // Set silence timeout using configurable duration (block-aware = longer tolerance)
       this.silenceTimeout = setTimeout(() => {
         if (this.currentTranscript.trim() && this.isRunning) {
           this.finishUserTurn();
         }
-      }, 2000);
+      }, this.blockAwareConfig.silenceTimeoutMs);
     };
 
     this.recognition.onerror = (event) => {
@@ -225,9 +293,9 @@ export class VoiceConversation {
     this.callbacks.onUserTranscript(userText, true);
 
     // Record user turn
-    const disfluencyCount = this.countDisfluencies(userText);
+    const disfluencyCount = countDisfluencies(userText);
     const elapsed = (Date.now() - this.turnStartTime) / 60000;
-    const syllables = this.estimateSyllables(userText);
+    const syllables = estimateSyllables(userText);
     const speakingRate = elapsed > 0.01 ? Math.round(syllables / elapsed) : 0;
 
     const userTurn: TurnMetrics = {
@@ -355,31 +423,4 @@ export class VoiceConversation {
     });
   }
 
-  private countDisfluencies(text: string): number {
-    let count = 0;
-    const lower = text.toLowerCase();
-    const fillers = ["um", "uh", "er", "ah", "like", "you know", "i mean"];
-    for (const filler of fillers) {
-      const regex = new RegExp(`\\b${filler}\\b`, "gi");
-      const matches = lower.match(regex);
-      if (matches) count += matches.length;
-    }
-    // Word repetitions
-    const repMatches = text.match(/\b(\w+)\s+\1\b/gi);
-    if (repMatches) count += repMatches.length;
-    return count;
-  }
-
-  private estimateSyllables(text: string): number {
-    const words = text.toLowerCase().replace(/[^a-z\s]/g, "").split(/\s+/).filter(Boolean);
-    let total = 0;
-    for (const word of words) {
-      if (word.length <= 2) { total += 1; continue; }
-      const vowelGroups = word.match(/[aeiouy]+/g);
-      let count = vowelGroups ? vowelGroups.length : 1;
-      if (word.endsWith("e") && count > 1) count--;
-      total += Math.max(1, count);
-    }
-    return total;
-  }
 }

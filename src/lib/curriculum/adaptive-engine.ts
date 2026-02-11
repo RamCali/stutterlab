@@ -78,6 +78,8 @@ export function getAdaptiveDailyPlan(
 
   const tasks: DailyTask[] = [];
 
+  const weightLabel = weight >= 0.65 ? "fluency shaping" : weight <= 0.35 ? "modification" : "balanced";
+
   // Every day starts with breathing warm-up
   tasks.push({
     title: "Diaphragmatic Breathing",
@@ -85,6 +87,7 @@ export function getAdaptiveDailyPlan(
     duration: "2 min",
     type: "warmup",
     href: "/app/exercises",
+    reason: "Breathing resets vocal tension before practice — essential for maintaining gains long-term.",
   });
 
   // Main technique practice (weighted by approach)
@@ -95,6 +98,7 @@ export function getAdaptiveDailyPlan(
     type: "exercise",
     href: "/app/exercises",
     premium: true,
+    reason: `Your data shows ${weightLabel} techniques work best for you — today's ${technique.name} practice is weighted by your personal outcomes.`,
   });
 
   // Audio Lab rotation (every other day)
@@ -106,6 +110,7 @@ export function getAdaptiveDailyPlan(
       type: "audio-lab",
       href: "/app/audio-lab",
       premium: true,
+      reason: "Audio feedback on alternate days maintains fluency gains without building dependency on the tools.",
     });
   }
 
@@ -119,6 +124,7 @@ export function getAdaptiveDailyPlan(
       type: "ai",
       href: "/app/ai-practice",
       premium: true,
+      reason: "Conversational practice every 3rd day keeps your transfer skills sharp without overloading your schedule.",
     });
   }
 
@@ -131,6 +137,7 @@ export function getAdaptiveDailyPlan(
       type: "feared-words",
       href: "/app/feared-words",
       premium: true,
+      reason: "Feared word practice is personalized to your specific triggers — regular exposure reduces avoidance.",
     });
   }
 
@@ -141,6 +148,7 @@ export function getAdaptiveDailyPlan(
     duration: "2 min",
     type: "journal",
     href: "/app/voice-journal/new",
+    reason: "Daily journaling tracks subtle progress that's invisible day-to-day but transformative over weeks.",
   });
 
   // Mindfulness every 5th day
@@ -151,6 +159,7 @@ export function getAdaptiveDailyPlan(
       duration: "2 min",
       type: "mindfulness",
       href: "/app/mindfulness",
+      reason: "Regular mindfulness prevents the anxiety-tension-stuttering cycle from rebuilding.",
     });
   }
 
@@ -163,6 +172,7 @@ export function getAdaptiveDailyPlan(
       type: "challenge",
       href: "/app/challenges",
       premium: true,
+      reason: "Weekly real-world practice is the #1 predictor of maintaining gains after the structured program.",
     });
   }
 

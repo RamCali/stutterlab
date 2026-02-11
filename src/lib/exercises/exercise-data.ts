@@ -13,6 +13,20 @@ import {
 import type { LucideIcon } from "lucide-react";
 import type { CoachingConfig, TechniqueType } from "@/lib/audio/SpeechCoach";
 
+export interface CoachingTip {
+  /** What "doing it right" looks like */
+  doThis: string;
+  /** Common mistake to avoid */
+  notThis: string;
+}
+
+export interface FeedbackRubric {
+  /** What to check after each practice item */
+  checkpoints: string[];
+  /** What success sounds/feels like */
+  successSignal: string;
+}
+
 export interface ExerciseDefinition {
   id: string;
   title: string;
@@ -31,6 +45,10 @@ export interface ExerciseDefinition {
   coachConfig?: Partial<CoachingConfig>;
   /** Exercise-specific practice items (overrides default readingContent) */
   practiceItems?: Record<string, string[]>;
+  /** Coaching layer: do/don't tips for the technique */
+  coachingTips?: CoachingTip[];
+  /** Coaching layer: post-practice self-check rubric */
+  feedbackRubric?: FeedbackRubric;
 }
 
 export const exercises: ExerciseDefinition[] = [
@@ -106,6 +124,19 @@ export const exercises: ExerciseDefinition[] = [
       activeTechniques: ["gentle_onset", "rate_compliance"] as TechniqueType[],
       targetSPM: { min: 100, max: 160 },
     },
+    coachingTips: [
+      { doThis: "Start with a soft sigh of air before adding voice", notThis: "Starting with a hard, sudden vocal attack" },
+      { doThis: "Feel a gentle stream of air on your hand before the word", notThis: "Holding your breath and then forcing the word out" },
+      { doThis: "The first syllable should sound slightly breathy", notThis: "Whispering the whole word — only the onset is soft" },
+    ],
+    feedbackRubric: {
+      checkpoints: [
+        "Did air flow before voice started?",
+        "Was the first sound relaxed, not forced?",
+        "Did you maintain smooth airflow into the rest of the word?",
+      ],
+      successSignal: "The word begins softly, almost like a sigh, then transitions smoothly to normal volume.",
+    },
   },
   {
     id: "light-contact",
@@ -129,6 +160,19 @@ export const exercises: ExerciseDefinition[] = [
     coachConfig: {
       activeTechniques: ["gentle_onset", "rate_compliance"] as TechniqueType[],
       targetSPM: { min: 120, max: 180 },
+    },
+    coachingTips: [
+      { doThis: "Barely touch your tongue to the roof of your mouth for /t/, /d/, /n/", notThis: "Pressing hard or creating tension in your tongue" },
+      { doThis: "Let your lips loosely touch for /p/, /b/, /m/ sounds", notThis: "Pressing lips tightly together before releasing" },
+      { doThis: "Keep your jaw relaxed and slightly open throughout", notThis: "Clenching your jaw between words" },
+    ],
+    feedbackRubric: {
+      checkpoints: [
+        "Did your consonants feel light, not forceful?",
+        "Was your jaw relaxed throughout?",
+        "Could you feel minimal contact at articulation points?",
+      ],
+      successSignal: "Consonants sound clear but effortless — like your mouth is barely working to make them.",
     },
   },
   {
@@ -154,6 +198,19 @@ export const exercises: ExerciseDefinition[] = [
       activeTechniques: ["prolonged_speech", "rate_compliance"] as TechniqueType[],
       targetSPM: { min: 80, max: 140 },
     },
+    coachingTips: [
+      { doThis: "Stretch vowels naturally — like singing in slow motion", notThis: "Stretching consonants or making robotic sounds" },
+      { doThis: "Blend words together so speech flows continuously", notThis: "Stopping between each word with a gap" },
+      { doThis: "Gradually speed up as you get comfortable", notThis: "Staying at the slowest speed forever — the goal is natural pace" },
+    ],
+    feedbackRubric: {
+      checkpoints: [
+        "Did your vowels sound elongated but natural?",
+        "Did words blend smoothly without gaps?",
+        "Was your pace slow but not robotic?",
+      ],
+      successSignal: "Speech sounds like a smooth, flowing stream — slow but connected, with stretched vowels carrying the rhythm.",
+    },
   },
   {
     id: "pausing",
@@ -177,6 +234,19 @@ export const exercises: ExerciseDefinition[] = [
     coachConfig: {
       activeTechniques: ["pacing", "rate_compliance"] as TechniqueType[],
       targetSPM: { min: 120, max: 180 },
+    },
+    coachingTips: [
+      { doThis: "Pause at natural phrase boundaries (commas, breath points)", notThis: "Pausing randomly in the middle of a phrase" },
+      { doThis: "Use the pause to take a quick diaphragmatic breath", notThis: "Holding your breath during the pause" },
+      { doThis: "Keep pauses short and natural (0.5-1 second)", notThis: "Making pauses so long they feel awkward" },
+    ],
+    feedbackRubric: {
+      checkpoints: [
+        "Did you pause at natural phrase boundaries?",
+        "Did you breathe during pauses?",
+        "Did your speech sound conversational, not choppy?",
+      ],
+      successSignal: "Speech sounds like a confident speaker who pauses deliberately — not rushed, not hesitant.",
     },
   },
   {
@@ -202,6 +272,19 @@ export const exercises: ExerciseDefinition[] = [
       activeTechniques: ["cancellation", "gentle_onset"] as TechniqueType[],
       targetSPM: { min: 100, max: 160 },
     },
+    coachingTips: [
+      { doThis: "Pause completely after a stutter — full stop, 2-3 seconds", notThis: "Pushing through the stutter without stopping" },
+      { doThis: "During the pause, consciously relax your articulators", notThis: "Just waiting tensely without actually releasing tension" },
+      { doThis: "Re-attempt the word with gentle onset or light contact", notThis: "Repeating the word the exact same way you stuttered on it" },
+    ],
+    feedbackRubric: {
+      checkpoints: [
+        "Did you fully stop after the stutter?",
+        "Did you consciously relax before re-attempting?",
+        "Was the second attempt smoother than the first?",
+      ],
+      successSignal: "You stutter, pause with purpose, then produce the word smoothly — showing control over the moment.",
+    },
   },
   {
     id: "pull-out",
@@ -225,6 +308,19 @@ export const exercises: ExerciseDefinition[] = [
     coachConfig: {
       activeTechniques: ["pull_out", "rate_compliance"] as TechniqueType[],
       targetSPM: { min: 100, max: 160 },
+    },
+    coachingTips: [
+      { doThis: "When you feel a block, slow down instead of stopping", notThis: "Stopping completely — that's cancellation, not pull-out" },
+      { doThis: "Consciously release tension mid-stutter (relax jaw, soften lips)", notThis: "Adding more force to push through the block" },
+      { doThis: "Slide out of the block into the rest of the word", notThis: "Restarting the word from the beginning" },
+    ],
+    feedbackRubric: {
+      checkpoints: [
+        "Did you slow down during the block instead of stopping?",
+        "Did you release tension while still in the stutter?",
+        "Did you finish the word smoothly after easing out?",
+      ],
+      successSignal: "Mid-stutter, you visibly relax and the word emerges smoothly — like untangling a knot in real-time.",
     },
   },
   {
@@ -250,6 +346,19 @@ export const exercises: ExerciseDefinition[] = [
       activeTechniques: ["gentle_onset", "rate_compliance"] as TechniqueType[],
       targetSPM: { min: 100, max: 160 },
     },
+    coachingTips: [
+      { doThis: "Visualize the mouth position for the first sound before speaking", notThis: "Overthinking it — just a quick mental image is enough" },
+      { doThis: "Position your articulators lightly, not tightly", notThis: "Clenching or pressing hard in the preparatory position" },
+      { doThis: "Flow directly from the set position into the word with gentle onset", notThis: "Holding the preparatory position too long — it should be brief" },
+    ],
+    feedbackRubric: {
+      checkpoints: [
+        "Did you mentally prepare the first sound before starting?",
+        "Was your preparatory position light, not tense?",
+        "Did you transition smoothly from set to speech?",
+      ],
+      successSignal: "A brief moment of preparation, then the word flows out smoothly — like a swimmer preparing to dive.",
+    },
   },
   {
     id: "voluntary-stuttering",
@@ -270,6 +379,19 @@ export const exercises: ExerciseDefinition[] = [
       "The goal is to stutter ON PURPOSE to reduce fear of stuttering.",
       "Practice until it feels boring, not scary.",
     ],
+    coachingTips: [
+      { doThis: "Choose easy words you're already fluent on", notThis: "Choosing words you actually fear — start with safe words first" },
+      { doThis: "Keep the stutter easy, bouncy, and relaxed (b-b-beautiful)", notThis: "Making the voluntary stutter tense or forced" },
+      { doThis: "Practice until voluntary stuttering feels boring, not scary", notThis: "Stopping as soon as it feels uncomfortable — lean into it" },
+    ],
+    feedbackRubric: {
+      checkpoints: [
+        "Was your voluntary stutter relaxed and easy?",
+        "Did you stutter on words you're normally fluent on?",
+        "Did the fear/tension decrease over repetitions?",
+      ],
+      successSignal: "Voluntary stuttering feels like a deliberate choice, not a loss of control — it's boring, not scary.",
+    },
     practiceItems: {
       words: [
         "beautiful", "together", "wonderful", "Saturday", "telephone",

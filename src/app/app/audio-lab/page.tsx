@@ -146,7 +146,7 @@ export default function AudioLabPage() {
             Audio Lab
           </h1>
           <p className="text-muted-foreground mt-1">
-            Real-time audio therapy tools powered by Web Audio API
+            Real-time audio training tools powered by Web Audio API
           </p>
         </div>
         <Badge variant="outline" className="text-xs">

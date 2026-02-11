@@ -58,7 +58,7 @@ export function BeforeAfterCard({ data }: { data: BeforeAfterData }) {
       `Fluency Score: ${data.first.fluencyScore} → ${data.latest.fluencyScore} ${fluencyImproved ? "(↑ improved!)" : ""}`,
       `Severity: ${data.first.severityRating} → ${data.latest.severityRating}`,
       ``,
-      `${data.totalSessions} sessions completed. Evidence-based stuttering treatment.`,
+      `${data.totalSessions} sessions completed. Evidence-based stuttering training.`,
       `stutterlab.com`,
     ].join("\n");
 

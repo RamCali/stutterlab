@@ -17,9 +17,12 @@ import {
   Clock,
   Square,
   Shield,
+  Hand,
+  MicOff,
 } from "lucide-react";
 import Link from "next/link";
-import { VoiceConversation, type VoiceState, type TurnMetrics } from "@/lib/audio/VoiceConversation";
+import { VoiceConversation, type VoiceState, type TurnMetrics, type TurnMode } from "@/lib/audio/VoiceConversation";
+import { useElevenLabsConversation } from "@/hooks/useElevenLabsConversation";
 import { VoiceOrb } from "@/components/ai-conversations/voice-orb";
 import { VoiceModeToggle } from "@/components/ai-conversations/voice-mode-toggle";
 import { PerformanceReport } from "@/components/ai-conversations/performance-report";
@@ -70,12 +73,36 @@ export default function AIConversationPage() {
   const [earnedXp, setEarnedXp] = useState<number | undefined>();
   const voiceConvRef = useRef<VoiceConversation | null>(null);
   const [voiceAnalyserNode, setVoiceAnalyserNode] = useState<AnalyserNode | null>(null);
+  const [usingElevenLabs, setUsingElevenLabs] = useState(false);
 
   // Stress mode state
   const [stressMode, setStressMode] = useState(false);
   const [stressLevel, setStressLevel] = useState<StressLevel>(1);
   const [countdownSeconds, setCountdownSeconds] = useState<number | null>(null);
   const stressEngineRef = useRef<StressEngine | null>(null);
+
+  // Block-aware mode state
+  const [blockAwareMode, setBlockAwareMode] = useState(false);
+  const [turnMode, setTurnMode] = useState<TurnMode>("auto");
+
+  // ElevenLabs Conversational AI hook
+  const elevenLabs = useElevenLabsConversation({
+    scenario,
+    stressLevel: stressMode ? stressLevel : undefined,
+    onStateChange: setVoiceState,
+    onUserTranscript: (text) => setVoiceTranscript(text),
+    onAssistantMessage: (text) => {
+      setMessages((prev) => [...prev, { role: "assistant", content: text }]);
+    },
+    onTurnComplete: (turn) => {
+      setVoiceTurns((prev) => [...prev, turn]);
+      if (turn.role === "user") {
+        setMessages((prev) => [...prev, { role: "user", content: turn.text }]);
+        setVoiceTranscript("");
+      }
+    },
+    onError: (err) => console.error("ElevenLabs error:", err),
+  });
 
   // Usage gate
   const [usage, setUsage] = useState<{ canStart: boolean; plan: PlanTier } | null>(null);
@@ -94,6 +121,7 @@ export default function AIConversationPage() {
       voiceConvRef.current?.stop();
       stressEngineRef.current?.stop();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ==================== TEXT MODE ====================
@@ -170,19 +198,6 @@ export default function AIConversationPage() {
       setElapsedSeconds((s) => s + 1);
     }, 1000);
 
-    // Set up mic AnalyserNode for LiveCoachOverlay
-    try {
-      const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const audioCtx = new AudioContext();
-      const source = audioCtx.createMediaStreamSource(micStream);
-      const analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
-      source.connect(analyser);
-      setVoiceAnalyserNode(analyser);
-    } catch {
-      // Continue without coaching overlay
-    }
-
     // Start stress engine if stress mode enabled
     if (stressMode) {
       const engine = new StressEngine(stressLevel);
@@ -194,6 +209,29 @@ export default function AIConversationPage() {
       });
       engine.start();
       stressEngineRef.current = engine;
+    }
+
+    // Try ElevenLabs Conversational AI first (single WebSocket, lower latency)
+    const elevenLabsSuccess = await elevenLabs.start();
+    if (elevenLabsSuccess) {
+      setUsingElevenLabs(true);
+      return;
+    }
+
+    // Fallback to legacy pipeline (Web Speech API → Claude → ElevenLabs TTS)
+    setUsingElevenLabs(false);
+
+    // Set up mic AnalyserNode for LiveCoachOverlay
+    try {
+      const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const audioCtx = new AudioContext();
+      const source = audioCtx.createMediaStreamSource(micStream);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      setVoiceAnalyserNode(analyser);
+    } catch {
+      // Continue without coaching overlay
     }
 
     const voiceConv = new VoiceConversation(scenario, {
@@ -210,7 +248,10 @@ export default function AIConversationPage() {
         }
       },
       onError: (err) => console.error("Voice error:", err),
-    }, undefined, stressMode ? stressLevel : undefined);
+    }, undefined, stressMode ? stressLevel : undefined, {
+      silenceTimeoutMs: blockAwareMode ? 5000 : 2000,
+      turnMode,
+    });
 
     voiceConvRef.current = voiceConv;
     await voiceConv.start();
@@ -219,13 +260,23 @@ export default function AIConversationPage() {
   async function endConversation() {
     if (timerRef.current) clearInterval(timerRef.current);
 
-    if (isVoiceMode && voiceConvRef.current) {
-      const turns = voiceConvRef.current.stop();
+    if (isVoiceMode) {
+      // Stop the active voice engine (ElevenLabs or legacy)
+      let turns: TurnMetrics[];
+      if (usingElevenLabs) {
+        turns = elevenLabs.stop();
+      } else if (voiceConvRef.current) {
+        turns = voiceConvRef.current.stop();
+        voiceConvRef.current = null;
+      } else {
+        turns = [];
+      }
+
       setVoiceTurns(turns);
-      voiceConvRef.current = null;
       stressEngineRef.current?.stop();
       stressEngineRef.current = null;
       setCountdownSeconds(null);
+
       if (turns.filter((t) => t.role === "user").length > 0) {
         // Persist to DB and capture XP
         saveAIConversation({
@@ -419,6 +470,63 @@ export default function AIConversationPage() {
                 )}
               </div>
             )}
+            {/* Block-Aware Pacing (voice mode only) */}
+            {isVoiceMode && (
+              <div className="mt-4 p-4 rounded-xl border border-teal-500/20 bg-teal-500/5 max-w-md w-full">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Hand className="h-4 w-4 text-teal-500" />
+                    <span className="text-sm font-semibold">Block-Aware Pacing</span>
+                  </div>
+                  <button
+                    onClick={() => setBlockAwareMode(!blockAwareMode)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      blockAwareMode ? "bg-teal-500" : "bg-muted"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        blockAwareMode ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+                {blockAwareMode && (
+                  <div className="space-y-3">
+                    <p className="text-xs text-muted-foreground">
+                      Extra patience for blocks and prolongations. The AI waits longer before responding.
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setTurnMode("auto")}
+                        className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                          turnMode === "auto"
+                            ? "bg-teal-500/20 text-teal-400 border border-teal-500/30"
+                            : "bg-muted/50 text-muted-foreground"
+                        }`}
+                      >
+                        Auto (5s pause)
+                      </button>
+                      <button
+                        onClick={() => setTurnMode("push-to-talk")}
+                        className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                          turnMode === "push-to-talk"
+                            ? "bg-teal-500/20 text-teal-400 border border-teal-500/30"
+                            : "bg-muted/50 text-muted-foreground"
+                        }`}
+                      >
+                        Push-to-Talk
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground/70">
+                      {turnMode === "auto"
+                        ? "Waits 5 seconds of silence (instead of 2) before responding. You can tap \"I'm not done\" for more time."
+                        : "You control when your turn ends. Tap \"Done Speaking\" when you're ready for the AI to respond."}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
             <Button
               className="mt-6"
               size="lg"
@@ -450,11 +558,13 @@ export default function AIConversationPage() {
               </Badge>
             )}
 
-            {/* Live Coach Overlay */}
-            <LiveCoachOverlay
-              analyserNode={voiceAnalyserNode}
-              enabled={voiceState === "listening" || voiceState === "speaking"}
-            />
+            {/* Live Coach Overlay (legacy mode only — ElevenLabs manages its own audio) */}
+            {!usingElevenLabs && (
+              <LiveCoachOverlay
+                analyserNode={voiceAnalyserNode}
+                enabled={voiceState === "listening" || voiceState === "speaking"}
+              />
+            )}
 
             {/* Live transcript */}
             {voiceTranscript && voiceState === "listening" && (
@@ -472,6 +582,53 @@ export default function AIConversationPage() {
                   {messages[messages.length - 1].content}
                 </p>
               </div>
+            )}
+
+            {/* Block-aware controls */}
+            {voiceState === "listening" && blockAwareMode && (
+              <div className="flex gap-3">
+                {turnMode === "push-to-talk" ? (
+                  <Button
+                    size="lg"
+                    variant="default"
+                    className="bg-teal-600 hover:bg-teal-700 text-white gap-2 px-6"
+                    onClick={() => {
+                      if (usingElevenLabs) {
+                        elevenLabs.submitTurn();
+                      } else {
+                        voiceConvRef.current?.submitTurn();
+                      }
+                    }}
+                  >
+                    <MicOff className="h-4 w-4" />
+                    Done Speaking
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-teal-500/30 text-teal-400 hover:bg-teal-500/10 gap-2"
+                    onClick={() => {
+                      if (usingElevenLabs) {
+                        elevenLabs.extendSilence();
+                      } else {
+                        voiceConvRef.current?.extendSilence();
+                      }
+                    }}
+                  >
+                    <Hand className="h-4 w-4" />
+                    I&apos;m Not Done
+                  </Button>
+                )}
+              </div>
+            )}
+
+            {/* Block-aware indicator */}
+            {blockAwareMode && voiceState === "listening" && (
+              <Badge variant="outline" className="border-teal-500/30 text-teal-400 text-xs">
+                <Hand className="h-3 w-3 mr-1" />
+                {turnMode === "push-to-talk" ? "Push-to-Talk" : "Block-Aware (5s)"}
+              </Badge>
             )}
 
             {/* Technique reminder */}

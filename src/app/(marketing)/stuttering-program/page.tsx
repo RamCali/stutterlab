@@ -18,10 +18,10 @@ import { CtaSection } from "@/components/marketing/cta-section";
 import { createMetadata, jsonLd } from "@/lib/seo";
 
 export const metadata = createMetadata({
-  title: "AI Stuttering Treatment That Builds Real-World Confidence",
+  title: "AI Stuttering Program That Builds Real-World Confidence",
   description:
-    "Evidence-based stuttering treatment combining DAF, FAF, AI speech analysis, and daily structured practice. For kids and adults. Browser-based, no downloads.",
-  path: "/stuttering-treatment",
+    "Evidence-based stuttering program combining DAF, FAF, AI speech analysis, and daily structured practice. For kids and adults. Browser-based, no downloads.",
+  path: "/stuttering-program",
 });
 
 const approaches = [
@@ -79,14 +79,14 @@ export default function StutteringTreatmentPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={jsonLd({
           "@type": "MedicalWebPage",
-          name: "Stuttering Treatment - StutterLab",
+          name: "Stuttering Program - StutterLab",
           about: {
             "@type": "MedicalCondition",
             name: "Stuttering",
             alternateName: "Stammering",
           },
           description:
-            "Evidence-based stuttering treatment combining DAF, FAF, AI speech analysis, and structured practice.",
+            "Evidence-based stuttering program combining DAF, FAF, AI speech analysis, and structured practice.",
           lastReviewed: "2026-01-15",
         })}
       />
@@ -100,7 +100,7 @@ export default function StutteringTreatmentPage() {
             className="mb-5 bg-primary/10 text-primary border-0 px-4 py-1.5"
           >
             <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-            Evidence-Based Stuttering Treatment
+            Evidence-Based Stuttering Program
           </Badge>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1]">
             Stop Avoiding.{" "}
@@ -134,9 +134,9 @@ export default function StutteringTreatmentPage() {
           <p className="text-muted-foreground mt-4 text-center max-w-2xl mx-auto leading-relaxed">
             Stuttering affects over 70 million people worldwide — about 1% of
             the global population. It&apos;s a neurological speech disorder, not
-            a psychological one. Modern treatment combines fluency-shaping
+            a psychological one. Modern approaches combine fluency-shaping
             techniques, stuttering modification strategies, and cognitive
-            approaches — and technology is making these treatments more
+            methods — and technology is making these approaches more
             accessible than ever.
           </p>
         </div>
@@ -153,7 +153,7 @@ export default function StutteringTreatmentPage() {
               How It Works
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold">
-              A Multi-Modal Treatment System
+              A Multi-Modal Training System
             </h2>
             <p className="text-muted-foreground mt-3 max-w-xl mx-auto">
               StutterLab combines six evidence-based approaches into one daily
@@ -185,7 +185,7 @@ export default function StutteringTreatmentPage() {
       <section className="py-16 px-6 bg-muted/30">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-10">
-            Why Choose StutterLab for Treatment?
+            Why Choose StutterLab?
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {benefits.map((benefit) => (
@@ -203,7 +203,7 @@ export default function StutteringTreatmentPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-bold">
-              Your Daily Treatment Plan
+              Your Daily Training Plan
             </h2>
             <p className="text-muted-foreground mt-3">
               25 minutes a day. Structured. Progressive. Measurable.
@@ -227,7 +227,7 @@ export default function StutteringTreatmentPage() {
                 step: "3",
                 title: "Track & Reflect",
                 description:
-                  "Voice journal, AI fluency analysis, and progress tracking across your treatment.",
+                  "Voice journal, AI fluency analysis, and progress tracking across your training.",
               },
             ].map((step) => (
               <div key={step.step} className="text-center">

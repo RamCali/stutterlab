@@ -50,7 +50,7 @@ export const organizationJsonLd = {
   name: SITE_NAME,
   url: SITE_URL,
   description:
-    "Evidence-based stuttering treatment platform powered by AI. Combines DAF, FAF, speech analysis, and real-world practice.",
+    "Evidence-based stuttering training platform powered by AI. Combines DAF, FAF, speech analysis, and real-world practice.",
 };
 
 export const SITE = { url: SITE_URL, name: SITE_NAME };

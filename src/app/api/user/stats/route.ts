@@ -72,11 +72,23 @@ export async function POST(req: NextRequest) {
           const daysSinceLast = Math.floor(
             (today.getTime() - lastPractice.getTime()) / 86400000
           );
-          if (daysSinceLast === 1) {
+          if (daysSinceLast === 0) {
+            // Same day = no change to streak
+          } else if (daysSinceLast <= 2) {
+            // Flexible streak: 1-2 day gap keeps streak alive
+            // Still consume a streak freeze if gap is exactly 2 and user has tokens
+            if (daysSinceLast === 2 && stats.streakFreezeTokens > 0) {
+              await db
+                .update(userStats)
+                .set({
+                  streakFreezeTokens: sql`${userStats.streakFreezeTokens} - 1`,
+                })
+                .where(eq(userStats.userId, userId));
+            }
             newStreak += 1;
-          } else if (daysSinceLast > 1) {
-            // Check for streak freeze
-            if (stats.streakFreezeTokens > 0 && daysSinceLast === 2) {
+          } else {
+            // 3+ days gap — check for streak freeze (covers 3-day gap)
+            if (stats.streakFreezeTokens > 0 && daysSinceLast === 3) {
               newStreak += 1;
               await db
                 .update(userStats)
@@ -88,7 +100,6 @@ export async function POST(req: NextRequest) {
               newStreak = 1;
             }
           }
-          // Same day = no change to streak
         } else {
           newStreak = 1;
         }

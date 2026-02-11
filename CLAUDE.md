@@ -1,6 +1,6 @@
 # StutterLab
 
-AI-powered stuttering therapy app with a 90-day structured program (speech analysis, guided exercises, gamification, clinician support).
+AI-guided speech training program for people who stutter — daily practice for smoother, more confident speaking.
 
 ## Getting Started
 
@@ -114,6 +114,13 @@ npx drizzle-kit studio          # browse data in browser
 ## Environment
 
 See `.env.example` for all required variables (DATABASE_URL, NextAuth, Google OAuth, Stripe, OpenAI, ElevenLabs, R2 storage, PostHog, Resend).
+
+## Branding
+
+**Never use "therapy" or "treatment"** when describing StutterLab. Use "program", "training", or "practice" instead.
+- OK in clinical context: "Treatment plan design" (what SLPs do), "speech therapist" (referring to the profession)
+- NOT OK: "AI therapy", "stuttering treatment app", "DAF therapy"
+- The `treatmentPath` DB column is internal — keep as-is, no rename needed
 
 ## Deploy
 

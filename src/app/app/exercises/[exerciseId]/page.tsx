@@ -21,6 +21,7 @@ import {
 import { getExerciseById } from "@/lib/exercises/exercise-data";
 import { readingContent } from "@/lib/practice/daily-session";
 import { LiveCoachOverlay } from "@/components/coaching/LiveCoachOverlay";
+import { CoachingPanel } from "@/components/coaching/coaching-panel";
 import { completeExercise } from "@/lib/actions/exercises";
 
 type ContentLevel = string;
@@ -300,6 +301,11 @@ export default function ExerciseDetailPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Coaching Panel */}
+        <div className="mb-4">
+          <CoachingPanel tips={exercise.coachingTips} rubric={exercise.feedbackRubric} />
+        </div>
 
         {/* Content level picker */}
         {contentLevels.length > 1 && (

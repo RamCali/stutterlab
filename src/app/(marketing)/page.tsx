@@ -48,7 +48,7 @@ const painPoints = [
   {
     icon: Target,
     pain: "Rehearsing one sentence 10 times before you say it",
-    solve: "Rewire your speech patterns with clinically-proven DAF therapy",
+    solve: "Rewire your speech patterns with clinically-proven DAF",
   },
 ];
 
@@ -200,7 +200,7 @@ const pricingTiers = [
     price: "$99",
     period: "per month",
     yearlyNote: "$999/year — save $189",
-    description: "The complete treatment program",
+    description: "The complete training program",
     features: [
       "Full Audio Lab (DAF + FAF + Choral + Metronome)",
       "90-day SLP-designed curriculum",
@@ -210,9 +210,9 @@ const pricingTiers = [
       "Real-world challenges with XP & streaks",
       "Voice Journal with AI fluency scoring",
       "Clinical progress reports",
-      "7-day free trial included",
+      "7-day money-back guarantee",
     ],
-    cta: "Start 7-Day Free Trial",
+    cta: "Start for $99/mo",
     highlighted: true,
   },
 ];
@@ -220,36 +220,43 @@ const pricingTiers = [
 export default function LandingPage() {
   return (
     <>
-      {/* ═══ Hero — Lead with the pain ═══ */}
-      <section className="relative py-20 md:py-32 px-6 overflow-hidden">
+      {/* ═══ Hero ═══ */}
+      <section className="relative py-24 md:py-36 px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/3 via-transparent to-transparent pointer-events-none" />
-        <div className="max-w-4xl mx-auto text-center relative">
-          <p className="text-muted-foreground text-lg md:text-xl mb-6 max-w-2xl mx-auto leading-relaxed">
-            You know what you want to say. You know you&apos;re smart enough, qualified enough, ready enough.
-          </p>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1]">
-            The Only Thing Between You and{" "}
-            <span className="text-primary">Your Full Life</span>
-            <br />
-            Is Getting the Words Out
+        <div className="max-w-3xl mx-auto relative flex flex-col items-center">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-center">
+            Stuttering?
           </h1>
-          <p className="mt-8 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            StutterLab is a clinical stuttering treatment program — not an app full of breathing exercises.
-            Practice real conversations with AI. Rewire your speech with DAF therapy. Build fluency in 10 minutes a day.
-          </p>
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="mt-10 flex flex-col gap-3 w-fit">
+            {[
+              "Evidence based",
+              "24/7 private training",
+              "AI-powered conversation practice",
+              "Fraction of traditional speech training cost",
+              "Personalized to your communication needs",
+              "Developed by Speech-Language Pathologist",
+            ].map((item) => (
+              <div key={item} className="flex items-center gap-3">
+                <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="text-base sm:text-lg md:text-xl text-foreground/90">{item}</span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-10">
             <Button size="lg" className="px-8 text-base h-12" asChild>
               <Link href="/signup">
-                Start Free — No Credit Card
+                Start for $99/mo
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="px-8 text-base h-12" asChild>
-              <Link href="/app/audio-lab">Try DAF Therapy Free</Link>
-            </Button>
           </div>
           <p className="mt-4 text-xs text-muted-foreground">
-            Free tier available forever. Premium includes a 7-day free trial.
+            Cancel within 7 days for a full refund.
+          </p>
+          <p className="mt-4 text-xs text-muted-foreground">
+            <a href="#not-for-everyone" className="underline underline-offset-2 hover:text-foreground transition-colors">
+              StutterLab is not for everyone.
+            </a>
           </p>
         </div>
       </section>
@@ -334,18 +341,57 @@ export default function LandingPage() {
             ))}
           </div>
           <div className="text-center mt-10">
-            <Button size="lg" className="px-8" asChild>
+            <Button size="lg" className="px-8 text-base h-12" asChild>
               <Link href="/signup">
-                Start Your Transformation
+                Start training today — $99/mo
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Link>
             </Button>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Cancel within 7 days for a full refund.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ Not For Everyone ═══ */}
+      <section id="not-for-everyone" className="py-16 px-6 bg-muted/30">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
+            StutterLab Is Not For Everyone
+          </h2>
+          <p className="text-muted-foreground text-center mb-8">
+            We&apos;d rather be honest upfront than waste your time.
+          </p>
+          <div className="space-y-3 max-w-lg mx-auto">
+            {[
+              {
+                title: "Children",
+                detail: "StutterLab is designed for adults. Pediatric stuttering requires direct SLP supervision.",
+              },
+              {
+                title: "People looking for a quick fix",
+                detail: "There is no magic cure for stuttering. This is a 90-day training program that requires real effort.",
+              },
+              {
+                title: "People who can\u2019t commit to 10 minutes a day",
+                detail: "Consistency is everything. If you can\u2019t practice daily, this won\u2019t work.",
+              },
+            ].map((item) => (
+              <div key={item.title} className="flex items-start gap-3 p-4 rounded-xl bg-card border border-border/60">
+                <X className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-sm">{item.title}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{item.detail}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ═══ How It Works ═══ */}
-      <section id="how-it-works" className="py-20 px-6 bg-muted/30">
+      <section id="how-it-works" className="py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
             <Badge
@@ -356,7 +402,7 @@ export default function LandingPage() {
               10 Minutes a Day
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold">
-              A Real Treatment Program.
+              A Real Training Program.
               <br />
               Not Another Meditation App.
             </h2>
@@ -367,7 +413,7 @@ export default function LandingPage() {
                 step: "1",
                 title: "Day 1: Feel the Difference",
                 description:
-                  "Try DAF therapy in your first session. Most people feel an immediate change in their speech. It's not magic — it's neuroscience. Your brain responds to altered auditory feedback by slowing and smoothing your speech patterns.",
+                  "Try DAF in your first session. Most people feel an immediate change in their speech. It's not magic — it's neuroscience. Your brain responds to altered auditory feedback by slowing and smoothing your speech patterns.",
                 icon: Sparkles,
               },
               {
@@ -513,7 +559,7 @@ export default function LandingPage() {
             {[
               {
                 stat: "80%",
-                label: "fluency improvement with DAF therapy",
+                label: "fluency improvement with DAF",
                 detail:
                   "Delayed Auditory Feedback is one of the most-studied interventions in stuttering research. It changes how your brain processes speech in real time.",
               },
@@ -521,7 +567,7 @@ export default function LandingPage() {
                 stat: "70M",
                 label: "people worldwide stutter",
                 detail:
-                  "You're not broken. Stuttering is a neurological difference affecting 1% of the population. Practice-based treatment works because of neuroplasticity.",
+                  "You're not broken. Stuttering is a neurological difference affecting 1% of the population. Consistent practice works because of neuroplasticity.",
               },
               {
                 stat: "10 min",
@@ -577,7 +623,7 @@ export default function LandingPage() {
                 Every exercise, every AI conversation prompt, every progression in this
                 curriculum is built on peer-reviewed fluency shaping and stuttering modification
                 research. This isn&apos;t a wellness app with a speech theme.
-                It&apos;s a treatment program.
+                It&apos;s a training program.
               </p>
               <div className="mt-6 space-y-1">
                 <p className="font-semibold">Ram Gangisetty, M.S., CCC-SLP</p>
@@ -684,7 +730,7 @@ export default function LandingPage() {
               },
               {
                 q: "I've tried other apps. They didn't work.",
-                a: "Most speech apps offer breathing exercises and call it therapy. StutterLab has a 90-day clinical curriculum, real-time AI conversation practice, DAF/FAF therapy, feared word desensitization, and CBT — the full toolkit, not a fraction of it.",
+                a: "Most speech apps offer breathing exercises and call it training. StutterLab has a 90-day clinical curriculum, real-time AI conversation practice, DAF/FAF, feared word desensitization, and CBT — the full toolkit, not a fraction of it.",
               },
               {
                 q: "What if I don't have time?",
@@ -741,13 +787,13 @@ export default function LandingPage() {
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button size="lg" className="px-10 text-base h-12" asChild>
               <Link href="/signup">
-                Start Free Today
+                Start for $99/mo
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Link>
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-4">
-            No credit card required. Free tier available forever.
+            Cancel within 7 days for a full refund.
           </p>
         </div>
       </section>

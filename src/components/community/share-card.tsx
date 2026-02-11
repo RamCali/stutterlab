@@ -130,7 +130,7 @@ export function ShareProgressCard({ data }: { data: ShareCardData }) {
             {/* Footer */}
             <div className="relative mt-5 pt-3 border-t border-white/10">
               <p className="text-[10px] text-white/40 text-center">
-                Member since {data.memberSince} — Evidence-based stuttering treatment
+                Member since {data.memberSince} — Evidence-based stuttering training
               </p>
             </div>
           </CardContent>
@@ -176,7 +176,7 @@ function buildShareText(data: ShareCardData): string {
     lines.push(`${data.fluencyImprovement}% fluency improvement so far.`);
   }
   lines.push(
-    `${data.totalSessions} sessions completed. Evidence-based stuttering treatment that works.`
+    `${data.totalSessions} sessions completed. Evidence-based stuttering training that works.`
   );
   lines.push("");
   lines.push("stutterlab.com");
@@ -196,7 +196,7 @@ export function ShareProgressPrompt({
   if (streak < 3 && sessions < 5) return null; // Don't prompt until there's something to share
 
   async function handleShare() {
-    const text = `I'm on a ${streak}-day streak with StutterLab! ${sessions} sessions completed. Evidence-based stuttering treatment. stutterlab.com`;
+    const text = `I'm on a ${streak}-day streak with StutterLab! ${sessions} sessions completed. Evidence-based stuttering training. stutterlab.com`;
     try {
       if (navigator.share) {
         await navigator.share({ title: "StutterLab Progress", text });

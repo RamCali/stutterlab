@@ -21,10 +21,10 @@ import { CtaSection } from "@/components/marketing/cta-section";
 import { createMetadata, jsonLd } from "@/lib/seo";
 
 export const metadata = createMetadata({
-  title: "AI Stuttering Therapy - Smart Speech Analysis & Practice",
+  title: "AI Speech Training - Smart Speech Analysis & Practice",
   description:
-    "StutterLab uses AI to analyze your speech patterns, map your stutter fingerprint, simulate real-world conversations, and adapt your therapy in real-time.",
-  path: "/ai-stuttering-therapy",
+    "StutterLab uses AI to analyze your speech patterns, map your stutter fingerprint, simulate real-world conversations, and adapt your training in real-time.",
+  path: "/ai-speech-training",
 });
 
 const aiFeatures = [
@@ -100,9 +100,9 @@ export default function AiStutteringTherapyPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={jsonLd({
           "@type": "WebPage",
-          name: "AI Stuttering Therapy - StutterLab",
+          name: "AI Speech Training - StutterLab",
           description:
-            "AI-powered stuttering therapy with speech analysis, conversation simulation, and adaptive treatment.",
+            "AI-powered speech training with speech analysis, conversation simulation, and adaptive practice.",
         })}
       />
 
@@ -116,9 +116,10 @@ export default function AiStutteringTherapyPage() {
           >
             <Sparkles className="h-3.5 w-3.5 mr-1.5" />
             AI-Powered Stuttering Help Program
-
-            <Check className="h-3.5 w-3.5 mr-1.5" />
+            <p>
+                          <Check className="h-3.5 w-3.5 mr-1.5" />
             Developed by Licensed Speech-Language Pathologists
+            </p>
           </Badge>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1]">
             Practice the Conversations{" "}
@@ -132,12 +133,12 @@ export default function AiStutteringTherapyPage() {
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button size="lg" className="px-8" asChild>
               <Link href="/signup">
-                Try AI Therapy Free
+                Try StutterLab Free
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="px-8" asChild>
-              <Link href="/stuttering-treatment">Learn About Treatment</Link>
+              <Link href="/stuttering-program">Learn About the Program</Link>
             </Button>
           </div>
         </div>
@@ -181,7 +182,7 @@ export default function AiStutteringTherapyPage() {
               AI Features
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold">
-              Six Ways AI Powers Your Therapy
+              Six Ways AI Powers Your Practice
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -257,7 +258,7 @@ export default function AiStutteringTherapyPage() {
       <CtaSection
         title="Stop Letting Stuttering Choose Your Words"
         description="Practice any conversation, any time. Build the confidence to say what you actually mean."
-        primaryCta="Try AI Therapy Free"
+        primaryCta="Try StutterLab Free"
       />
     </>
   );

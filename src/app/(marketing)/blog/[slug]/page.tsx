@@ -142,7 +142,7 @@ export default async function BlogPostPage({ params }: Props) {
 
       <CtaSection
         title="Ready to Practice?"
-        description="Start your evidence-based stuttering treatment with StutterLab. Free to begin."
+        description="Start your evidence-based stuttering training with StutterLab. Free to begin."
       />
     </>
   );

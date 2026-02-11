@@ -3,9 +3,9 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 const navLinks = [
-  { href: "/stuttering-treatment", label: "Treatment" },
+  { href: "/stuttering-program", label: "Program" },
   { href: "/stuttering-exercises", label: "Exercises" },
-  { href: "/ai-stuttering-therapy", label: "AI Therapy" },
+  { href: "/ai-speech-training", label: "AI Training" },
   { href: "/blog", label: "Blog" },
   { href: "/#pricing", label: "Pricing" },
 ];
