@@ -141,7 +141,7 @@ export default function SpeechTherapyForStutteringPage() {
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="px-8" asChild>
-              <Link href="/find-slp">Find an SLP Near You</Link>
+              <Link href="/app/find-slp">Find an SLP Near You</Link>
             </Button>
           </div>
         </div>

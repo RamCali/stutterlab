@@ -29,6 +29,12 @@ export async function POST(req: NextRequest) {
       recommendedEmphasis,
     } = body;
 
+    const {
+      stutterFrequency,
+      stutterDuration,
+      stutterImpact,
+    } = body;
+
     const treatmentPath = {
       fearedSituations: fearedSituations || [],
       speechChallenges: speechChallenges || [],
@@ -38,6 +44,10 @@ export async function POST(req: NextRequest) {
       avoidanceBehaviors: avoidanceBehaviors || [],
       stutteringTypes: stutteringTypes || [],
       speakingFrequency: speakingFrequency || null,
+      stutterFrequency: stutterFrequency || null,
+      stutterDuration: stutterDuration || null,
+      stutterImpact: stutterImpact || null,
+      severity: severity || null,
       severityScore: severityScore || null,
       confidenceScore: confidenceScore || null,
       assessmentProfile: assessmentProfile || null,

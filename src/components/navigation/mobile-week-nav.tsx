@@ -22,7 +22,7 @@ export function MobileWeekNav({ currentDay }: MobileWeekNavProps) {
         {days.map((day, i) => (
           <Link
             key={day.dayNumber}
-            href={day.isLocked ? "#" : "/practice"}
+            href={day.isLocked ? "#" : "/app/practice"}
             onClick={(e) => day.isLocked && e.preventDefault()}
             className="flex flex-col items-center gap-0.5"
           >
@@ -50,21 +50,21 @@ export function MobileWeekNav({ currentDay }: MobileWeekNavProps) {
       {/* Action bar */}
       <div className="flex justify-around px-4 py-1.5 border-t border-border/40">
         <Link
-          href="/practice"
+          href="/app/practice"
           className="flex flex-col items-center gap-0.5 text-primary"
         >
           <Play className="h-5 w-5 stroke-[2.5]" />
           <span className="text-[10px] font-medium">Today</span>
         </Link>
         <Link
-          href="/progress"
+          href="/app/progress"
           className="flex flex-col items-center gap-0.5 text-muted-foreground"
         >
           <LineChart className="h-5 w-5" />
           <span className="text-[10px] font-medium">Progress</span>
         </Link>
         <Link
-          href="/settings"
+          href="/app/settings"
           className="flex flex-col items-center gap-0.5 text-muted-foreground"
         >
           <Settings className="h-5 w-5" />

@@ -82,7 +82,7 @@ export async function createCheckoutSession(
         quantity: 1,
       },
     ],
-    return_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
+    return_url: `${process.env.NEXT_PUBLIC_APP_URL}/app/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
     metadata: { userId, plan: "pro" },
     subscription_data: {
       metadata: { userId, plan: "pro" },
@@ -94,6 +94,6 @@ export async function createCheckoutSession(
 export async function createPortalSession(stripeCustomerId: string) {
   return getStripe().billingPortal.sessions.create({
     customer: stripeCustomerId,
-    return_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings`,
+    return_url: `${process.env.NEXT_PUBLIC_APP_URL}/app/settings`,
   });
 }

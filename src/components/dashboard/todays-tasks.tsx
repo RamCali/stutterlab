@@ -121,7 +121,7 @@ export function TodaysTasks({ dailyPlan, currentDay }: TodaysTasksProps) {
             <p className="text-xs text-muted-foreground mt-1">Great work. See you tomorrow.</p>
           </div>
         ) : (
-          <Link href="/practice">
+          <Link href="/app/practice">
             <Button className="w-full" size="lg">
               <Play className="h-4 w-4 mr-2" />
               Start Today&apos;s Session

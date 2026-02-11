@@ -2,6 +2,11 @@
  * Assessment scoring algorithm for the Speech Assessment quiz funnel.
  * Produces severity + confidence scores and a user profile that
  * influences curriculum emphasis.
+ *
+ * Severity is computed from three observable dimensions (inspired by SSI-4):
+ *  1. Frequency  — how often stuttering occurs (~40% weight)
+ *  2. Duration   — how long each stutter lasts (~30% weight)
+ *  3. Impact     — how much it affects daily life (~30% weight)
  */
 
 export type AssessmentProfile =
@@ -14,6 +19,8 @@ export interface AssessmentScores {
   severityScore: number;     // 1-100
   confidenceScore: number;   // 1-100
   profile: AssessmentProfile;
+  /** Derived from severityScore for DB enum backwards compatibility */
+  severityLabel: "mild" | "moderate" | "severe";
   recommendedEmphasis: {
     fluencyShaping: number;          // 0-1
     stutteringModification: number;  // 0-1
@@ -21,43 +28,70 @@ export interface AssessmentScores {
   };
 }
 
-interface ScoringInput {
-  severity: "mild" | "moderate" | "severe" | null;
+export interface ScoringInput {
+  /** How often stuttering occurs in conversation */
+  stutterFrequency: string;   // "rarely" | "sometimes" | "often" | "very-often"
+  /** How long each stutter event lasts */
+  stutterDuration: string;    // "brief" | "moderate" | "long" | "very-long"
+  /** How much stuttering affects daily life */
+  stutterImpact: string;      // "minimal" | "some" | "significant" | "severe"
   confidenceRatings: Record<string, number>; // situation -> 1-5
   avoidanceBehaviors: string[];
   stutteringTypes: string[];
-  speakingFrequency: string; // "rarely" | "sometimes" | "often" | "daily"
+  speakingFrequency: string;  // "rarely" | "sometimes" | "often" | "daily"
   fearedSituations: string[];
 }
 
-const SEVERITY_BASE: Record<string, number> = {
-  mild: 25,
-  moderate: 50,
-  severe: 75,
+/* ─── Dimension scoring tables ─── */
+
+const FREQUENCY_SCORES: Record<string, number> = {
+  "rarely": 15,
+  "sometimes": 35,
+  "often": 60,
+  "very-often": 85,
 };
 
-const FREQUENCY_ADJUSTMENT: Record<string, number> = {
-  rarely: 10,
-  sometimes: 5,
-  often: -3,
-  daily: -5,
+const DURATION_SCORES: Record<string, number> = {
+  "brief": 15,
+  "moderate": 35,
+  "long": 60,
+  "very-long": 85,
+};
+
+const IMPACT_SCORES: Record<string, number> = {
+  "minimal": 15,
+  "some": 35,
+  "significant": 60,
+  "severe": 85,
+};
+
+const SPEAKING_FREQ_ADJUSTMENT: Record<string, number> = {
+  rarely: 5,
+  sometimes: 2,
+  often: -2,
+  daily: -4,
 };
 
 export function calculateScores(data: ScoringInput): AssessmentScores {
-  // --- Severity Score ---
-  let severityScore = SEVERITY_BASE[data.severity || "moderate"] ?? 50;
+  // --- Severity Score (3-dimension composite) ---
+  const freqScore = FREQUENCY_SCORES[data.stutterFrequency] ?? 35;
+  const durScore = DURATION_SCORES[data.stutterDuration] ?? 35;
+  const impactScore = IMPACT_SCORES[data.stutterImpact] ?? 35;
 
-  // Adjust for stuttering types (more types = more complex)
-  severityScore += data.stutteringTypes.length * 4;
+  // Weighted composite: frequency 40%, duration 30%, impact 30%
+  let severityScore = freqScore * 0.4 + durScore * 0.3 + impactScore * 0.3;
+
+  // Adjust for stuttering types (more types = more complex presentation)
+  severityScore += data.stutteringTypes.length * 3;
 
   // Adjust for avoidance behaviors
-  severityScore += data.avoidanceBehaviors.length * 3;
+  severityScore += data.avoidanceBehaviors.length * 2;
 
-  // Adjust for speaking frequency
-  severityScore += FREQUENCY_ADJUSTMENT[data.speakingFrequency] ?? 0;
+  // Adjust for speaking frequency (frequent speakers get small bonus)
+  severityScore += SPEAKING_FREQ_ADJUSTMENT[data.speakingFrequency] ?? 0;
 
   // Adjust for feared situations count
-  if (data.fearedSituations.length > 5) severityScore += 5;
+  if (data.fearedSituations.length > 5) severityScore += 4;
   else if (data.fearedSituations.length > 3) severityScore += 2;
 
   severityScore = Math.max(1, Math.min(100, Math.round(severityScore)));
@@ -67,7 +101,7 @@ export function calculateScores(data: ScoringInput): AssessmentScores {
   let confidenceScore: number;
 
   if (ratings.length === 0) {
-    confidenceScore = 50; // default
+    confidenceScore = 50;
   } else {
     const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
     // Scale 1-5 to 0-100
@@ -84,10 +118,15 @@ export function calculateScores(data: ScoringInput): AssessmentScores {
   // --- Recommended Emphasis ---
   const recommendedEmphasis = getEmphasis(profile);
 
+  // --- Derive severity label for DB enum ---
+  const severityLabel: "mild" | "moderate" | "severe" =
+    severityScore <= 33 ? "mild" : severityScore <= 66 ? "moderate" : "severe";
+
   return {
     severityScore,
     confidenceScore,
     profile,
+    severityLabel,
     recommendedEmphasis,
   };
 }

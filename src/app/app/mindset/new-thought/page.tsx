@@ -147,7 +147,7 @@ function NewThoughtContent() {
         balancedThought,
       });
     }
-    router.push("/mindset");
+    router.push("/app/mindset");
   }
 
   function canProceed(): boolean {
@@ -181,7 +181,7 @@ function NewThoughtContent() {
             variant="ghost"
             size="sm"
             onClick={() =>
-              step > 0 ? setStep(step - 1) : router.push("/mindset")
+              step > 0 ? setStep(step - 1) : router.push("/app/mindset")
             }
           >
             <ArrowLeft className="h-4 w-4 mr-1" />

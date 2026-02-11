@@ -28,7 +28,7 @@ export default function PredictionOutcomePage() {
   function handleComplete() {
     if (!prediction) return;
     completePrediction(predictionId, actualOutcome, anxietyAfter);
-    router.push("/mindset");
+    router.push("/app/mindset");
   }
 
   if (!prediction) {
@@ -45,7 +45,7 @@ export default function PredictionOutcomePage() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.push("/mindset")}
+          onClick={() => router.push("/app/mindset")}
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Mindset
@@ -100,7 +100,7 @@ export default function PredictionOutcomePage() {
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => router.push("/mindset")}
+        onClick={() => router.push("/app/mindset")}
       >
         <ArrowLeft className="h-4 w-4 mr-1" />
         Back to Mindset

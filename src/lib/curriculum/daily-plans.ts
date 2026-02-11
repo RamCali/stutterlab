@@ -254,7 +254,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
     subtitle: phase <= 2 ? "Diaphragmatic belly breathing" : "Body scan + belly breathing",
     duration: "2 min",
     type: "warmup",
-    href: "/exercises",
+    href: "/app/exercises",
   });
 
   // ─── Phase 1: Quick Wins (Days 1-14) ───
@@ -268,21 +268,21 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Say 5 words with a soft start",
         duration: "3 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
       tasks.push({
         title: "DAF Demo",
         subtitle: "Read a sentence with delayed feedback — feel the difference",
         duration: "3 min",
         type: "audio-lab",
-        href: "/audio-lab",
+        href: "/app/audio-lab",
       });
       tasks.push({
         title: "Voice Journal",
         subtitle: "Record how that felt — your Day 1 baseline",
         duration: "2 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
     } else if (day === 2) {
       tasks.push({
@@ -290,14 +290,14 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Soft starts on 2-3 word phrases",
         duration: "3 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
       tasks.push({
         title: "DAF Reading Practice",
         subtitle: "Read a short paragraph with DAF on",
         duration: "4 min",
         type: "audio-lab",
-        href: "/audio-lab",
+        href: "/app/audio-lab",
       });
     } else if (day === 3) {
       // FIRST AI CHAT: the "I just practiced a real conversation" moment
@@ -306,14 +306,14 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Quick refresher on soft starts",
         duration: "2 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
       tasks.push({
         title: "AI Chat: Ordering Coffee",
         subtitle: "Your first practice conversation — just 3 turns",
         duration: "4 min",
         type: "ai",
-        href: "/ai-practice",
+        href: "/app/ai-practice",
         premium: true,
       });
       tasks.push({
@@ -321,7 +321,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "How did it feel to practice a real conversation?",
         duration: "2 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
     } else if (day === 4) {
       tasks.push({
@@ -329,21 +329,21 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Learn to use deliberate pauses as a tool",
         duration: "3 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
       tasks.push({
         title: "DAF + Pausing Combined",
         subtitle: "Read with DAF and add intentional pauses",
         duration: "4 min",
         type: "audio-lab",
-        href: "/audio-lab",
+        href: "/app/audio-lab",
       });
       tasks.push({
         title: "Mindfulness Check-In",
         subtitle: "1-minute anxiety rating + breathing reset",
         duration: "2 min",
         type: "mindfulness",
-        href: "/mindfulness",
+        href: "/app/mindfulness",
       });
     } else if (day === 5) {
       // FIRST CHALLENGE: take it into the real world
@@ -352,21 +352,21 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Full sentences with soft starts",
         duration: "3 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
       tasks.push({
         title: "Micro-Challenge: Say Hi",
         subtitle: "Greet someone new today using gentle onset",
         duration: "3 min",
         type: "challenge",
-        href: "/challenges",
+        href: "/app/challenges",
       });
       tasks.push({
         title: "Voice Journal",
         subtitle: "Record how the real-world moment went",
         duration: "2 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
     } else if (day === 6) {
       tasks.push({
@@ -374,14 +374,14 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Longer passage with delayed feedback",
         duration: "4 min",
         type: "audio-lab",
-        href: "/audio-lab",
+        href: "/app/audio-lab",
       });
       tasks.push({
         title: "FAF Preview",
         subtitle: "Try pitch-shifted feedback — hear your voice differently",
         duration: "3 min",
         type: "audio-lab",
-        href: "/audio-lab",
+        href: "/app/audio-lab",
         premium: true,
       });
     } else if (day === 7) {
@@ -390,21 +390,21 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Gentle onset + pausing — combine what you learned",
         duration: "4 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
       tasks.push({
         title: "Voice Journal — Weekly Reflection",
         subtitle: "Compare today to Day 1 — notice the difference",
         duration: "3 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
       tasks.push({
         title: "Mindfulness",
         subtitle: "4-7-8 breathing to close the week",
         duration: "2 min",
         type: "mindfulness",
-        href: "/mindfulness",
+        href: "/app/mindfulness",
       });
     } else if (day === 8) {
       tasks.push({
@@ -412,14 +412,14 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "3-4 word phrases flowing into full sentences",
         duration: "3 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
       tasks.push({
         title: "DAF with New Passage",
         subtitle: "Fresh reading material to keep it interesting",
         duration: "4 min",
         type: "audio-lab",
-        href: "/audio-lab",
+        href: "/app/audio-lab",
       });
     } else if (day === 9) {
       // FEARED WORDS: meet your triggers
@@ -428,14 +428,14 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Add your first 3 trigger words",
         duration: "3 min",
         type: "feared-words",
-        href: "/feared-words",
+        href: "/app/feared-words",
       });
       tasks.push({
         title: "AI Chat: Easy Small Talk",
         subtitle: "Casual conversation practice — low pressure",
         duration: "4 min",
         type: "ai",
-        href: "/ai-practice",
+        href: "/app/ai-practice",
         premium: true,
       });
       tasks.push({
@@ -443,7 +443,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Reflect on which words feel hardest",
         duration: "2 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
     } else if (day === 10) {
       tasks.push({
@@ -451,21 +451,21 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Read a full paragraph fluently with DAF support",
         duration: "4 min",
         type: "audio-lab",
-        href: "/audio-lab",
+        href: "/app/audio-lab",
       });
       tasks.push({
         title: "Gentle Onset + Pausing Combo",
         subtitle: "Combine both techniques in reading",
         duration: "3 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
       tasks.push({
         title: "Mindfulness Check-In",
         subtitle: "Rate your confidence 1-5 and breathe",
         duration: "2 min",
         type: "mindfulness",
-        href: "/mindfulness",
+        href: "/app/mindfulness",
       });
     } else if (day === 11) {
       tasks.push({
@@ -473,7 +473,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Quick, low-pressure real-world scenario",
         duration: "4 min",
         type: "ai",
-        href: "/ai-practice",
+        href: "/app/ai-practice",
         premium: true,
       });
       tasks.push({
@@ -481,7 +481,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Say your trigger words with gentle onset",
         duration: "3 min",
         type: "feared-words",
-        href: "/feared-words",
+        href: "/app/feared-words",
       });
     } else if (day === 12) {
       tasks.push({
@@ -489,21 +489,21 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Taste the next technique — stretch syllables slowly",
         duration: "3 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
       tasks.push({
         title: "DAF + Prolonged Speech",
         subtitle: "Combine stretching with delayed feedback",
         duration: "4 min",
         type: "audio-lab",
-        href: "/audio-lab",
+        href: "/app/audio-lab",
       });
       tasks.push({
         title: "Voice Journal",
         subtitle: "How does prolonged speech feel different?",
         duration: "2 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
     } else if (day === 13) {
       tasks.push({
@@ -511,14 +511,14 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Order a drink or meal using gentle onset",
         duration: "3 min",
         type: "challenge",
-        href: "/challenges",
+        href: "/app/challenges",
       });
       tasks.push({
         title: "Technique Combo Practice",
         subtitle: "Gentle onset + pausing + DAF — all together",
         duration: "4 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
     } else if (day === 14) {
       // CHECKPOINT: celebrate + assess
@@ -527,21 +527,21 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Read a passage — see how far you've come since Day 1",
         duration: "4 min",
         type: "exercise",
-        href: "/progress/assess",
+        href: "/app/progress/assess",
       });
       tasks.push({
         title: "Voice Journal — Phase Reflection",
         subtitle: "What worked? What surprised you? What's next?",
         duration: "3 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
       tasks.push({
         title: "Mindfulness Celebration",
         subtitle: "You completed Phase 1 — breathe and appreciate that",
         duration: "2 min",
         type: "mindfulness",
-        href: "/mindfulness",
+        href: "/app/mindfulness",
       });
     }
   }
@@ -566,14 +566,14 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: t.sub,
         duration: "4 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
       tasks.push({
         title: "DAF Support Practice",
         subtitle: "Apply today's technique with DAF on",
         duration: "4 min",
         type: "audio-lab",
-        href: "/audio-lab",
+        href: "/app/audio-lab",
       });
     } else if (rotation === 2) {
       // Audio Lab day: FAF + combined
@@ -582,7 +582,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: dayInPhase <= 8 ? "Practice with pitch-shifted feedback" : "Dual audio therapy reading",
         duration: "5 min",
         type: "audio-lab",
-        href: "/audio-lab",
+        href: "/app/audio-lab",
         premium: true,
       });
       tasks.push({
@@ -590,7 +590,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Read at 3 different speeds — slow, medium, natural",
         duration: "3 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
     } else if (rotation === 3) {
       // AI day
@@ -601,7 +601,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Apply your techniques in a practice conversation",
         duration: "5 min",
         type: "ai",
-        href: "/ai-practice",
+        href: "/app/ai-practice",
         premium: true,
       });
       tasks.push({
@@ -609,7 +609,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "How did your techniques hold up in conversation?",
         duration: "2 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
     } else if (rotation === 4) {
       // Feared words + technique
@@ -618,21 +618,21 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Use your trigger words in full sentences",
         duration: "3 min",
         type: "feared-words",
-        href: "/feared-words",
+        href: "/app/feared-words",
       });
       tasks.push({
         title: "Light Contact + Prolonged Speech",
         subtitle: "Combine two techniques in paragraph reading",
         duration: "4 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
       tasks.push({
         title: "Mindfulness Check-In",
         subtitle: "Box breathing + anxiety rating",
         duration: "2 min",
         type: "mindfulness",
-        href: "/mindfulness",
+        href: "/app/mindfulness",
       });
     } else if (rotation === 5) {
       // Challenge + audio
@@ -641,14 +641,14 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Use today's technique in a real interaction",
         duration: "3 min",
         type: "challenge",
-        href: "/challenges",
+        href: "/app/challenges",
       });
       tasks.push({
         title: "DAF Reading — New Passage",
         subtitle: "Fresh material to build fluency confidence",
         duration: "4 min",
         type: "audio-lab",
-        href: "/audio-lab",
+        href: "/app/audio-lab",
       });
     } else {
       // Review + learn day
@@ -657,21 +657,21 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Pick your favorite technique and practice freestyle",
         duration: "4 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
       tasks.push({
         title: "Learn: How Fluency Shaping Works",
         subtitle: "The neuroscience behind your techniques",
         duration: "3 min",
         type: "learn",
-        href: "/learn",
+        href: "/app/learn",
       });
       tasks.push({
         title: "Voice Journal",
         subtitle: "What technique feels most natural so far?",
         duration: "2 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
     }
 
@@ -683,14 +683,14 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Read a passage — compare to your Day 14 baseline",
         duration: "4 min",
         type: "exercise",
-        href: "/progress/assess",
+        href: "/app/progress/assess",
       });
       tasks.push({
         title: "Voice Journal — Phase Reflection",
         subtitle: "Which techniques are becoming your go-to?",
         duration: "3 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
     }
   }
@@ -715,7 +715,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: t.sub,
         duration: "4 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
         premium: true,
       });
       tasks.push({
@@ -723,13 +723,13 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Use today's technique in 5 sentences",
         duration: "4 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
     } else if (rotation === 2) {
       // CBT / mindset day
       const cbtTasks = [
-        { title: "CBT: Thought Record", sub: "Capture a speech-anxiety thought and reframe it", href: "/mindset/new-thought" },
-        { title: "CBT: Thinking Traps", sub: "Identify which cognitive distortions trip you up", href: "/mindset/traps" },
+        { title: "CBT: Thought Record", sub: "Capture a speech-anxiety thought and reframe it", href: "/app/mindset/new-thought" },
+        { title: "CBT: Thinking Traps", sub: "Identify which cognitive distortions trip you up", href: "/app/mindset/traps" },
         { title: "Anxiety Ladder Step", sub: "Rate and rank your feared situations", href: "/mindfulness" },
       ];
       const c = cbtTasks[(dayInPhase - 1) % cbtTasks.length];
@@ -746,14 +746,14 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Practice trigger words with modification techniques",
         duration: "3 min",
         type: "feared-words",
-        href: "/feared-words",
+        href: "/app/feared-words",
       });
       tasks.push({
         title: "Voice Journal",
         subtitle: "What thoughts come up before speaking?",
         duration: "2 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
     } else if (rotation === 3) {
       // AI practice day (medium scenarios)
@@ -764,7 +764,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Use your modification techniques in conversation",
         duration: "5 min",
         type: "ai",
-        href: "/ai-practice",
+        href: "/app/ai-practice",
         premium: true,
       });
       tasks.push({
@@ -772,7 +772,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Which technique did you reach for? How did it go?",
         duration: "2 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
     } else if (rotation === 4) {
       // Choral speaking + audio
@@ -781,7 +781,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Read along with an AI voice for the choral effect",
         duration: "4 min",
         type: "audio-lab",
-        href: "/audio-lab",
+        href: "/app/audio-lab",
         premium: true,
       });
       tasks.push({
@@ -789,7 +789,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Stutter on purpose — reduce the fear of stuttering",
         duration: "3 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
         premium: true,
       });
     } else if (rotation === 5) {
@@ -799,7 +799,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Use a modification technique in a real interaction today",
         duration: "3 min",
         type: "challenge",
-        href: "/challenges",
+        href: "/app/challenges",
         premium: true,
       });
       tasks.push({
@@ -807,7 +807,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Practice cancellation or pull-out with DAF support",
         duration: "4 min",
         type: "audio-lab",
-        href: "/audio-lab",
+        href: "/app/audio-lab",
       });
     } else if (rotation === 6) {
       // Mixed technique + feared words
@@ -816,21 +816,21 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Fluency shaping + modification — use what fits",
         duration: "4 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
       tasks.push({
         title: "Feared Words in Paragraphs",
         subtitle: "Your trigger words embedded in longer text",
         duration: "3 min",
         type: "feared-words",
-        href: "/feared-words",
+        href: "/app/feared-words",
       });
       tasks.push({
         title: "Mindfulness",
         subtitle: "Pre-speaking calm-down technique",
         duration: "2 min",
         type: "mindfulness",
-        href: "/mindfulness",
+        href: "/app/mindfulness",
       });
     } else {
       // Learn + review day
@@ -839,21 +839,21 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Why cancellation and pull-out work",
         duration: "3 min",
         type: "learn",
-        href: "/learn",
+        href: "/app/learn",
       });
       tasks.push({
         title: "Technique Choice Practice",
         subtitle: "Read a passage — choose your own techniques",
         duration: "4 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
       tasks.push({
         title: "Voice Journal",
         subtitle: "Are you more a shaper or a modifier? Which fits you?",
         duration: "2 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
     }
 
@@ -865,14 +865,14 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Full passage reading — measure your progress",
         duration: "4 min",
         type: "exercise",
-        href: "/progress/assess",
+        href: "/app/progress/assess",
       });
       tasks.push({
         title: "Voice Journal — Halfway Celebration",
         subtitle: "You're halfway through the program!",
         duration: "3 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
     }
   }
@@ -898,14 +898,14 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "30 seconds of your go-to technique",
         duration: "1 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
       });
       tasks.push({
         title: s.title,
         subtitle: s.sub,
         duration: "6 min",
         type: "ai",
-        href: "/ai-practice",
+        href: "/app/ai-practice",
         premium: true,
       });
       tasks.push({
@@ -913,7 +913,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Rate your fluency and confidence after that scenario",
         duration: "2 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
     } else if (rotation === 2) {
       // Phone simulation day
@@ -922,7 +922,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Practice a phone conversation — no visual cues",
         duration: "5 min",
         type: "ai",
-        href: "/ai-practice",
+        href: "/app/ai-practice",
         premium: true,
       });
       tasks.push({
@@ -930,7 +930,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Work your trigger words into practice dialogue",
         duration: "3 min",
         type: "feared-words",
-        href: "/feared-words",
+        href: "/app/feared-words",
       });
     } else if (rotation === 3) {
       // Real-world challenge day
@@ -939,7 +939,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Take your skills into a real interaction today",
         duration: "5 min",
         type: "challenge",
-        href: "/challenges",
+        href: "/app/challenges",
         premium: true,
       });
       tasks.push({
@@ -947,7 +947,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "What did you predict? What actually happened?",
         duration: "3 min",
         type: "mindfulness",
-        href: "/mindset",
+        href: "/app/mindset",
         premium: true,
       });
     } else if (rotation === 4) {
@@ -959,7 +959,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
           : "Combine fluency shaping + modification + breathing",
         duration: "4 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
         premium: true,
       });
       tasks.push({
@@ -967,7 +967,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Talk freely with DAF — build transfer confidence",
         duration: "4 min",
         type: "audio-lab",
-        href: "/audio-lab",
+        href: "/app/audio-lab",
       });
     } else {
       // Mixed practice + mindfulness
@@ -976,7 +976,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Longer scenario — push past the 5-minute mark",
         duration: "6 min",
         type: "ai",
-        href: "/ai-practice",
+        href: "/app/ai-practice",
         premium: true,
       });
       tasks.push({
@@ -984,7 +984,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Breathing exercise + confidence affirmation",
         duration: "2 min",
         type: "mindfulness",
-        href: "/mindfulness",
+        href: "/app/mindfulness",
       });
     }
 
@@ -996,14 +996,14 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Full reading passage + conversation — your best yet?",
         duration: "5 min",
         type: "exercise",
-        href: "/progress/assess",
+        href: "/app/progress/assess",
       });
       tasks.push({
         title: "Voice Journal — Real-World Reflection",
         subtitle: "How has your speaking changed outside the app?",
         duration: "3 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
     }
   }
@@ -1022,7 +1022,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Choose your own technique and passage — you lead",
         duration: "5 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
         premium: true,
       });
       tasks.push({
@@ -1030,7 +1030,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "What did you choose and why? Track your instincts",
         duration: "2 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
     } else if (rotation === 2) {
       // Advanced AI day
@@ -1046,7 +1046,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: s.sub,
         duration: "6 min",
         type: "ai",
-        href: "/ai-practice",
+        href: "/app/ai-practice",
         premium: true,
       });
       tasks.push({
@@ -1054,7 +1054,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Post-conversation calm-down and reflection",
         duration: "2 min",
         type: "mindfulness",
-        href: "/mindfulness",
+        href: "/app/mindfulness",
       });
     } else if (rotation === 3) {
       // Real-world marathon day
@@ -1063,7 +1063,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Advanced mission — phone call, presentation, or social",
         duration: "5 min",
         type: "challenge",
-        href: "/challenges",
+        href: "/app/challenges",
         premium: true,
       });
       tasks.push({
@@ -1071,7 +1071,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Log your prediction, do the challenge, compare reality",
         duration: "3 min",
         type: "mindfulness",
-        href: "/mindset",
+        href: "/app/mindset",
         premium: true,
       });
     } else if (rotation === 4) {
@@ -1083,7 +1083,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
           : "Explain a technique out loud — teaching deepens mastery",
         duration: "4 min",
         type: "exercise",
-        href: "/exercises",
+        href: "/app/exercises",
         premium: true,
       });
       tasks.push({
@@ -1091,14 +1091,14 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Review your trigger words — how many feel easy now?",
         duration: "3 min",
         type: "feared-words",
-        href: "/feared-words",
+        href: "/app/feared-words",
       });
       tasks.push({
         title: "Voice Journal",
         subtitle: "What would you tell Day 1 you?",
         duration: "2 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
     } else {
       // Review + learn
@@ -1109,7 +1109,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
           : "Finalize your go-to techniques for any situation",
         duration: "4 min",
         type: "learn",
-        href: "/learn",
+        href: "/app/learn",
         premium: true,
       });
       tasks.push({
@@ -1117,7 +1117,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Talk about anything with DAF — practice being natural",
         duration: "4 min",
         type: "audio-lab",
-        href: "/audio-lab",
+        href: "/app/audio-lab",
       });
     }
 
@@ -1129,21 +1129,21 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         subtitle: "Your graduation reading — see your full journey",
         duration: "4 min",
         type: "exercise",
-        href: "/progress/assess",
+        href: "/app/progress/assess",
       });
       tasks.push({
         title: "Voice Journal — Graduation",
         subtitle: "Record your graduation message to yourself",
         duration: "3 min",
         type: "journal",
-        href: "/voice-journal/new",
+        href: "/app/voice-journal/new",
       });
       tasks.push({
         title: "Celebrate & Plan Ahead",
         subtitle: "Review your achievements and set your next goal",
         duration: "2 min",
         type: "mindfulness",
-        href: "/mindfulness",
+        href: "/app/mindfulness",
       });
     }
   }

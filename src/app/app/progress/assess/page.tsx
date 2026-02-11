@@ -101,7 +101,7 @@ export default function AssessmentPage() {
               history={[]}
             />
             <div className="flex gap-3 justify-center">
-              <Button variant="outline" onClick={() => router.push("/progress")}>
+              <Button variant="outline" onClick={() => router.push("/app/progress")}>
                 View All Reports
               </Button>
               <Button

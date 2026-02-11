@@ -84,7 +84,7 @@ export function getAdaptiveDailyPlan(
     subtitle: "Advanced breathing with body scan",
     duration: "2 min",
     type: "warmup",
-    href: "/exercises",
+    href: "/app/exercises",
   });
 
   // Main technique practice (weighted by approach)
@@ -93,7 +93,7 @@ export function getAdaptiveDailyPlan(
     subtitle: `${capitalizeFirst(contentLevel)}-level practice`,
     duration: "8 min",
     type: "exercise",
-    href: "/exercises",
+    href: "/app/exercises",
     premium: true,
   });
 
@@ -104,7 +104,7 @@ export function getAdaptiveDailyPlan(
       subtitle: "Paragraph-level auditory feedback practice",
       duration: "10 min",
       type: "audio-lab",
-      href: "/audio-lab",
+      href: "/app/audio-lab",
       premium: true,
     });
   }
@@ -117,7 +117,7 @@ export function getAdaptiveDailyPlan(
       subtitle: `Scenario: ${formatScenarioName(AI_SCENARIOS[scenarioIdx])}`,
       duration: "8 min",
       type: "ai",
-      href: "/ai-practice",
+      href: "/app/ai-practice",
       premium: true,
     });
   }
@@ -129,7 +129,7 @@ export function getAdaptiveDailyPlan(
       subtitle: "Target your trigger words with today's technique",
       duration: "5 min",
       type: "feared-words",
-      href: "/feared-words",
+      href: "/app/feared-words",
       premium: true,
     });
   }
@@ -140,7 +140,7 @@ export function getAdaptiveDailyPlan(
     subtitle: "Record how your speech feels today",
     duration: "2 min",
     type: "journal",
-    href: "/voice-journal/new",
+    href: "/app/voice-journal/new",
   });
 
   // Mindfulness every 5th day
@@ -150,7 +150,7 @@ export function getAdaptiveDailyPlan(
       subtitle: "2-minute guided breathing + anxiety rating",
       duration: "2 min",
       type: "mindfulness",
-      href: "/mindfulness",
+      href: "/app/mindfulness",
     });
   }
 
@@ -161,7 +161,7 @@ export function getAdaptiveDailyPlan(
       subtitle: "Take your practice into the real world",
       duration: "varies",
       type: "challenge",
-      href: "/challenges",
+      href: "/app/challenges",
       premium: true,
     });
   }

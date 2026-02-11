@@ -261,7 +261,7 @@ export default function AIConversationPage() {
       }).catch((err) => console.error("Failed to save AI conversation:", err));
     }
 
-    router.push("/ai-practice");
+    router.push("/app/ai-practice");
   }
 
   const formatTime = (s: number) =>
@@ -277,7 +277,7 @@ export default function AIConversationPage() {
           turns={voiceTurns}
           scenario={title}
           durationSeconds={elapsedSeconds}
-          onBack={() => router.push("/ai-practice")}
+          onBack={() => router.push("/app/ai-practice")}
           xpEarned={earnedXp}
           stressLevel={stressMode ? stressLevel : undefined}
         />

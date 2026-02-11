@@ -8,7 +8,7 @@ import { ChevronRight, Mic, Users } from "lucide-react";
 /** Compact dashboard widget linking to the Shadowing Challenge page */
 export function ShadowingChallengeCompact() {
   return (
-    <Link href="/shadowing">
+    <Link href="/app/shadowing">
       <Card className="hover:border-primary/50 transition-colors cursor-pointer border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
         <CardContent className="py-4">
           <div className="flex items-center gap-3">

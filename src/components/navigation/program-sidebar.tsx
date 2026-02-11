@@ -158,12 +158,12 @@ function WeekAccordion({
       {isExpanded && days.length > 0 && (
         <div className={cn("ml-3 pl-3 border-l-2 mt-0.5 space-y-0.5", phaseColor)}>
           {days.map((day) => {
-            const isActive = pathname === `/practice` && day.isCurrent;
+            const isActive = pathname === `/app/practice` && day.isCurrent;
 
             return (
               <Link
                 key={day.dayNumber}
-                href={day.isLocked ? "#" : "/practice"}
+                href={day.isLocked ? "#" : "/app/practice"}
                 onClick={(e) => day.isLocked && e.preventDefault()}
                 className={cn(
                   "flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-all",

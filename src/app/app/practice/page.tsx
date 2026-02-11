@@ -84,7 +84,7 @@ export default function PracticePage() {
       console.error("Failed to save session:", err);
     }
 
-    router.push("/dashboard");
+    router.push("/app/dashboard");
   }
 
   return (

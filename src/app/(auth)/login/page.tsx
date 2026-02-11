@@ -12,7 +12,7 @@ export default function LoginPage() {
 
   async function handleGoogleSignIn() {
     setLoading(true);
-    await signIn("google", { callbackUrl: "/dashboard" });
+    await signIn("google", { callbackUrl: "/app/dashboard" });
   }
 
   return (

@@ -50,7 +50,7 @@ function CheckoutReturnContent() {
               premium features including AI coaching, advanced analytics, and
               personalized treatment plans.
             </p>
-            <Button onClick={() => router.push("/dashboard")} className="w-full">
+            <Button onClick={() => router.push("/app/dashboard")} className="w-full">
               Go to Dashboard
             </Button>
           </CardContent>
@@ -73,7 +73,7 @@ function CheckoutReturnContent() {
           </p>
           <Button
             variant="outline"
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push("/app/dashboard")}
             className="w-full"
           >
             Back to Dashboard

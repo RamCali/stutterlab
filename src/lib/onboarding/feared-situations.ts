@@ -72,6 +72,7 @@ export interface OnboardingData {
   completed: boolean;
   name: string;
   fearedSituations: string[];
+  /** Derived label for DB backwards compat (computed from 3-dimension scoring) */
   severity: "mild" | "moderate" | "severe" | null;
   speechChallenges?: string[];
   northStarGoal?: string;
@@ -80,6 +81,10 @@ export interface OnboardingData {
   avoidanceBehaviors?: string[];
   stutteringTypes?: string[];
   speakingFrequency?: string;
+  /** 3-dimension severity inputs */
+  stutterFrequency?: string;
+  stutterDuration?: string;
+  stutterImpact?: string;
   severityScore?: number;
   confidenceScore?: number;
 }

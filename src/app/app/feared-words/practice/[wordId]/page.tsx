@@ -49,7 +49,7 @@ export default function FearedWordPracticePage() {
     if (wordEntry) {
       recordPractice(wordId, currentLevel);
     }
-    router.push("/feared-words");
+    router.push("/app/feared-words");
   }
 
   if (!wordEntry) {
@@ -68,7 +68,7 @@ export default function FearedWordPracticePage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push("/feared-words")}
+            onClick={() => router.push("/app/feared-words")}
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back

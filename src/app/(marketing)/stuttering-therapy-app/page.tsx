@@ -201,7 +201,7 @@ export default function StutteringTherapyAppPage() {
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="px-8" asChild>
-              <Link href="/audio-lab">Try Audio Lab Free</Link>
+              <Link href="/app/audio-lab">Try Audio Lab Free</Link>
             </Button>
           </div>
           <div className="mt-6 flex items-center justify-center gap-1">

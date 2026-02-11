@@ -154,7 +154,7 @@ export default function StutteringExercisesPage() {
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="px-8" asChild>
-              <Link href="/audio-lab">Try Audio Lab Free</Link>
+              <Link href="/app/audio-lab">Try Audio Lab Free</Link>
             </Button>
           </div>
         </div>

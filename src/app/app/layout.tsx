@@ -92,14 +92,14 @@ function AppShell({ children }: { children: React.ReactNode }) {
         {/* Bottom pinned items */}
         <div className="border-t border-border/60 p-3 space-y-0.5">
           <Link
-            href="/progress"
+            href="/app/progress"
             className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all"
           >
             <LineChart className="h-4 w-4 flex-shrink-0" />
             Progress
           </Link>
           <Link
-            href="/settings"
+            href="/app/settings"
             className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all"
           >
             <Settings className="h-4 w-4 flex-shrink-0" />

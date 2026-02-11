@@ -56,8 +56,10 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   // Step 0: Name
   const [name, setName] = useState("");
 
-  // Step 1: Severity + Stuttering Types
-  const [severity, setSeverity] = useState<"mild" | "moderate" | "severe" | null>(null);
+  // Step 1: Severity dimensions + Stuttering Types
+  const [stutterFrequency, setStutterFrequency] = useState("");
+  const [stutterDuration, setStutterDuration] = useState("");
+  const [stutterImpact, setStutterImpact] = useState("");
   const [stutteringTypes, setStutteringTypes] = useState<Set<string>>(new Set());
 
   // Step 2: Confidence Ratings
@@ -111,40 +113,42 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     else setFearedWordInputs((prev) => [...prev, word]);
   }
 
-  function goToResults() {
-    const result = calculateScores({
-      severity,
+  function buildScoringInput() {
+    return {
+      stutterFrequency,
+      stutterDuration,
+      stutterImpact,
       confidenceRatings,
       avoidanceBehaviors: Array.from(avoidanceBehaviors),
       stutteringTypes: Array.from(stutteringTypes),
       speakingFrequency,
       fearedSituations: Array.from(selectedFears),
-    });
+    };
+  }
+
+  function goToResults() {
+    const result = calculateScores(buildScoringInput());
     setScores(result);
     setStep(7);
   }
 
   async function handleFinish() {
-    const computed = scores || calculateScores({
-      severity,
-      confidenceRatings,
-      avoidanceBehaviors: Array.from(avoidanceBehaviors),
-      stutteringTypes: Array.from(stutteringTypes),
-      speakingFrequency,
-      fearedSituations: Array.from(selectedFears),
-    });
+    const computed = scores || calculateScores(buildScoringInput());
 
     const data: OnboardingData = {
       completed: true,
       name: name.trim(),
       fearedSituations: Array.from(selectedFears),
-      severity,
+      severity: computed.severityLabel,
       speechChallenges: Array.from(selectedChallenges),
       northStarGoal: goalText.trim(),
       confidenceRatings,
       avoidanceBehaviors: Array.from(avoidanceBehaviors),
       stutteringTypes: Array.from(stutteringTypes),
       speakingFrequency,
+      stutterFrequency,
+      stutterDuration,
+      stutterImpact,
       severityScore: computed.severityScore,
       confidenceScore: computed.confidenceScore,
     };
@@ -160,7 +164,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
-          severity,
+          severity: computed.severityLabel,
           fearedSituations: Array.from(selectedFears),
           speechChallenges: Array.from(selectedChallenges),
           northStarGoal: goalText.trim(),
@@ -169,6 +173,9 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           avoidanceBehaviors: Array.from(avoidanceBehaviors),
           stutteringTypes: Array.from(stutteringTypes),
           speakingFrequency,
+          stutterFrequency,
+          stutterDuration,
+          stutterImpact,
           severityScore: computed.severityScore,
           confidenceScore: computed.confidenceScore,
           assessmentProfile: computed.profile,
@@ -234,7 +241,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
         )}
 
-        {/* Step 1: Severity + Stuttering Types */}
+        {/* Step 1: Severity Dimensions + Stuttering Types */}
         {step === 1 && (
           <div className="space-y-6">
             <div className="text-center">
@@ -242,27 +249,95 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 Tell us about your stutter{name ? `, ${name}` : ""}
               </h2>
               <p className="text-muted-foreground mt-1 text-sm">
-                This helps us calibrate your program.
+                These questions help us calibrate your program accurately.
               </p>
             </div>
 
+            {/* Q1: Frequency */}
             <div>
-              <label className="text-sm font-medium">How would you describe your stuttering?</label>
-              <div className="flex gap-2 mt-1.5">
-                {(["mild", "moderate", "severe"] as const).map((level) => (
-                  <Button
-                    key={level}
-                    variant={severity === level ? "default" : "outline"}
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => setSeverity(level)}
+              <label className="text-sm font-medium">
+                In a typical conversation, how often do you stutter?
+              </label>
+              <div className="grid grid-cols-2 gap-2 mt-1.5">
+                {[
+                  { id: "rarely", label: "A few times", desc: "Across a long conversation" },
+                  { id: "sometimes", label: "Several times", desc: "In most conversations" },
+                  { id: "often", label: "Frequently", desc: "On many words or sentences" },
+                  { id: "very-often", label: "Very often", desc: "On most words or sentences" },
+                ].map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setStutterFrequency(opt.id)}
+                    className={`p-3 rounded-lg border text-left transition-all ${
+                      stutterFrequency === opt.id
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                        : "hover:border-primary/50"
+                    }`}
                   >
-                    {level.charAt(0).toUpperCase() + level.slice(1)}
-                  </Button>
+                    <p className="text-sm font-medium">{opt.label}</p>
+                    <p className="text-xs text-muted-foreground">{opt.desc}</p>
+                  </button>
                 ))}
               </div>
             </div>
 
+            {/* Q2: Duration */}
+            <div>
+              <label className="text-sm font-medium">
+                When you stutter, how long does it usually last?
+              </label>
+              <div className="grid grid-cols-2 gap-2 mt-1.5">
+                {[
+                  { id: "brief", label: "Brief", desc: "Quick repetitions, under 1 second" },
+                  { id: "moderate", label: "Noticeable", desc: "Pauses or repetitions, 1-2 seconds" },
+                  { id: "long", label: "Prolonged", desc: "Blocks lasting 2-5 seconds" },
+                  { id: "very-long", label: "Extended", desc: "5+ seconds, very hard to push through" },
+                ].map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setStutterDuration(opt.id)}
+                    className={`p-3 rounded-lg border text-left transition-all ${
+                      stutterDuration === opt.id
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                        : "hover:border-primary/50"
+                    }`}
+                  >
+                    <p className="text-sm font-medium">{opt.label}</p>
+                    <p className="text-xs text-muted-foreground">{opt.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Q3: Impact */}
+            <div>
+              <label className="text-sm font-medium">
+                How much does stuttering affect your daily life?
+              </label>
+              <div className="grid grid-cols-2 gap-2 mt-1.5">
+                {[
+                  { id: "minimal", label: "A little", desc: "Annoying but doesn't stop me" },
+                  { id: "some", label: "Moderate", desc: "I sometimes avoid situations" },
+                  { id: "significant", label: "A lot", desc: "Regularly limits my opportunities" },
+                  { id: "severe", label: "Severely", desc: "Dominates my daily decisions" },
+                ].map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setStutterImpact(opt.id)}
+                    className={`p-3 rounded-lg border text-left transition-all ${
+                      stutterImpact === opt.id
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                        : "hover:border-primary/50"
+                    }`}
+                  >
+                    <p className="text-sm font-medium">{opt.label}</p>
+                    <p className="text-xs text-muted-foreground">{opt.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Stuttering Types */}
             <div>
               <label className="text-sm font-medium">
                 What types of disfluency do you experience?
@@ -298,11 +373,19 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
-              <Button onClick={() => setStep(2)}>
+              <Button
+                onClick={() => setStep(2)}
+                disabled={!stutterFrequency || !stutterDuration || !stutterImpact}
+              >
                 Continue
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </div>
+            {(!stutterFrequency || !stutterDuration || !stutterImpact) && (
+              <p className="text-xs text-muted-foreground text-center">
+                Please answer all three questions above to continue.
+              </p>
+            )}
           </div>
         )}
 
@@ -355,11 +438,19 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
-              <Button onClick={() => setStep(3)}>
+              <Button
+                onClick={() => setStep(3)}
+                disabled={Object.keys(confidenceRatings).length < 3}
+              >
                 Continue
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </div>
+            {Object.keys(confidenceRatings).length < 3 && (
+              <p className="text-xs text-muted-foreground text-center">
+                Please rate at least 3 situations to continue.
+              </p>
+            )}
           </div>
         )}
 
