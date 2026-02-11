@@ -5,10 +5,10 @@
  * FAF (Frequency Altered Feedback), Choral Speaking, and Metronome.
  *
  * Audio Graph:
- * Mic → GainNode → [DAF DelayNode] → [FAF PitchShift] → Output
- *                                                       ↗
- *                              [Choral TTS] → GainNode
- *                              [Metronome Osc] → GainNode ↗
+ * Mic → SourceGain → DelayNode (DAF) → DAF Gain ─→ MasterGain → Destination
+ *                                                 ↗
+ *                            Metronome Osc → Gain
+ *                            Choral TTS (Web Speech API — separate output)
  */
 
 export interface AudioEngineState {
@@ -18,6 +18,7 @@ export interface AudioEngineState {
   choral: { enabled: boolean; rate: number; text: string };
   metronome: { enabled: boolean; bpm: number };
   inputLevel: number;
+  error: string | null;
 }
 
 export const DEFAULT_STATE: AudioEngineState = {
@@ -27,6 +28,7 @@ export const DEFAULT_STATE: AudioEngineState = {
   choral: { enabled: false, rate: 1.0, text: "" },
   metronome: { enabled: false, bpm: 80 },
   inputLevel: 0,
+  error: null,
 };
 
 export class AudioEngine {
@@ -36,8 +38,7 @@ export class AudioEngine {
   private analyserNode: AnalyserNode | null = null;
   private dafDelayNode: DelayNode | null = null;
   private dafGainNode: GainNode | null = null;
-  private fafGainNode: GainNode | null = null;
-  private metronomeOscillator: OscillatorNode | null = null;
+  private sourceGainNode: GainNode | null = null;
   private metronomeGain: GainNode | null = null;
   private metronomeBeatInterval: ReturnType<typeof setInterval> | null = null;
   private choralUtterance: SpeechSynthesisUtterance | null = null;
@@ -74,21 +75,57 @@ export class AudioEngine {
   async start(deviceId?: string): Promise<void> {
     if (this.audioContext) return;
 
-    this.audioContext = new AudioContext({ sampleRate: 48000 });
-    await this.audioContext.resume();
+    // Check mic permission first
+    try {
+      const permissionResult = await navigator.permissions.query({
+        name: "microphone" as PermissionName,
+      });
+      if (permissionResult.state === "denied") {
+        this.updateState({ error: "Microphone permission denied. Please allow microphone access in your browser settings." });
+        return;
+      }
+    } catch {
+      // permissions.query may not support "microphone" in all browsers — continue to getUserMedia
+    }
+
+    try {
+      this.audioContext = new AudioContext();
+      // Ensure AudioContext is running (browsers suspend until user gesture)
+      if (this.audioContext.state === "suspended") {
+        await this.audioContext.resume();
+      }
+      if (this.audioContext.state !== "running") {
+        this.updateState({ error: "Audio context failed to start. Please try again." });
+        await this.audioContext.close();
+        this.audioContext = null;
+        return;
+      }
+    } catch (e) {
+      this.updateState({ error: `Failed to create audio context: ${e}` });
+      return;
+    }
 
     // Get microphone input
-    const constraints: MediaStreamConstraints = {
-      audio: deviceId
-        ? { deviceId: { exact: deviceId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false }
-        : { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
-    };
-    this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+    try {
+      const constraints: MediaStreamConstraints = {
+        audio: deviceId
+          ? { deviceId: { exact: deviceId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+          : { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+      };
+      this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+    } catch (e) {
+      this.updateState({ error: "Microphone access denied. Please allow microphone access and try again." });
+      await this.audioContext.close();
+      this.audioContext = null;
+      return;
+    }
+
     this.sourceNode = this.audioContext.createMediaStreamSource(this.stream);
 
-    // Create analyser for input level metering
+    // Create analyser for input level metering (tapped from source, not in the output chain)
     this.analyserNode = this.audioContext.createAnalyser();
-    this.analyserNode.fftSize = 256;
+    this.analyserNode.fftSize = 2048;
+    this.analyserNode.smoothingTimeConstant = 0.3;
     this.sourceNode.connect(this.analyserNode);
 
     // Master gain before output
@@ -96,30 +133,48 @@ export class AudioEngine {
     this.masterGain.gain.value = 1.0;
     this.masterGain.connect(this.audioContext.destination);
 
-    // DAF chain
-    this.dafDelayNode = this.audioContext.createDelay(1.0); // max 1 second delay
-    this.dafDelayNode.delayTime.value = this.state.daf.delayMs / 1000;
+    // Source gain — controls dry signal before delay
+    this.sourceGainNode = this.audioContext.createGain();
+    this.sourceGainNode.gain.value = 1.0;
+
+    // DAF delay chain
+    this.dafDelayNode = this.audioContext.createDelay(1.0); // max 1 second
     this.dafGainNode = this.audioContext.createGain();
-    this.dafGainNode.gain.value = this.state.daf.enabled ? 1.0 : 0.0;
 
-    // FAF gain (pitch shifting is done via playback rate trick or AudioWorklet)
-    this.fafGainNode = this.audioContext.createGain();
-    this.fafGainNode.gain.value = this.state.faf.enabled ? 1.0 : 0.0;
-
-    // Connect DAF chain: source → delay → dafGain → masterGain
-    this.sourceNode.connect(this.dafDelayNode);
+    // Connect the DAF chain: source → sourceGain → delay → dafGain → masterGain
+    this.sourceNode.connect(this.sourceGainNode);
+    this.sourceGainNode.connect(this.dafDelayNode);
     this.dafDelayNode.connect(this.dafGainNode);
     this.dafGainNode.connect(this.masterGain);
+
+    // Apply DAF settings
+    if (this.state.daf.enabled) {
+      this.dafDelayNode.delayTime.value = this.state.daf.delayMs / 1000;
+      this.dafGainNode.gain.value = 1.0;
+    } else {
+      this.dafDelayNode.delayTime.value = 0;
+      this.dafGainNode.gain.value = 0.0;
+    }
 
     // Metronome setup
     this.metronomeGain = this.audioContext.createGain();
     this.metronomeGain.gain.value = 0;
     this.metronomeGain.connect(this.masterGain);
 
+    // Start metronome if enabled
+    if (this.state.metronome.enabled) {
+      this.startMetronome();
+    }
+
+    // Start choral if enabled
+    if (this.state.choral.enabled && this.state.choral.text) {
+      this.startChoral();
+    }
+
     // Start level monitoring
     this.startLevelMonitoring();
 
-    this.updateState({ isActive: true });
+    this.updateState({ isActive: true, error: null });
   }
 
   async stop(): Promise<void> {
@@ -145,7 +200,7 @@ export class AudioEngine {
     this.analyserNode = null;
     this.dafDelayNode = null;
     this.dafGainNode = null;
-    this.fafGainNode = null;
+    this.sourceGainNode = null;
     this.masterGain = null;
     this.metronomeGain = null;
 
@@ -155,46 +210,44 @@ export class AudioEngine {
   // ==================== DAF ====================
 
   setDAFEnabled(enabled: boolean): void {
-    if (this.dafGainNode) {
-      this.dafGainNode.gain.setTargetAtTime(
-        enabled ? 1.0 : 0.0,
-        this.audioContext!.currentTime,
+    this.updateState({ daf: { ...this.state.daf, enabled } });
+    if (!this.dafGainNode || !this.dafDelayNode || !this.audioContext) return;
+
+    if (enabled) {
+      this.dafDelayNode.delayTime.setTargetAtTime(
+        this.state.daf.delayMs / 1000,
+        this.audioContext.currentTime,
         0.01
       );
+      this.dafGainNode.gain.setTargetAtTime(1.0, this.audioContext.currentTime, 0.01);
+    } else {
+      this.dafDelayNode.delayTime.setTargetAtTime(0, this.audioContext.currentTime, 0.01);
+      this.dafGainNode.gain.setTargetAtTime(0.0, this.audioContext.currentTime, 0.01);
     }
-    this.updateState({ daf: { ...this.state.daf, enabled } });
   }
 
   setDAFDelay(delayMs: number): void {
     const clamped = Math.max(0, Math.min(500, delayMs));
-    if (this.dafDelayNode && this.audioContext) {
-      this.dafDelayNode.delayTime.setTargetAtTime(
-        clamped / 1000,
-        this.audioContext.currentTime,
-        0.01
-      );
-    }
     this.updateState({ daf: { ...this.state.daf, delayMs: clamped } });
+    if (!this.dafDelayNode || !this.audioContext || !this.state.daf.enabled) return;
+
+    this.dafDelayNode.delayTime.setTargetAtTime(
+      clamped / 1000,
+      this.audioContext.currentTime,
+      0.01
+    );
   }
 
   // ==================== FAF ====================
 
   setFAFEnabled(enabled: boolean): void {
-    if (this.fafGainNode) {
-      this.fafGainNode.gain.setTargetAtTime(
-        enabled ? 1.0 : 0.0,
-        this.audioContext!.currentTime,
-        0.01
-      );
-    }
+    // FAF pitch shifting requires an AudioWorklet (not yet implemented).
+    // Store the setting so it's ready when the worklet is added.
     this.updateState({ faf: { ...this.state.faf, enabled } });
   }
 
   setFAFSemitones(semitones: number): void {
     const clamped = Math.max(-24, Math.min(24, semitones));
-    // FAF pitch shifting would typically use an AudioWorklet
-    // For now, store the setting - full pitch shift implementation
-    // requires the audio-worklets/pitch-shift-processor.js
     this.updateState({ faf: { ...this.state.faf, semitones: clamped } });
   }
 
@@ -219,7 +272,7 @@ export class AudioEngine {
   }
 
   private startMetronome(): void {
-    if (!this.audioContext || !this.metronomeGain) return;
+    if (!this.audioContext || !this.masterGain) return;
 
     const intervalMs = 60000 / this.state.metronome.bpm;
 
@@ -230,7 +283,7 @@ export class AudioEngine {
   }
 
   private playMetronomeTick(): void {
-    if (!this.audioContext || !this.metronomeGain) return;
+    if (!this.audioContext || !this.masterGain) return;
 
     const osc = this.audioContext.createOscillator();
     const tickGain = this.audioContext.createGain();
@@ -241,7 +294,7 @@ export class AudioEngine {
     tickGain.gain.setTargetAtTime(0, this.audioContext.currentTime + 0.05, 0.01);
 
     osc.connect(tickGain);
-    tickGain.connect(this.masterGain!);
+    tickGain.connect(this.masterGain);
 
     osc.start(this.audioContext.currentTime);
     osc.stop(this.audioContext.currentTime + 0.1);
@@ -298,19 +351,25 @@ export class AudioEngine {
   private startLevelMonitoring(): void {
     if (!this.analyserNode) return;
 
-    const dataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
+    const bufferLength = this.analyserNode.fftSize;
+    const dataArray = new Float32Array(bufferLength);
 
     const updateLevel = () => {
       if (!this.analyserNode) return;
-      this.analyserNode.getByteFrequencyData(dataArray);
 
-      // Calculate RMS level
-      let sum = 0;
-      for (let i = 0; i < dataArray.length; i++) {
-        sum += dataArray[i] * dataArray[i];
+      // Use time domain data for responsive input level metering
+      this.analyserNode.getFloatTimeDomainData(dataArray);
+
+      // Calculate RMS (root mean square) for accurate volume level
+      let sumSquares = 0;
+      for (let i = 0; i < bufferLength; i++) {
+        sumSquares += dataArray[i] * dataArray[i];
       }
-      const rms = Math.sqrt(sum / dataArray.length);
-      const normalizedLevel = Math.min(1, rms / 128);
+      const rms = Math.sqrt(sumSquares / bufferLength);
+
+      // Convert to a 0-1 range with some amplification for visibility
+      // Typical speech RMS is ~0.01-0.1, so multiply to fill the meter
+      const normalizedLevel = Math.min(1, rms * 5);
 
       this.onLevelUpdate?.(normalizedLevel);
       this.levelAnimationFrame = requestAnimationFrame(updateLevel);

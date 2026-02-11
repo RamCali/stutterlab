@@ -15,6 +15,8 @@ import {
   Music,
   Volume2,
   Crown,
+  AlertTriangle,
+  Headphones,
 } from "lucide-react";
 import { AudioEngine } from "@/lib/audio/AudioEngine";
 import { LiveCoachOverlay } from "@/components/coaching/LiveCoachOverlay";
@@ -23,6 +25,7 @@ export default function AudioLabPage() {
   const engineRef = useRef<AudioEngine | null>(null);
   const [running, setRunning] = useState(false);
   const [inputLevel, setInputLevel] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   // DAF
   const [dafEnabled, setDafEnabled] = useState(false);
@@ -47,16 +50,28 @@ export default function AudioLabPage() {
 
   async function toggleAudio() {
     if (running) {
-      engineRef.current?.stop();
+      await engineRef.current?.stop();
       engineRef.current = null;
       setRunning(false);
       setInputLevel(0);
+      setError(null);
       return;
     }
 
+    setError(null);
     const engine = new AudioEngine();
     engineRef.current = engine;
 
+    // Listen for engine errors
+    engine.setOnStateChange((state) => {
+      if (state.error) {
+        setError(state.error);
+        setRunning(false);
+        engineRef.current = null;
+      }
+    });
+
+    // Store settings in engine state BEFORE start (engine reads from state during init)
     engine.setDAFEnabled(dafEnabled);
     engine.setDAFDelay(dafDelay);
     engine.setFAFEnabled(fafEnabled);
@@ -70,8 +85,17 @@ export default function AudioLabPage() {
     }
 
     engine.setOnLevelUpdate(levelCb);
-    await engine.start();
-    setRunning(true);
+
+    try {
+      await engine.start();
+      // Check if engine actually started (it may have set an error instead)
+      if (engine.getState().isActive) {
+        setRunning(true);
+      }
+    } catch (e) {
+      setError(`Failed to start audio: ${e instanceof Error ? e.message : e}`);
+      engineRef.current = null;
+    }
   }
 
   // Sync settings to engine in real time
@@ -130,6 +154,33 @@ export default function AudioLabPage() {
           PRO
         </Badge>
       </div>
+
+      {/* Error Banner */}
+      {error && (
+        <Card className="border-destructive/50 bg-destructive/10">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              <p className="text-sm">{error}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Headphones Reminder */}
+      {!running && !error && (
+        <Card className="border-amber-500/30 bg-amber-500/5">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-center gap-2 text-amber-500">
+              <Headphones className="h-4 w-4 shrink-0" />
+              <p className="text-sm">
+                <span className="font-medium">Headphones required.</span>{" "}
+                DAF and FAF need headphones to work — without them you&apos;ll get audio feedback.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Mic toggle + Level Meter */}
       <Card className={running ? "border-primary/50 bg-primary/5" : ""}>
