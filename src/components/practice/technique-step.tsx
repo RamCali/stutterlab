@@ -41,7 +41,6 @@ export function TechniqueStep({
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const animFrameRef = useRef<number | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const delayNodeRef = useRef<DelayNode | null>(null);
   const dafGainRef = useRef<GainNode | null>(null);
@@ -60,19 +59,31 @@ export function TechniqueStep({
     ? { activeTechniques: ["pacing", "rate_compliance"], targetSPM: { min: 120, max: 180 } }
     : undefined;
 
-  function updateBars() {
-    if (!analyserRef.current) return;
-    const data = new Uint8Array(analyserRef.current.fftSize);
-    analyserRef.current.getByteTimeDomainData(data);
-    const step = Math.floor(data.length / 40);
-    const newBars = Array(40).fill(0).map((_, i) => {
-      // Time domain: 128 = silence, 0/255 = max amplitude
-      const val = data[i * step] ?? 128;
-      return Math.min(100, (Math.abs(val - 128) / 128) * 200);
-    });
-    setBars(newBars);
-    animFrameRef.current = requestAnimationFrame(updateBars);
-  }
+  // Waveform animation loop — driven by isRecording state
+  useEffect(() => {
+    if (!isRecording) return;
+
+    let frameId: number;
+
+    function tick() {
+      const analyser = analyserRef.current;
+      if (analyser) {
+        const data = new Uint8Array(analyser.fftSize);
+        analyser.getByteTimeDomainData(data);
+        const step = Math.floor(data.length / 40);
+        const newBars = Array.from({ length: 40 }, (_, i) => {
+          const val = data[i * step] ?? 128;
+          return Math.min(100, (Math.abs(val - 128) / 128) * 300);
+        });
+        setBars(newBars);
+      }
+      frameId = requestAnimationFrame(tick);
+    }
+
+    frameId = requestAnimationFrame(tick);
+
+    return () => cancelAnimationFrame(frameId);
+  }, [isRecording]);
 
   async function startRecording() {
     try {
@@ -104,8 +115,6 @@ export function TechniqueStep({
         delayNodeRef.current = delay;
         dafGainRef.current = gain;
       }
-
-      animFrameRef.current = requestAnimationFrame(updateBars);
     } catch {
       // Continue without mic — still allow practice
     }
@@ -117,7 +126,6 @@ export function TechniqueStep({
   }
 
   function stopRecording() {
-    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     analyserRef.current = null;
     if (delayNodeRef.current) {
       delayNodeRef.current.disconnect();
@@ -148,7 +156,6 @@ export function TechniqueStep({
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       if (audioCtxRef.current) audioCtxRef.current.close();
       if (streamRef.current) streamRef.current.getTracks().forEach((t) => t.stop());
       if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
