@@ -50,6 +50,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const stoppedIntentionallyRef = useRef(false);
   const [coachAnalyser, setCoachAnalyser] = useState<AnalyserNode | null>(null);
   const coachAudioCtxRef = useRef<AudioContext | null>(null);
 
@@ -209,6 +210,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
       speechSynthesis.cancel();
     }
     setSpeaking(false);
+    stoppedIntentionallyRef.current = false;
 
     const recognition = new SpeechRecognitionAPI();
     recognition.lang = "en-US";
@@ -219,6 +221,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
 
     let finalTranscript = "";
     let hadError = false;
+    let restartCount = 0;
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let interim = "";
@@ -234,8 +237,21 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
     };
 
     recognition.onend = () => {
-      setListening(false);
       const text = finalTranscript.trim();
+
+      // Chrome can randomly end recognition even with continuous=true.
+      // Auto-restart if user didn't tap stop and we have no text yet.
+      if (!stoppedIntentionallyRef.current && !text && !hadError && restartCount < 5) {
+        restartCount++;
+        try {
+          recognition.start();
+          return; // Keep "Listening" state — don't update UI
+        } catch {
+          // Can't restart — fall through to end
+        }
+      }
+
+      setListening(false);
       setTranscript("");
 
       if (text) {
@@ -246,20 +262,24 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
     };
 
     recognition.onerror = (event) => {
+      const errorCode = (event as ErrorEvent & { error?: string }).error || "";
+
+      // "no-speech" and "aborted" are recoverable — don't mark as fatal error
+      if (errorCode === "no-speech" || errorCode === "aborted") {
+        return; // Let onend handle restart
+      }
+
       hadError = true;
       setListening(false);
       setTranscript("");
 
       const errorMap: Record<string, string> = {
         "not-allowed": "Mic blocked — click the lock icon in the address bar to allow microphone",
-        "no-speech": "No speech detected — tap the mic and speak clearly",
         "network": "Network error — check your connection",
         "audio-capture": "No microphone found — connect a mic and try again",
         "service-not-allowed": "Speech service unavailable — please use Chrome",
-        "aborted": "Listening stopped",
       };
 
-      const errorCode = (event as ErrorEvent & { error?: string }).error || "";
       const msg = errorMap[errorCode] || `Mic error (${errorCode}) — tap to try again`;
       setStatusText(msg);
     };
@@ -271,6 +291,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
   }
 
   function stopListening() {
+    stoppedIntentionallyRef.current = true;
     if (recognitionRef.current) {
       recognitionRef.current.stop();
     }
