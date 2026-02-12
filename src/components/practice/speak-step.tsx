@@ -71,6 +71,21 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
     setSpeaking(true);
     setStatusText("AI is speaking...");
 
+    // Safety timeout — auto-recover if audio callbacks never fire
+    // (common on iOS: onended/onend don't fire reliably)
+    const wordCount = text.split(/\s+/).length;
+    const maxMs = Math.max(10000, wordCount * 600);
+    const safetyTimer = setTimeout(() => {
+      setSpeaking(false);
+      setStatusText("Your turn — tap the mic");
+    }, maxMs);
+
+    function finishSpeaking() {
+      clearTimeout(safetyTimer);
+      setSpeaking(false);
+      setStatusText("Your turn — tap the mic");
+    }
+
     try {
       const res = await fetch("/api/tts", {
         method: "POST",
@@ -85,18 +100,21 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
         audioRef.current = audio;
 
         audio.onended = () => {
-          setSpeaking(false);
-          setStatusText("Your turn — tap the mic");
+          finishSpeaking();
           URL.revokeObjectURL(url);
         };
         audio.onerror = () => {
-          setSpeaking(false);
-          setStatusText("Your turn — tap the mic");
+          finishSpeaking();
           URL.revokeObjectURL(url);
         };
 
-        await audio.play();
-        return;
+        try {
+          await audio.play();
+          return;
+        } catch {
+          // Autoplay blocked (common on iOS) — fall through to speechSynthesis
+          URL.revokeObjectURL(url);
+        }
       }
     } catch {
       // ElevenLabs unavailable — fall back to browser TTS
@@ -119,18 +137,11 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
       );
       if (preferred) utterance.voice = preferred;
 
-      utterance.onend = () => {
-        setSpeaking(false);
-        setStatusText("Your turn — tap the mic");
-      };
-      utterance.onerror = () => {
-        setSpeaking(false);
-        setStatusText("Your turn — tap the mic");
-      };
+      utterance.onend = () => finishSpeaking();
+      utterance.onerror = () => finishSpeaking();
       speechSynthesis.speak(utterance);
     } else {
-      setSpeaking(false);
-      setStatusText("Your turn — tap the mic");
+      finishSpeaking();
     }
   }
 
