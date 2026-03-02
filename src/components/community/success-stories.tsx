@@ -18,7 +18,7 @@ function StoryCard({ story, defaultExpanded = false }: { story: SuccessStory; de
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
               <p className="text-sm font-semibold">{story.title}</p>
-              <Badge variant="secondary" className="text-[10px] bg-amber-500/10 text-amber-600">
+              <Badge variant="secondary" className="text-sm bg-amber-500/10 text-amber-600">
                 Real Story
               </Badge>
             </div>
@@ -26,14 +26,14 @@ function StoryCard({ story, defaultExpanded = false }: { story: SuccessStory; de
               &ldquo;{expanded ? story.quote : story.keyTakeaway}&rdquo;
             </p>
             {expanded && (
-              <p className="text-xs text-muted-foreground mt-3">
+              <p className="text-sm text-muted-foreground mt-3">
                 &mdash; {story.name} &middot; {story.source}
               </p>
             )}
             <Button
               variant="ghost"
               size="sm"
-              className="text-xs mt-2 px-0 h-auto text-muted-foreground hover:text-foreground"
+              className="text-sm mt-2 px-0 h-auto text-muted-foreground hover:text-foreground"
               onClick={() => setExpanded(!expanded)}
             >
               {expanded ? (

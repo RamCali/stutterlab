@@ -226,13 +226,13 @@ export function ReadingAssessment({ onComplete }: ReadingAssessmentProps) {
                     {passage.description}
                   </p>
                   <div className="flex gap-2 mt-3">
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-sm">
                       {passage.syllableCount} syllables
                     </Badge>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-sm">
                       ~{Math.round(passage.estimatedDurationSeconds / 60)} min
                     </Badge>
-                    <Badge variant="outline" className="text-xs capitalize">
+                    <Badge variant="outline" className="text-sm capitalize">
                       {passage.difficulty}
                     </Badge>
                   </div>
@@ -327,7 +327,7 @@ export function ReadingAssessment({ onComplete }: ReadingAssessmentProps) {
           {/* Live transcript preview */}
           {transcript && (
             <div>
-              <p className="text-xs text-muted-foreground mb-1">
+              <p className="text-sm text-muted-foreground mb-1">
                 Live Transcript
               </p>
               <div className="p-3 rounded bg-muted/10 text-sm max-h-32 overflow-y-auto">

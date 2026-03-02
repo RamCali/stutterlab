@@ -33,11 +33,11 @@ export default function ExercisesPage() {
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <BookOpen className="h-6 w-6 text-primary" />
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          <BookOpen className="h-7 w-7 text-primary" />
           Exercises
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-lg text-muted-foreground mt-1.5">
           Evidence-based speech techniques. Practice with recording and Audio Lab overlay.
         </p>
       </div>
@@ -81,7 +81,7 @@ export default function ExercisesPage() {
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-medium text-sm">{ex.title}</h3>
                       {ex.isPremium && (
-                        <Badge variant="outline" className="text-[10px]">
+                        <Badge variant="outline" className="text-xs">
                           <Crown className="h-2.5 w-2.5 mr-0.5" />
                           PRO
                         </Badge>
@@ -93,11 +93,11 @@ export default function ExercisesPage() {
                     <div className="flex items-center gap-2">
                       <Badge
                         variant="secondary"
-                        className={`text-[10px] ${difficultyColors[ex.difficulty]}`}
+                        className={`text-xs ${difficultyColors[ex.difficulty]}`}
                       >
                         {ex.difficulty}
                       </Badge>
-                      <span className="text-[10px] text-muted-foreground">
+                      <span className="text-xs text-muted-foreground">
                         {ex.duration}
                       </span>
                     </div>

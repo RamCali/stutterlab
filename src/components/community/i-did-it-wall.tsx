@@ -122,7 +122,7 @@ export function IDidItWall() {
             <PartyPopper className="h-5 w-5 text-primary" />
             I Did It!
           </h2>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Celebrate real-world speaking victories
           </p>
         </div>
@@ -145,7 +145,7 @@ export function IDidItWall() {
                   className={`flex items-center gap-2 p-3 rounded-lg border hover:border-primary/50 transition-colors text-left ${vt.bg}`}
                 >
                   <vt.icon className={`h-4 w-4 ${vt.color} flex-shrink-0`} />
-                  <span className="text-xs font-medium">{vt.label}</span>
+                  <span className="text-sm font-medium">{vt.label}</span>
                 </button>
               ))}
             </div>
@@ -162,7 +162,7 @@ export function IDidItWall() {
               <p className="text-sm font-medium">
                 You did it! {vt?.label} — that took courage.
               </p>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 The community is celebrating with you.
               </p>
             </CardContent>
@@ -185,16 +185,16 @@ export function IDidItWall() {
                     <vt.icon className={`h-3.5 w-3.5 ${vt.color}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium">
+                    <p className="text-sm font-medium">
                       {victory.anonymousName} {vt.label.toLowerCase()}
                     </p>
-                    <p className="text-[10px] text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       {timeAgo(victory.createdAt)}
                     </p>
                   </div>
                   <button
                     onClick={() => celebrate(victory.id)}
-                    className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] transition-colors ${
+                    className={`flex items-center gap-1 px-2 py-1 rounded-full text-sm transition-colors ${
                       isCelebrated
                         ? "bg-pink-500/10 text-pink-500"
                         : "bg-muted/50 text-muted-foreground hover:bg-pink-500/10 hover:text-pink-500"
@@ -212,7 +212,7 @@ export function IDidItWall() {
         {victories.length === 0 && (
           <Card className="bg-muted/30">
             <CardContent className="py-4 text-center">
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 No victories yet. Be the first to share one!
               </p>
             </CardContent>
@@ -223,7 +223,7 @@ export function IDidItWall() {
       {victories.length > 5 && (
         <button
           onClick={() => setShowAll(!showAll)}
-          className="flex items-center gap-1 mx-auto text-xs text-primary hover:underline"
+          className="flex items-center gap-1 mx-auto text-sm text-primary hover:underline"
         >
           {showAll ? (
             <>
@@ -240,7 +240,7 @@ export function IDidItWall() {
       {/* Weekly victory count */}
       <Card className="bg-muted/30">
         <CardContent className="py-3 text-center">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             <span className="font-bold text-foreground">{totalWeekly} real-world victories</span>{" "}
             shared this week. Every one of them took courage.
           </p>
@@ -281,8 +281,8 @@ export function IDidItButton() {
       <Card className="border-[#00E676]/50 bg-[#00E676]/5">
         <CardContent className="py-3 text-center">
           <PartyPopper className="h-5 w-5 text-[#00E676] mx-auto mb-1" />
-          <p className="text-xs font-medium">{vt?.label}!</p>
-          <p className="text-[10px] text-muted-foreground">That took courage.</p>
+          <p className="text-sm font-medium">{vt?.label}!</p>
+          <p className="text-sm text-muted-foreground">That took courage.</p>
         </CardContent>
       </Card>
     );
@@ -301,7 +301,7 @@ export function IDidItButton() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium">I Did It!</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Celebrate a real-world speaking victory
               </p>
             </div>
@@ -318,7 +318,7 @@ export function IDidItButton() {
               className={`flex items-center gap-2 p-2.5 rounded-lg border hover:border-primary/50 transition-colors text-left ${vt.bg}`}
             >
               <vt.icon className={`h-3.5 w-3.5 ${vt.color} flex-shrink-0`} />
-              <span className="text-[10px] font-medium">{vt.label}</span>
+              <span className="text-sm font-medium">{vt.label}</span>
             </button>
           ))}
         </div>

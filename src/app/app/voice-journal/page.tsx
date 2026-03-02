@@ -77,21 +77,21 @@ export default function VoiceJournalPage() {
           <CardContent className="pt-5 pb-4 text-center">
             <Mic className="h-5 w-5 text-primary mx-auto mb-1" />
             <p className="text-2xl font-bold">{entries.length}</p>
-            <p className="text-[10px] text-muted-foreground">Total Entries</p>
+            <p className="text-xs text-muted-foreground">Total Entries</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5 pb-4 text-center">
             <Calendar className="h-5 w-5 text-blue-500 mx-auto mb-1" />
             <p className="text-2xl font-bold">2</p>
-            <p className="text-[10px] text-muted-foreground">This Week</p>
+            <p className="text-xs text-muted-foreground">This Week</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5 pb-4 text-center">
             <TrendingUp className="h-5 w-5 text-emerald-500 mx-auto mb-1" />
             <p className="text-2xl font-bold">--</p>
-            <p className="text-[10px] text-muted-foreground">Avg Fluency</p>
+            <p className="text-xs text-muted-foreground">Avg Fluency</p>
           </CardContent>
         </Card>
       </div>
@@ -107,7 +107,7 @@ export default function VoiceJournalPage() {
                 Upgrade to Pro for AI-powered fluency scoring on every journal entry.
               </p>
             </div>
-            <Badge variant="outline" className="text-[10px] flex-shrink-0">
+            <Badge variant="outline" className="text-xs flex-shrink-0">
               <Crown className="h-2.5 w-2.5 mr-0.5" />
               PRO
             </Badge>
@@ -127,7 +127,7 @@ export default function VoiceJournalPage() {
                   </span>
                   <Badge
                     variant="secondary"
-                    className={`text-[10px] ${emotionColors[entry.emotion]}`}
+                    className={`text-xs ${emotionColors[entry.emotion]}`}
                   >
                     {entry.emotion}
                   </Badge>

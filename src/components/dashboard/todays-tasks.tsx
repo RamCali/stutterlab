@@ -64,16 +64,16 @@ export function TodaysTasks({ dailyPlan, currentDay }: TodaysTasksProps) {
           <h3 className="text-sm font-bold uppercase tracking-wide text-muted-foreground">
             Today&apos;s Tasks
           </h3>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-sm text-muted-foreground">
             {completedTypes.size}/{dailyPlan.tasks.length}
           </span>
         </div>
-        <p className="text-lg font-bold mb-1">{dailyPlan.title}</p>
+        <p className="text-xl font-bold mb-1">{dailyPlan.title}</p>
 
         {dailyPlan.affirmation && (
           <div className="flex items-start gap-2 mb-4 p-2 rounded-md bg-muted/30">
             <Sparkles className="h-3.5 w-3.5 text-amber-500 mt-0.5 flex-shrink-0" />
-            <p className="text-xs italic text-muted-foreground">
+            <p className="text-sm italic text-muted-foreground">
               &ldquo;{dailyPlan.affirmation}&rdquo;
             </p>
           </div>
@@ -105,13 +105,13 @@ export function TodaysTasks({ dailyPlan, currentDay }: TodaysTasksProps) {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium ${isCompleted ? "line-through text-muted-foreground" : ""}`}>
+                      <p className={`text-base font-medium ${isCompleted ? "line-through text-muted-foreground" : ""}`}>
                         {task.title}
                       </p>
-                      <p className="text-xs text-muted-foreground truncate">{task.subtitle}</p>
+                      <p className="text-sm text-muted-foreground truncate">{task.subtitle}</p>
                     </div>
                   </Link>
-                  <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded flex-shrink-0">
+                  <span className="text-sm text-muted-foreground bg-muted px-2 py-0.5 rounded flex-shrink-0">
                     {task.duration}
                   </span>
                   {task.reason && (
@@ -133,7 +133,7 @@ export function TodaysTasks({ dailyPlan, currentDay }: TodaysTasksProps) {
                 </div>
                 {isReasonExpanded && task.reason && (
                   <div className="ml-12 mr-2 mb-1 p-2 rounded-md bg-primary/5 border border-primary/10">
-                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       <span className="font-semibold text-primary">Why this exercise:</span>{" "}
                       {task.reason}
                     </p>
@@ -147,8 +147,8 @@ export function TodaysTasks({ dailyPlan, currentDay }: TodaysTasksProps) {
         {allCompleted ? (
           <div className="text-center p-4 rounded-lg bg-primary/5 border border-primary/20">
             <Check className="h-8 w-8 text-primary mx-auto mb-2" />
-            <p className="text-sm font-semibold text-primary">All done for today!</p>
-            <p className="text-xs text-muted-foreground mt-1">Great work. See you tomorrow.</p>
+            <p className="text-base font-semibold text-primary">All done for today!</p>
+            <p className="text-sm text-muted-foreground mt-1">Great work. See you tomorrow.</p>
           </div>
         ) : (
           <Link href="/app/practice">

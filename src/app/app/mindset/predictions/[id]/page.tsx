@@ -127,13 +127,13 @@ export default function PredictionOutcomePage() {
           <div className="flex gap-3 mt-2">
             <Badge
               variant="secondary"
-              className="text-[10px] bg-blue-500/10 text-blue-600"
+              className="text-xs bg-blue-500/10 text-blue-600"
             >
               Confidence: {prediction.confidenceLevel}/10
             </Badge>
             <Badge
               variant="secondary"
-              className="text-[10px] bg-amber-500/10 text-amber-600"
+              className="text-xs bg-amber-500/10 text-amber-600"
             >
               Anxiety: {prediction.anxietyBefore}/10
             </Badge>
@@ -168,7 +168,7 @@ export default function PredictionOutcomePage() {
           onChange={(e) => setAnxietyAfter(parseInt(e.target.value))}
           className="w-full mt-1.5 accent-primary"
         />
-        <div className="flex justify-between text-[10px] text-muted-foreground">
+        <div className="flex justify-between text-xs text-muted-foreground">
           <span>Calm</span>
           <span>Very anxious</span>
         </div>

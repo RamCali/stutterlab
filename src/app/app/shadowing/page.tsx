@@ -268,7 +268,7 @@ export default function ShadowingPage() {
                   <Trophy className="h-4 w-4" />
                   <span className="text-lg font-bold">{completedIds.size}</span>
                 </div>
-                <p className="text-[9px] text-muted-foreground">Echoes Shadowed</p>
+                <p className="text-xs text-muted-foreground">Echoes Shadowed</p>
               </CardContent>
             </Card>
             <Card className="flex-1">
@@ -277,7 +277,7 @@ export default function ShadowingPage() {
                   <Sparkles className="h-4 w-4" />
                   <span className="text-lg font-bold">{totalXP}</span>
                 </div>
-                <p className="text-[9px] text-muted-foreground">XP Earned</p>
+                <p className="text-xs text-muted-foreground">XP Earned</p>
               </CardContent>
             </Card>
             <Card className="flex-1">
@@ -286,7 +286,7 @@ export default function ShadowingPage() {
                   <Flame className="h-4 w-4" />
                   <span className="text-lg font-bold">{Math.min(completedIds.size, 3)}</span>
                 </div>
-                <p className="text-[9px] text-muted-foreground">Day Streak</p>
+                <p className="text-xs text-muted-foreground">Day Streak</p>
               </CardContent>
             </Card>
           </div>

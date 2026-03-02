@@ -73,7 +73,7 @@ export function PhaseTimeline({ currentDay }: PhaseTimelineProps) {
             >
               <p
                 className={cn(
-                  "text-[10px] font-medium truncate",
+                  "text-sm font-medium truncate",
                   isCurrent && "text-primary",
                   isCompleted && "text-muted-foreground",
                   !isCurrent && !isCompleted && "text-muted-foreground/50"

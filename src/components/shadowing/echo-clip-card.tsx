@@ -75,12 +75,12 @@ export function EchoClipCard({ clip, onShadow, completed }: EchoClipCardProps) {
       <CardContent className="py-4">
         {/* Header */}
         <div className="flex items-center gap-2 mb-3">
-          <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold ${authorColors[clip.authorRole]}`}>
+          <div className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold ${authorColors[clip.authorRole]}`}>
             {clip.author.split(" ").map((w) => w[0]).join("").slice(0, 2)}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-medium">{clip.author}</span>
+              <span className="text-sm font-medium">{clip.author}</span>
               {clip.authorRole === "slp" && (
                 <Badge variant="outline" className="text-[8px] px-1 py-0">
                   <Crown className="h-2 w-2 mr-0.5" />
@@ -88,9 +88,9 @@ export function EchoClipCard({ clip, onShadow, completed }: EchoClipCardProps) {
                 </Badge>
               )}
             </div>
-            <span className="text-[10px] text-muted-foreground">{clip.technique}</span>
+            <span className="text-sm text-muted-foreground">{clip.technique}</span>
           </div>
-          <Badge className={`text-[9px] ${difficultyColors[clip.difficulty]}`}>
+          <Badge className={`text-sm ${difficultyColors[clip.difficulty]}`}>
             {clip.difficulty}
           </Badge>
         </div>
@@ -98,7 +98,7 @@ export function EchoClipCard({ clip, onShadow, completed }: EchoClipCardProps) {
         {/* Title + Transcript */}
         <h3 className="text-sm font-medium mb-1">{clip.title}</h3>
         <div className="p-3 rounded-lg bg-muted/30 mb-3">
-          <p className="text-xs text-muted-foreground italic leading-relaxed">
+          <p className="text-sm text-muted-foreground italic leading-relaxed">
             &ldquo;{clip.transcript}&rdquo;
           </p>
         </div>
@@ -132,7 +132,7 @@ export function EchoClipCard({ clip, onShadow, completed }: EchoClipCardProps) {
               );
             })}
           </div>
-          <span className="text-[10px] text-muted-foreground flex-shrink-0">
+          <span className="text-sm text-muted-foreground flex-shrink-0">
             {clip.durationSeconds}s
           </span>
         </div>
@@ -153,13 +153,13 @@ export function EchoClipCard({ clip, onShadow, completed }: EchoClipCardProps) {
           <Button
             size="sm"
             variant="ghost"
-            className={`text-xs ${hearted ? "text-pink-500" : ""}`}
+            className={`text-sm ${hearted ? "text-pink-500" : ""}`}
             onClick={() => setHearted(!hearted)}
           >
             <Heart className={`h-3.5 w-3.5 mr-1 ${hearted ? "fill-current" : ""}`} />
             {clip.heartCount + (hearted ? 1 : 0)}
           </Button>
-          <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+          <span className="flex items-center gap-1 text-sm text-muted-foreground">
             <Users className="h-3 w-3" />
             {clip.shadowCount}
           </span>

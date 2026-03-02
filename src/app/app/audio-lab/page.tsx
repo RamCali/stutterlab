@@ -141,11 +141,11 @@ export default function AudioLabPage() {
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <AudioWaveform className="h-6 w-6 text-primary" />
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <AudioWaveform className="h-7 w-7 text-primary" />
             Audio Lab
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-lg text-muted-foreground mt-1.5">
             Real-time audio training tools powered by Web Audio API
           </p>
         </div>
@@ -203,7 +203,7 @@ export default function AudioLabPage() {
                 <p className="font-medium">
                   {running ? "Audio Lab Active" : "Start Audio Lab"}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   {running
                     ? "Speak into your microphone. Use headphones for best results."
                     : "Tap to enable microphone and start audio processing."}
@@ -249,7 +249,7 @@ export default function AudioLabPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground mb-3">
+            <p className="text-sm text-muted-foreground mb-3">
               Hear your voice with a slight delay. Reduces stuttering 60-80% for most people.
             </p>
             <div>
@@ -264,7 +264,7 @@ export default function AudioLabPage() {
                 className="w-full mt-1 accent-primary"
                 disabled={!dafEnabled}
               />
-              <div className="flex justify-between text-[10px] text-muted-foreground">
+              <div className="flex justify-between text-xs text-muted-foreground">
                 <span>20ms</span>
                 <span>300ms</span>
               </div>
@@ -284,7 +284,7 @@ export default function AudioLabPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground mb-3">
+            <p className="text-sm text-muted-foreground mb-3">
               Shifts the pitch of your voice. Combined with DAF, can reduce stuttering up to 80%.
             </p>
             <div>
@@ -301,7 +301,7 @@ export default function AudioLabPage() {
                 className="w-full mt-1 accent-primary"
                 disabled={!fafEnabled}
               />
-              <div className="flex justify-between text-[10px] text-muted-foreground">
+              <div className="flex justify-between text-xs text-muted-foreground">
                 <span>-12</span>
                 <span>0</span>
                 <span>+12</span>
@@ -325,7 +325,7 @@ export default function AudioLabPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground mb-3">
+            <p className="text-sm text-muted-foreground mb-3">
               Paced speaking with a steady beat. Helps establish smooth speech rhythm.
             </p>
             <div>
@@ -340,7 +340,7 @@ export default function AudioLabPage() {
                 className="w-full mt-1 accent-primary"
                 disabled={!metronomeEnabled}
               />
-              <div className="flex justify-between text-[10px] text-muted-foreground">
+              <div className="flex justify-between text-xs text-muted-foreground">
                 <span>40</span>
                 <span>100</span>
                 <span>160</span>
@@ -364,7 +364,7 @@ export default function AudioLabPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground mb-3">
+            <p className="text-sm text-muted-foreground mb-3">
               An AI voice reads along with you in unison. Choral effect eliminates stuttering for most people.
             </p>
             <div className="space-y-2">
@@ -394,7 +394,7 @@ export default function AudioLabPage() {
         </Card>
       </div>
 
-      <p className="text-xs text-muted-foreground text-center">
+      <p className="text-sm text-muted-foreground text-center">
         Use headphones to prevent feedback. Audio is processed entirely in your browser — nothing is recorded or sent to any server.
       </p>
 

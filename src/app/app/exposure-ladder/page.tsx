@@ -98,11 +98,11 @@ export default function ExposureLadderPage() {
     <div className="p-6 max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-2xl font-bold flex items-center justify-center gap-2">
-          <Mountain className="h-6 w-6 text-primary" />
+        <h1 className="text-3xl font-bold flex items-center justify-center gap-2">
+          <Mountain className="h-7 w-7 text-primary" />
           Exposure Ladder
         </h1>
-        <p className="text-muted-foreground text-sm mt-1">
+        <p className="text-lg text-muted-foreground mt-1.5">
           Gradually face speaking situations from easy to challenging
         </p>
       </div>
@@ -209,7 +209,7 @@ export default function ExposureLadderPage() {
                   <div className="flex-1 text-left min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium truncate">{rung.title}</p>
-                      <Badge className={`text-[10px] px-1.5 ${CATEGORY_COLORS[rung.category]}`}>
+                      <Badge className={`text-xs px-1.5 ${CATEGORY_COLORS[rung.category]}`}>
                         {rung.category}
                       </Badge>
                     </div>
@@ -246,7 +246,7 @@ export default function ExposureLadderPage() {
                     {/* Suggested techniques */}
                     <div className="flex flex-wrap gap-1">
                       {rung.suggestedTechniques.map((tech) => (
-                        <Badge key={tech} variant="outline" className="text-[10px]">
+                        <Badge key={tech} variant="outline" className="text-xs">
                           {tech}
                         </Badge>
                       ))}
@@ -261,7 +261,7 @@ export default function ExposureLadderPage() {
                             <p className="text-xs italic text-muted-foreground">
                               &ldquo;{rung.inspirationalStory.quote}&rdquo;
                             </p>
-                            <p className="text-[10px] text-muted-foreground/70 mt-1">
+                            <p className="text-xs text-muted-foreground/70 mt-1">
                               &mdash; {rung.inspirationalStory.name}
                             </p>
                           </div>
@@ -278,7 +278,7 @@ export default function ExposureLadderPage() {
                         <div className="space-y-1">
                           {attempts.slice(-3).map((a, i) => (
                             <div key={i} className="flex items-center gap-2 text-xs">
-                              <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                              <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${
                                 a.outcome === "completed" ? "bg-green-500/10 text-green-400" :
                                 a.outcome === "partial" ? "bg-amber-500/10 text-amber-400" :
                                 "bg-red-500/10 text-red-400"
@@ -314,7 +314,7 @@ export default function ExposureLadderPage() {
         })}
       </div>
 
-      <p className="text-xs text-muted-foreground text-center">
+      <p className="text-sm text-muted-foreground text-center">
         Research shows predicted anxiety is usually higher than actual anxiety.
         Tracking this gap builds confidence over time.
       </p>
@@ -396,7 +396,7 @@ function ReflectionForm({
         {/* Anxiety ratings */}
         <div className="grid grid-cols-3 gap-3">
           <div>
-            <label className="text-[10px] font-medium text-muted-foreground">Predicted Anxiety</label>
+            <label className="text-xs font-medium text-muted-foreground">Predicted Anxiety</label>
             <input
               type="range"
               min={1}
@@ -408,7 +408,7 @@ function ReflectionForm({
             <p className="text-center text-xs font-bold">{predictedAnxiety}/10</p>
           </div>
           <div>
-            <label className="text-[10px] font-medium text-muted-foreground">Actual Anxiety</label>
+            <label className="text-xs font-medium text-muted-foreground">Actual Anxiety</label>
             <input
               type="range"
               min={1}
@@ -420,7 +420,7 @@ function ReflectionForm({
             <p className="text-center text-xs font-bold">{actualAnxiety}/10</p>
           </div>
           <div>
-            <label className="text-[10px] font-medium text-muted-foreground">Confidence After</label>
+            <label className="text-xs font-medium text-muted-foreground">Confidence After</label>
             <input
               type="range"
               min={1}

@@ -50,7 +50,7 @@ export function EmotionIndicator({ state, confidence }: EmotionIndicatorProps) {
       className={`flex items-center gap-1.5 px-2 py-1 rounded-full ${config.bg} transition-all duration-500`}
     >
       <Icon className={`h-3 w-3 ${config.color}`} />
-      <span className={`text-[10px] font-medium ${config.color}`}>
+      <span className={`text-sm font-medium ${config.color}`}>
         {config.label}
       </span>
     </div>

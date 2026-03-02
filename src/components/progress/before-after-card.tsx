@@ -89,8 +89,8 @@ export function BeforeAfterCard({ data }: { data: BeforeAfterData }) {
             <div className="h-6 w-6 rounded-lg bg-blue-500 flex items-center justify-center">
               <AudioWaveform className="h-3 w-3 text-white" />
             </div>
-            <span className="text-xs font-bold">StutterLab</span>
-            <span className="text-[9px] text-white/40 ml-auto">
+            <span className="text-sm font-bold">StutterLab</span>
+            <span className="text-sm text-white/40 ml-auto">
               {data.totalMonths}-month transformation
             </span>
           </div>
@@ -99,16 +99,16 @@ export function BeforeAfterCard({ data }: { data: BeforeAfterData }) {
           <div className="relative grid grid-cols-[1fr_auto_1fr] gap-3 items-center">
             {/* Before */}
             <div className="space-y-3">
-              <p className="text-[10px] text-white/50 uppercase tracking-wider">Before</p>
+              <p className="text-sm text-white/50 uppercase tracking-wider">Before</p>
               <div className="p-3 rounded-lg bg-white/5">
                 <p className="text-2xl font-bold">{data.first.percentSS.toFixed(1)}%</p>
-                <p className="text-[9px] text-white/50">%SS Score</p>
+                <p className="text-sm text-white/50">%SS Score</p>
               </div>
               <div className="p-3 rounded-lg bg-white/5">
                 <p className="text-lg font-bold">{data.first.fluencyScore}</p>
-                <p className="text-[9px] text-white/50">Fluency Score</p>
+                <p className="text-sm text-white/50">Fluency Score</p>
               </div>
-              <Badge className={`text-[9px] ${getSeverityColor(data.first.severityRating)} bg-white/5`}>
+              <Badge className={`text-sm ${getSeverityColor(data.first.severityRating)} bg-white/5`}>
                 {data.first.severityRating.charAt(0).toUpperCase() + data.first.severityRating.slice(1)}
               </Badge>
             </div>
@@ -116,29 +116,29 @@ export function BeforeAfterCard({ data }: { data: BeforeAfterData }) {
             {/* Arrow */}
             <div className="flex flex-col items-center gap-2">
               <ArrowRight className="h-5 w-5 text-[#00E676]" />
-              <span className="text-[9px] text-[#00E676]">
+              <span className="text-sm text-[#00E676]">
                 {data.totalMonths}mo
               </span>
             </div>
 
             {/* After */}
             <div className="space-y-3">
-              <p className="text-[10px] text-white/50 uppercase tracking-wider">After</p>
+              <p className="text-sm text-white/50 uppercase tracking-wider">After</p>
               <div className="p-3 rounded-lg bg-white/5">
                 <div className="flex items-center gap-1.5">
                   <p className="text-2xl font-bold">{data.latest.percentSS.toFixed(1)}%</p>
                   {ssImproved && <TrendingDown className="h-4 w-4 text-[#00E676]" />}
                 </div>
-                <p className="text-[9px] text-white/50">%SS Score</p>
+                <p className="text-sm text-white/50">%SS Score</p>
               </div>
               <div className="p-3 rounded-lg bg-white/5">
                 <div className="flex items-center gap-1.5">
                   <p className="text-lg font-bold">{data.latest.fluencyScore}</p>
                   {fluencyImproved && <TrendingUp className="h-4 w-4 text-[#00E676]" />}
                 </div>
-                <p className="text-[9px] text-white/50">Fluency Score</p>
+                <p className="text-sm text-white/50">Fluency Score</p>
               </div>
-              <Badge className={`text-[9px] ${getSeverityColor(data.latest.severityRating)} bg-white/5`}>
+              <Badge className={`text-sm ${getSeverityColor(data.latest.severityRating)} bg-white/5`}>
                 {data.latest.severityRating.charAt(0).toUpperCase() + data.latest.severityRating.slice(1)}
               </Badge>
             </div>
@@ -147,13 +147,13 @@ export function BeforeAfterCard({ data }: { data: BeforeAfterData }) {
           {/* Summary */}
           <div className="relative mt-4 pt-3 border-t border-white/10 text-center">
             {ssImproved && (
-              <p className="text-xs">
+              <p className="text-sm">
                 <Sparkles className="h-3 w-3 inline text-[#00E676] mr-1" />
                 <span className="text-[#00E676] font-bold">{ssChange.toFixed(1)}% improvement</span>
                 <span className="text-white/50"> in stuttered syllables</span>
               </p>
             )}
-            <p className="text-[10px] text-white/40 mt-1">
+            <p className="text-sm text-white/40 mt-1">
               {data.totalSessions} sessions — stutterlab.com
             </p>
           </div>
@@ -180,7 +180,7 @@ export function BeforeAfterCard({ data }: { data: BeforeAfterData }) {
         </Button>
       </div>
 
-      <p className="text-[10px] text-muted-foreground text-center">
+      <p className="text-sm text-muted-foreground text-center">
         Screenshot the card or tap Share. Your identity is never included.
       </p>
     </div>
@@ -213,13 +213,13 @@ export function BeforeAfterPrompt() {
         <div className="flex items-center gap-3">
           <Sparkles className="h-4 w-4 text-[#00E676] flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium">Your transformation is shareable</p>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-sm font-medium">Your transformation is shareable</p>
+            <p className="text-sm text-muted-foreground">
               {data.first.percentSS.toFixed(1)}% → {data.latest.percentSS.toFixed(1)}% SS in {data.totalMonths} months
             </p>
           </div>
           {improvement > 0 && (
-            <Badge variant="secondary" className="text-[9px] text-[#00E676]">
+            <Badge variant="secondary" className="text-sm text-[#00E676]">
               {improvement.toFixed(1)}% better
             </Badge>
           )}

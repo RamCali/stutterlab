@@ -77,8 +77,8 @@ export default function SettingsPage({ searchParams: _searchParams }: SettingsPa
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Settings className="h-6 w-6 text-primary" />
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          <Settings className="h-7 w-7 text-primary" />
           Settings
         </h1>
       </div>

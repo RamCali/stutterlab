@@ -252,7 +252,7 @@ export default function ExerciseDetailPage() {
             </div>
             <span className="font-medium text-sm">{exercise.title}</span>
             {exercise.isPremium && (
-              <Badge variant="outline" className="text-[10px]">
+              <Badge variant="outline" className="text-xs">
                 <Crown className="h-2.5 w-2.5 mr-0.5" />
                 PRO
               </Badge>
@@ -260,7 +260,7 @@ export default function ExerciseDetailPage() {
           </div>
           <Badge
             variant="secondary"
-            className={`text-[10px] ${
+            className={`text-xs ${
               exercise.difficulty === "Beginner"
                 ? "bg-green-500/10 text-green-600"
                 : exercise.difficulty === "Intermediate"

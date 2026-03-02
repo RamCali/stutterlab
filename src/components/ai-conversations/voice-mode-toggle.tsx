@@ -24,7 +24,7 @@ export function VoiceModeToggle({
         size="sm"
         onClick={() => onToggle(false)}
         disabled={disabled}
-        className="h-7 px-3 text-xs"
+        className="h-7 px-3 text-sm"
       >
         <MessageSquare className="h-3.5 w-3.5 mr-1" />
         Text
@@ -37,7 +37,7 @@ export function VoiceModeToggle({
           onToggle(true);
         }}
         disabled={disabled || !isPremium}
-        className="h-7 px-3 text-xs relative"
+        className="h-7 px-3 text-sm relative"
       >
         <Mic className="h-3.5 w-3.5 mr-1" />
         Voice

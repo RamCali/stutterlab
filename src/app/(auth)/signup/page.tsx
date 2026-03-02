@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { Loader2, Check } from "lucide-react";
+import { Loader2, Check, ArrowLeft } from "lucide-react";
 
 const benefits = [
   "Daily guided practice sessions",
@@ -26,12 +26,18 @@ export default function SignupPage() {
 
   return (
     <div className="w-full max-w-sm mx-auto px-4">
-      <div className="text-center mb-8">
-        <div className="flex items-center justify-center mb-4">
-          <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={200} height={50} className="h-10 w-auto dark:hidden" />
-          <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={200} height={50} className="h-10 w-auto hidden dark:block" />
-        </div>
-        <p className="text-muted-foreground text-sm">
+      <div className="mb-6">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="h-4 w-4" />
+          Back to home
+        </Link>
+      </div>
+      <div className="text-center mb-10">
+        <Link href="/" className="inline-flex items-center justify-center mb-6">
+          <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={320} height={80} className="h-16 w-auto dark:hidden" />
+          <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={320} height={80} className="h-16 w-auto hidden dark:block" />
+        </Link>
+        <p className="text-muted-foreground text-lg">
           Start your free 7-day trial today
         </p>
       </div>
@@ -70,7 +76,7 @@ export default function SignupPage() {
             Sign up with Google
           </Button>
 
-          <p className="text-xs text-muted-foreground text-center">
+          <p className="text-sm text-muted-foreground text-center">
             No credit card required for trial
           </p>
         </CardContent>

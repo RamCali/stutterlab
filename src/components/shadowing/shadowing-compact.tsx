@@ -20,11 +20,11 @@ export function ShadowingChallengeCompact() {
                 <p className="text-sm font-medium">Shadowing Challenge</p>
                 <Badge className="text-[8px] bg-[#00E676]/10 text-[#00E676]">NEW</Badge>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Shadow SLP echo clips &amp; get scored by AI
               </p>
             </div>
-            <div className="flex items-center gap-1 text-[10px] text-muted-foreground flex-shrink-0">
+            <div className="flex items-center gap-1 text-sm text-muted-foreground flex-shrink-0">
               <Users className="h-3 w-3" />
               1.7k today
             </div>

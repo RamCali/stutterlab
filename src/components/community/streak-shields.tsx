@@ -101,7 +101,7 @@ export function StreakShields() {
           <Shield className="h-5 w-5 text-blue-500" />
           Streak Shields
         </h2>
-        <p className="text-xs text-muted-foreground mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Protect your streak or gift a shield to someone who needs it
         </p>
       </div>
@@ -112,21 +112,21 @@ export function StreakShields() {
           <CardContent className="py-3 text-center">
             <Shield className="h-5 w-5 text-blue-500 mx-auto mb-1" />
             <p className="text-xl font-bold">{available}</p>
-            <p className="text-[9px] text-muted-foreground">Available</p>
+            <p className="text-sm text-muted-foreground">Available</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="py-3 text-center">
             <Heart className="h-5 w-5 text-pink-500 mx-auto mb-1" />
             <p className="text-xl font-bold">0</p>
-            <p className="text-[9px] text-muted-foreground">Received</p>
+            <p className="text-sm text-muted-foreground">Received</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="py-3 text-center">
             <Gift className="h-5 w-5 text-amber-500 mx-auto mb-1" />
             <p className="text-xl font-bold">{sentShields.size}</p>
-            <p className="text-[9px] text-muted-foreground">Gifted</p>
+            <p className="text-sm text-muted-foreground">Gifted</p>
           </CardContent>
         </Card>
       </div>
@@ -134,7 +134,7 @@ export function StreakShields() {
       {/* How shields work */}
       <Card className="bg-muted/30">
         <CardContent className="py-3">
-          <p className="text-[10px] text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             <span className="font-medium text-foreground">How it works:</span>{" "}
             You earn 1 Streak Shield for every 7-day streak. Use it to protect your own streak
             on a missed day, or gift it to a community member who needs one.
@@ -145,7 +145,7 @@ export function StreakShields() {
 
       {/* Shield requests from community */}
       <div>
-        <p className="text-xs font-semibold mb-2 flex items-center gap-1.5">
+        <p className="text-sm font-semibold mb-2 flex items-center gap-1.5">
           <Sparkles className="h-3.5 w-3.5 text-amber-500" />
           Community Members Need Help
         </p>
@@ -156,27 +156,27 @@ export function StreakShields() {
               <Card key={req.id}>
                 <CardContent className="py-3">
                   <div className="flex items-start gap-3">
-                    <div className="h-8 w-8 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 text-xs">
+                    <div className="h-8 w-8 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 text-sm">
                       {req.anonymousName.split(" ").map((w) => w[0]).join("")}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-medium">{req.anonymousName}</span>
-                        <Badge variant="secondary" className="text-[9px]">
+                        <span className="text-sm font-medium">{req.anonymousName}</span>
+                        <Badge variant="secondary" className="text-sm">
                           {req.streak}-day streak
                         </Badge>
-                        <span className="text-[9px] text-muted-foreground ml-auto">
+                        <span className="text-sm text-muted-foreground ml-auto">
                           {req.timeAgo}
                         </span>
                       </div>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                      <p className="text-sm text-muted-foreground mt-0.5">
                         {req.message}
                       </p>
                     </div>
                     <Button
                       size="sm"
                       variant={isSent ? "default" : "outline"}
-                      className="text-[10px] h-7 px-2.5 flex-shrink-0"
+                      className="text-sm h-7 px-2.5 flex-shrink-0"
                       disabled={isSent || available === 0}
                       onClick={() => sendShield(req.id)}
                     >
@@ -201,7 +201,7 @@ export function StreakShields() {
         {defaultShieldRequests.length > 2 && (
           <button
             onClick={() => setShowAll(!showAll)}
-            className="flex items-center gap-1 mx-auto mt-2 text-xs text-primary hover:underline"
+            className="flex items-center gap-1 mx-auto mt-2 text-sm text-primary hover:underline"
           >
             {showAll ? (
               <>Show less <ChevronUp className="h-3 w-3" /></>
@@ -241,8 +241,8 @@ export function StreakShieldCompact() {
             <Shield className="h-4 w-4 text-blue-500" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium">{available} Streak Shields</p>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-sm font-medium">{available} Streak Shields</p>
+            <p className="text-sm text-muted-foreground">
               Protect your streak or gift to someone
             </p>
           </div>

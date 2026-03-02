@@ -76,7 +76,7 @@ export function PhonemeHeatmap({
               )} ${expanded === p.phoneme ? "ring-2 ring-primary" : ""}`}
             >
               <span className="font-medium">{p.phoneme}</span>
-              <span className="text-[10px] ml-1 opacity-70">
+              <span className="text-sm ml-1 opacity-70">
                 {p.disfluencyCount}x
               </span>
             </button>
@@ -84,7 +84,7 @@ export function PhonemeHeatmap({
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
           <span className="flex items-center gap-1">
             <span className="w-2.5 h-2.5 rounded-sm bg-green-500/30 border border-green-500/40" />
             Easy
@@ -118,12 +118,12 @@ export function PhonemeHeatmap({
                   {getDifficultyLabel(phoneme.difficultyScore)}
                 </Badge>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 IPA: {getPhonemeLabel(expanded)} — {phoneme.disfluencyCount} disfluencies across {phoneme.totalAttempts} attempts
               </p>
               {phoneme.triggerWords.length > 0 && (
                 <div>
-                  <p className="text-[10px] text-muted-foreground mb-1">
+                  <p className="text-sm text-muted-foreground mb-1">
                     Words that triggered difficulty:
                   </p>
                   <div className="flex flex-wrap gap-1">
@@ -131,7 +131,7 @@ export function PhonemeHeatmap({
                       <Badge
                         key={w}
                         variant="secondary"
-                        className="text-[10px]"
+                        className="text-sm"
                       >
                         {w}
                       </Badge>
@@ -166,7 +166,7 @@ export function PhonemeHeatmap({
 
             {showPractice && practicesSentences && practicesSentences.length > 0 && (
               <div className="space-y-1.5 p-3 rounded-lg bg-primary/5 border border-primary/10">
-                <p className="text-[10px] text-muted-foreground mb-2">
+                <p className="text-sm text-muted-foreground mb-2">
                   Practice these sentences — they're loaded with your difficult sounds:
                 </p>
                 {practicesSentences.map((s, i) => (
@@ -179,7 +179,7 @@ export function PhonemeHeatmap({
           </div>
         )}
 
-        <p className="text-[10px] text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           Based on {data.totalAnalyzed} analyzed sessions
         </p>
       </CardContent>

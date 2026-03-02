@@ -262,7 +262,7 @@ function NewThoughtContent() {
                   }
                   className="w-full mt-1.5 accent-primary"
                 />
-                <div className="flex justify-between text-[10px] text-muted-foreground">
+                <div className="flex justify-between text-xs text-muted-foreground">
                   <span>Not sure</span>
                   <span>Certain</span>
                 </div>
@@ -282,7 +282,7 @@ function NewThoughtContent() {
                   }
                   className="w-full mt-1.5 accent-primary"
                 />
-                <div className="flex justify-between text-[10px] text-muted-foreground">
+                <div className="flex justify-between text-xs text-muted-foreground">
                   <span>Calm</span>
                   <span>Very anxious</span>
                 </div>
@@ -404,7 +404,7 @@ function NewThoughtContent() {
                             }
                             className="flex-1 accent-primary h-1"
                           />
-                          <span className="text-[10px] text-muted-foreground w-6 text-right">
+                          <span className="text-xs text-muted-foreground w-6 text-right">
                             {selected.intensity}/10
                           </span>
                         </div>
@@ -573,7 +573,7 @@ function NewThoughtContent() {
                         <Badge
                           key={trapId}
                           variant="secondary"
-                          className={`text-[10px] ${trap.color}`}
+                          className={`text-xs ${trap.color}`}
                         >
                           {trap.emoji} {trap.name}
                         </Badge>

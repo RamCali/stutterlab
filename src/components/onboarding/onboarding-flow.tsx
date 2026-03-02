@@ -275,7 +275,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     }`}
                   >
                     <p className="text-sm font-medium">{opt.label}</p>
-                    <p className="text-xs text-muted-foreground">{opt.desc}</p>
+                    <p className="text-sm text-muted-foreground">{opt.desc}</p>
                   </button>
                 ))}
               </div>
@@ -303,7 +303,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     }`}
                   >
                     <p className="text-sm font-medium">{opt.label}</p>
-                    <p className="text-xs text-muted-foreground">{opt.desc}</p>
+                    <p className="text-sm text-muted-foreground">{opt.desc}</p>
                   </button>
                 ))}
               </div>
@@ -331,7 +331,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     }`}
                   >
                     <p className="text-sm font-medium">{opt.label}</p>
-                    <p className="text-xs text-muted-foreground">{opt.desc}</p>
+                    <p className="text-sm text-muted-foreground">{opt.desc}</p>
                   </button>
                 ))}
               </div>
@@ -342,7 +342,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               <label className="text-sm font-medium">
                 What types of disfluency do you experience?
               </label>
-              <p className="text-xs text-muted-foreground mt-0.5 mb-2">Select all that apply.</p>
+              <p className="text-sm text-muted-foreground mt-0.5 mb-2">Select all that apply.</p>
               <div className="grid grid-cols-1 gap-2">
                 {STUTTERING_TYPES.map((type) => {
                   const isSelected = stutteringTypes.has(type.id);
@@ -359,7 +359,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                       <span className="text-xl">{type.emoji}</span>
                       <div className="flex-1">
                         <p className="text-sm font-medium">{type.label}</p>
-                        <p className="text-xs text-muted-foreground">{type.description}</p>
+                        <p className="text-sm text-muted-foreground">{type.description}</p>
                       </div>
                       {isSelected && <Check className="h-4 w-4 text-primary flex-shrink-0" />}
                     </button>
@@ -382,7 +382,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               </Button>
             </div>
             {(!stutterFrequency || !stutterDuration || !stutterImpact) && (
-              <p className="text-xs text-muted-foreground text-center">
+              <p className="text-sm text-muted-foreground text-center">
                 Please answer all three questions above to continue.
               </p>
             )}
@@ -416,7 +416,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                         <button
                           key={n}
                           onClick={() => setConfidence(situation.id, n)}
-                          className={`h-8 w-8 rounded-full text-xs font-semibold transition-all ${
+                          className={`h-8 w-8 rounded-full text-sm font-semibold transition-all ${
                             rating === n
                               ? "bg-primary text-primary-foreground scale-110"
                               : rating > 0 && n <= rating
@@ -447,7 +447,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               </Button>
             </div>
             {Object.keys(confidenceRatings).length < 3 && (
-              <p className="text-xs text-muted-foreground text-center">
+              <p className="text-sm text-muted-foreground text-center">
                 Please rate at least 3 situations to continue.
               </p>
             )}
@@ -486,7 +486,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                             <Check className="h-4 w-4 text-primary flex-shrink-0" />
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground mt-0.5">
+                        <p className="text-sm text-muted-foreground mt-0.5">
                           {situation.description}
                         </p>
                       </div>
@@ -503,7 +503,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               </Button>
               <div className="flex items-center gap-3">
                 {selectedFears.size > 0 && (
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge variant="secondary" className="text-sm">
                     {selectedFears.size} selected
                   </Badge>
                 )}
@@ -556,7 +556,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             )}
 
             <div className="text-center">
-              <p className="text-xs text-muted-foreground mb-2">
+              <p className="text-sm text-muted-foreground mb-2">
                 Common difficult words — tap to add:
               </p>
               <div className="flex flex-wrap gap-1.5 justify-center">
@@ -566,7 +566,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     <button
                       key={word}
                       onClick={() => toggleSuggested(word)}
-                      className={`text-xs px-2.5 py-1 rounded-full border transition-all ${
+                      className={`text-sm px-2.5 py-1 rounded-full border transition-all ${
                         isAdded
                           ? "bg-primary/10 border-primary/30 text-primary"
                           : "border-muted-foreground/20 text-muted-foreground hover:border-primary/30"
@@ -587,7 +587,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               </Button>
               <div className="flex items-center gap-3">
                 {fearedWordInputs.length > 0 && (
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge variant="secondary" className="text-sm">
                     {fearedWordInputs.length} word{fearedWordInputs.length !== 1 ? "s" : ""}
                   </Badge>
                 )}
@@ -614,7 +614,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
             <div>
               <label className="text-sm font-medium">Do any of these sound like you?</label>
-              <p className="text-xs text-muted-foreground mt-0.5 mb-2">Select all that apply.</p>
+              <p className="text-sm text-muted-foreground mt-0.5 mb-2">Select all that apply.</p>
               <div className="space-y-2">
                 {AVOIDANCE_BEHAVIORS.map((behavior) => {
                   const isSelected = avoidanceBehaviors.has(behavior.id);
@@ -656,7 +656,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     }`}
                   >
                     <p className="text-sm font-medium">{opt.label}</p>
-                    <p className="text-xs text-muted-foreground">{opt.desc}</p>
+                    <p className="text-sm text-muted-foreground">{opt.desc}</p>
                   </button>
                 ))}
               </div>
@@ -723,7 +723,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 rows={2}
                 className="resize-none"
               />
-              <p className="text-[10px] text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Be specific — we&apos;ll show this on your dashboard as motivation.
               </p>
             </div>
@@ -775,7 +775,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   </svg>
                   <span className="absolute text-xl font-bold">{scores.severityScore}</span>
                 </div>
-                <p className="text-xs font-medium text-muted-foreground mt-2">Severity Score</p>
+                <p className="text-sm font-medium text-muted-foreground mt-2">Severity Score</p>
               </div>
 
               <div className="text-center p-5 rounded-xl border bg-card">
@@ -800,7 +800,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   </svg>
                   <span className="absolute text-xl font-bold">{scores.confidenceScore}</span>
                 </div>
-                <p className="text-xs font-medium text-muted-foreground mt-2">Confidence Score</p>
+                <p className="text-sm font-medium text-muted-foreground mt-2">Confidence Score</p>
               </div>
             </div>
 
@@ -828,7 +828,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     key={item.phase}
                     className="flex items-center gap-3 p-3 rounded-lg border"
                   >
-                    <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                    <div className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold ${
                       item.phase === 1
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted text-muted-foreground"
@@ -842,7 +842,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                           (Weeks {item.weeks})
                         </span>
                       </p>
-                      <p className="text-xs text-muted-foreground">{item.focus}</p>
+                      <p className="text-sm text-muted-foreground">{item.focus}</p>
                     </div>
                   </div>
                 ))}
@@ -855,7 +855,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 <Star className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium">Your North Star</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-sm text-muted-foreground mt-0.5">
                     &ldquo;{goalText.trim()}&rdquo;
                   </p>
                 </div>

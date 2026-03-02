@@ -68,7 +68,7 @@ function ScoreRing({ value, label, color }: { value: number; label: string; colo
           {value}
         </span>
       </div>
-      <span className="text-[9px] text-muted-foreground mt-1">{label}</span>
+      <span className="text-sm text-muted-foreground mt-1">{label}</span>
     </div>
   );
 }
@@ -101,7 +101,7 @@ export function ShadowingScoreCard({ clip, score, onRetry, onShare, onNext }: Sh
             {starLabels[score.stars]}
           </p>
           <p className="text-4xl font-bold">{score.overallScore}</p>
-          <p className="text-xs text-muted-foreground">Overall Score</p>
+          <p className="text-sm text-muted-foreground">Overall Score</p>
 
           {/* XP earned */}
           <Badge className="mt-2 bg-amber-500/10 text-amber-500">
@@ -120,16 +120,16 @@ export function ShadowingScoreCard({ clip, score, onRetry, onShare, onNext }: Sh
 
           {/* Feedback */}
           <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
-            <p className="text-xs font-medium mb-1">Coach Feedback</p>
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            <p className="text-sm font-medium mb-1">Coach Feedback</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               {score.feedback}
             </p>
           </div>
 
           {/* Technique notes */}
           <div className="p-3 rounded-lg bg-muted/30">
-            <p className="text-xs font-medium mb-1">Technique: {clip.technique}</p>
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            <p className="text-sm font-medium mb-1">Technique: {clip.technique}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               {score.techniqueNotes}
             </p>
           </div>
@@ -184,7 +184,7 @@ export function ShadowingStoryCard({
           <div className="h-6 w-6 rounded-lg bg-blue-500 flex items-center justify-center">
             <AudioWaveform className="h-3 w-3 text-white" />
           </div>
-          <span className="text-xs font-bold">StutterLab</span>
+          <span className="text-sm font-bold">StutterLab</span>
         </div>
 
         {/* Stars */}
@@ -203,11 +203,11 @@ export function ShadowingStoryCard({
 
         {/* Score */}
         <p className="relative text-5xl font-bold mb-1">{score.overallScore}</p>
-        <p className="relative text-xs text-white/50 mb-4">SHADOWING SCORE</p>
+        <p className="relative text-sm text-white/50 mb-4">SHADOWING SCORE</p>
 
         {/* Technique */}
         <div className="relative p-3 rounded-lg bg-white/5 mb-4">
-          <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">
+          <p className="text-sm text-white/40 uppercase tracking-wider mb-1">
             Technique
           </p>
           <p className="text-sm font-medium">{clip.technique}</p>
@@ -222,13 +222,13 @@ export function ShadowingStoryCard({
           ].map((s) => (
             <div key={s.label} className="text-center">
               <p className="text-lg font-bold">{s.value}</p>
-              <p className="text-[9px] text-white/40">{s.label}</p>
+              <p className="text-sm text-white/40">{s.label}</p>
             </div>
           ))}
         </div>
 
         {/* Footer */}
-        <p className="relative text-[10px] text-white/30">
+        <p className="relative text-sm text-white/30">
           stutterlab.com — Evidence-based speech practice
         </p>
       </CardContent>

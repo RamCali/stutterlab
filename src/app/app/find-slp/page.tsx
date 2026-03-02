@@ -87,7 +87,7 @@ export default function FindSLPPage() {
                 Connect with your SLP via video call directly within StutterLab. Share your progress data automatically.
               </p>
             </div>
-            <Badge variant="outline" className="text-[10px] flex-shrink-0">
+            <Badge variant="outline" className="text-xs flex-shrink-0">
               <Crown className="h-2.5 w-2.5 mr-0.5" />
               PRO
             </Badge>
@@ -114,12 +114,12 @@ export default function FindSLPPage() {
               <p className="text-xs text-muted-foreground mb-3">{slp.bio}</p>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="text-[10px]">
+                  <Badge variant="secondary" className="text-xs">
                     <MapPin className="h-2.5 w-2.5 mr-0.5" />
                     {slp.location}
                   </Badge>
                   {slp.telehealth && (
-                    <Badge variant="secondary" className="text-[10px]">
+                    <Badge variant="secondary" className="text-xs">
                       <Video className="h-2.5 w-2.5 mr-0.5" />
                       Telehealth
                     </Badge>

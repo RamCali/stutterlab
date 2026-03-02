@@ -61,7 +61,7 @@ export default function ThinkingTrapsPage() {
                       {count > 0 && (
                         <Badge
                           variant="secondary"
-                          className={`text-[10px] ${trap.color}`}
+                          className={`text-xs ${trap.color}`}
                         >
                           {count}x in your records
                         </Badge>

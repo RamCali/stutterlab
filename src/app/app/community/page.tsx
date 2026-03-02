@@ -97,11 +97,11 @@ export default function CommunityPage() {
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Users className="h-6 w-6 text-primary" />
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <Users className="h-7 w-7 text-primary" />
             Community
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-lg text-muted-foreground mt-1.5">
             Connect with others on the same journey
           </p>
         </div>
@@ -145,12 +145,12 @@ export default function CommunityPage() {
           <div className="flex items-center gap-3">
             <Mic className="h-5 w-5 text-primary flex-shrink-0" />
             <div className="flex-1">
-              <p className="text-sm font-medium">Live Practice Rooms</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-base font-medium">Live Practice Rooms</p>
+              <p className="text-sm text-muted-foreground">
                 Join a live audio room to practice speaking with a partner.
               </p>
             </div>
-            <Badge variant="outline" className="text-[10px]">
+            <Badge variant="outline" className="text-xs">
               <Crown className="h-2.5 w-2.5 mr-0.5" />
               PRO
             </Badge>
@@ -192,16 +192,16 @@ export default function CommunityPage() {
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs font-medium">{post.author}</span>
                   {cat && (
-                    <Badge variant="secondary" className="text-[10px]">
+                    <Badge variant="secondary" className="text-xs">
                       {cat.label}
                     </Badge>
                   )}
-                  <span className="text-[10px] text-muted-foreground ml-auto">
+                  <span className="text-xs text-muted-foreground ml-auto">
                     {post.time}
                   </span>
                 </div>
-                <h3 className="font-medium text-sm mb-1">{post.title}</h3>
-                <p className="text-xs text-muted-foreground mb-3">{post.content}</p>
+                <h3 className="font-medium text-base mb-1">{post.title}</h3>
+                <p className="text-sm text-muted-foreground mb-3">{post.content}</p>
                 <div className="flex items-center gap-4">
                   <Button
                     variant="ghost"

@@ -77,7 +77,7 @@ export default function FearedWordPracticePage() {
             <span className="text-sm font-medium capitalize">
               {wordEntry.word}
             </span>
-            <Badge variant="secondary" className="text-[10px]">
+            <Badge variant="secondary" className="text-xs">
               {LEVEL_NAMES[currentLevel]}
             </Badge>
           </div>

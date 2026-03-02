@@ -44,13 +44,13 @@ export function PredictiveCoachCard({ data }: PredictiveCoachCardProps) {
           >
             <div className="flex items-start gap-2">
               <ConfidenceDot level={pred.confidence} />
-              <p className="text-xs leading-relaxed text-muted-foreground">
+              <p className="text-sm leading-relaxed text-muted-foreground">
                 {pred.description}
               </p>
             </div>
             <div className="flex items-center gap-1.5 ml-3.5">
               <ArrowRight className="h-2.5 w-2.5 text-primary" />
-              <p className="text-xs font-medium text-primary">
+              <p className="text-sm font-medium text-primary">
                 {pred.suggestion}
               </p>
             </div>
@@ -66,7 +66,7 @@ export function PredictiveCoachCard({ data }: PredictiveCoachCardProps) {
                 <Badge
                   key={i}
                   variant="secondary"
-                  className="text-[10px] bg-primary/5"
+                  className="text-sm bg-primary/5"
                 >
                   {s}
                 </Badge>
@@ -79,7 +79,7 @@ export function PredictiveCoachCard({ data }: PredictiveCoachCardProps) {
         {data.upcomingChallenges.length > 0 && (
           <div className="pt-1">
             {data.upcomingChallenges.map((c, i) => (
-              <p key={i} className="text-[10px] text-muted-foreground">
+              <p key={i} className="text-sm text-muted-foreground">
                 {c}
               </p>
             ))}

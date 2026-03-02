@@ -237,7 +237,7 @@ export default function TTSAssistPage() {
                 <Volume2 className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium truncate">{phrase.label}</p>
-                  <p className="text-[10px] text-muted-foreground truncate">{phrase.text}</p>
+                  <p className="text-xs text-muted-foreground truncate">{phrase.text}</p>
                 </div>
                 {phrase.id.startsWith("custom-") && (
                   <button

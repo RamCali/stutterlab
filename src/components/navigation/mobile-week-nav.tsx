@@ -26,12 +26,12 @@ export function MobileWeekNav({ currentDay }: MobileWeekNavProps) {
             onClick={(e) => day.isLocked && e.preventDefault()}
             className="flex flex-col items-center gap-0.5"
           >
-            <span className="text-[9px] text-muted-foreground">
+            <span className="text-sm text-muted-foreground">
               {DAY_LABELS[i] || "D"}
             </span>
             <div
               className={cn(
-                "h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-semibold transition-all",
+                "h-7 w-7 rounded-full flex items-center justify-center text-sm font-semibold transition-all",
                 day.isCompleted && "bg-primary/10 text-primary",
                 day.isCurrent && "bg-primary text-primary-foreground",
                 day.isLocked && "bg-muted/50 text-muted-foreground/30"
@@ -54,21 +54,21 @@ export function MobileWeekNav({ currentDay }: MobileWeekNavProps) {
           className="flex flex-col items-center gap-0.5 text-primary"
         >
           <Play className="h-5 w-5 stroke-[2.5]" />
-          <span className="text-[10px] font-medium">Today</span>
+          <span className="text-sm font-medium">Today</span>
         </Link>
         <Link
           href="/app/progress"
           className="flex flex-col items-center gap-0.5 text-muted-foreground"
         >
           <LineChart className="h-5 w-5" />
-          <span className="text-[10px] font-medium">Progress</span>
+          <span className="text-sm font-medium">Progress</span>
         </Link>
         <Link
           href="/app/settings"
           className="flex flex-col items-center gap-0.5 text-muted-foreground"
         >
           <Settings className="h-5 w-5" />
-          <span className="text-[10px] font-medium">Settings</span>
+          <span className="text-sm font-medium">Settings</span>
         </Link>
       </div>
     </div>

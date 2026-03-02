@@ -30,7 +30,7 @@ export function MarketingFooter() {
               <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={160} height={40} className="h-8 w-auto dark:hidden" />
               <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={160} height={40} className="h-8 w-auto hidden dark:block" />
             </Link>
-            <p className="text-sm text-muted-foreground mt-2 max-w-xs">
+            <p className="text-base text-muted-foreground mt-2 max-w-xs">
               Evidence-based stuttering training, powered by AI, accessible
               from any browser.
             </p>
@@ -53,7 +53,7 @@ export function MarketingFooter() {
             </div>
           ))}
         </div>
-        <div className="border-t border-border/60 mt-8 pt-6 flex flex-col md:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
+        <div className="border-t border-border/60 mt-8 pt-6 flex flex-col md:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} StutterLab. All rights reserved.</p>
           <p>
             StutterLab is not a substitute for professional diagnosis or

@@ -352,20 +352,20 @@ export function ClinicalReport({
           <div className="grid grid-cols-3 gap-3">
             <div className="text-center p-3 rounded-lg bg-muted/30">
               <p className="text-2xl font-bold">{freqTotal}</p>
-              <p className="text-[10px] text-muted-foreground">Frequency</p>
-              <p className="text-[9px] text-muted-foreground mt-0.5">
+              <p className="text-sm text-muted-foreground">Frequency</p>
+              <p className="text-sm text-muted-foreground mt-0.5">
                 {report.percentSS != null ? `${report.percentSS.toFixed(1)}% SS` : "—"}
               </p>
             </div>
             <div className="text-center p-3 rounded-lg bg-muted/30">
               <p className="text-2xl font-bold">{durScore}</p>
-              <p className="text-[10px] text-muted-foreground">Duration</p>
-              <p className="text-[9px] text-muted-foreground mt-0.5">Est. from types</p>
+              <p className="text-sm text-muted-foreground">Duration</p>
+              <p className="text-sm text-muted-foreground mt-0.5">Est. from types</p>
             </div>
             <div className="text-center p-3 rounded-lg bg-muted/30">
               <p className="text-2xl font-bold">{physScore}</p>
-              <p className="text-[10px] text-muted-foreground">Physical</p>
-              <p className="text-[9px] text-muted-foreground mt-0.5">Concomitants</p>
+              <p className="text-sm text-muted-foreground">Physical</p>
+              <p className="text-sm text-muted-foreground mt-0.5">Concomitants</p>
             </div>
           </div>
 
@@ -373,14 +373,14 @@ export function ClinicalReport({
           <div className={`p-4 rounded-lg ${ssi4Severity.bg} border`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-muted-foreground">SSI-4 Total Score</p>
+                <p className="text-sm text-muted-foreground">SSI-4 Total Score</p>
                 <p className="text-3xl font-bold">{ssi4Total}</p>
               </div>
               <div className="text-right">
                 <Badge className={`text-sm ${ssi4Severity.color} ${ssi4Severity.bg}`}>
                   {ssi4Severity.label}
                 </Badge>
-                <p className="text-[10px] text-muted-foreground mt-1 max-w-[200px]">
+                <p className="text-sm text-muted-foreground mt-1 max-w-[200px]">
                   {ssi4Severity.description}
                 </p>
               </div>
@@ -389,13 +389,13 @@ export function ClinicalReport({
 
           {/* Visual severity scale */}
           <div className="space-y-1">
-            <p className="text-[10px] text-muted-foreground">SSI-4 Severity Scale (Total Score)</p>
+            <p className="text-sm text-muted-foreground">SSI-4 Severity Scale (Total Score)</p>
             <div className="flex h-3 rounded-full overflow-hidden">
               <div className="bg-[#00E676]/60 flex-[17]" title="Very Mild/Mild: 0-17" />
               <div className="bg-[#FFB347] flex-[14]" title="Mild-Moderate/Moderate: 18-31" />
               <div className="bg-[#FF5252] flex-[15]" title="Severe/Very Severe: 32-46+" />
             </div>
-            <div className="flex justify-between text-[9px] text-muted-foreground">
+            <div className="flex justify-between text-sm text-muted-foreground">
               <span>0</span>
               <span>10</span>
               <span>17</span>
@@ -416,7 +416,7 @@ export function ClinicalReport({
             </div>
           </div>
 
-          <p className="text-[9px] text-muted-foreground italic">
+          <p className="text-sm text-muted-foreground italic">
             Based on the SSI-4 (Stuttering Severity Instrument, 4th Ed.). Duration and physical concomitant scores
             are estimated from disfluency type analysis. For a formal SSI-4 administration, consult a certified SLP.
           </p>
@@ -460,8 +460,8 @@ export function ClinicalReport({
                       : "—"}
                   </p>
                 </div>
-                <p className="text-[10px] text-muted-foreground">%SS Change</p>
-                <p className="text-[9px] text-muted-foreground mt-0.5">
+                <p className="text-sm text-muted-foreground">%SS Change</p>
+                <p className="text-sm text-muted-foreground mt-0.5">
                   {previousReport.percentSS?.toFixed(1)}% <ArrowRight className="h-2 w-2 inline" /> {report.percentSS?.toFixed(1)}%
                 </p>
               </div>
@@ -492,8 +492,8 @@ export function ClinicalReport({
                       : "—"}
                   </p>
                 </div>
-                <p className="text-[10px] text-muted-foreground">Fluency Score</p>
-                <p className="text-[9px] text-muted-foreground mt-0.5">
+                <p className="text-sm text-muted-foreground">Fluency Score</p>
+                <p className="text-sm text-muted-foreground mt-0.5">
                   {previousReport.fluencyScore} <ArrowRight className="h-2 w-2 inline" /> {report.fluencyScore}
                 </p>
               </div>
@@ -514,8 +514,8 @@ export function ClinicalReport({
                       : "—"}
                   </p>
                 </div>
-                <p className="text-[10px] text-muted-foreground">syl/min Change</p>
-                <p className="text-[9px] text-muted-foreground mt-0.5">
+                <p className="text-sm text-muted-foreground">syl/min Change</p>
+                <p className="text-sm text-muted-foreground mt-0.5">
                   {previousReport.speakingRate != null ? Math.round(previousReport.speakingRate) : "—"}{" "}
                   <ArrowRight className="h-2 w-2 inline" />{" "}
                   {report.speakingRate != null ? Math.round(report.speakingRate) : "—"}
@@ -600,7 +600,7 @@ export function ClinicalReport({
                       }}
                     />
                     <Legend
-                      formatter={(value) => <span className="text-[10px]">{value}</span>}
+                      formatter={(value) => <span className="text-sm">{value}</span>}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -610,21 +610,21 @@ export function ClinicalReport({
             {/* Comparison with previous month */}
             {prevAnalysis?.disfluency_breakdown && (
               <div className="pt-2 border-t">
-                <p className="text-[10px] text-muted-foreground mb-2">vs. Previous Assessment</p>
+                <p className="text-sm text-muted-foreground mb-2">vs. Previous Assessment</p>
                 <div className="space-y-1.5">
                   {disfluencyData.map((d) => {
                     const prevCount = Object.entries(prevAnalysis.disfluency_breakdown!)
                       .find(([key]) => (DISFLUENCY_LABELS[key] || key) === d.name)?.[1] ?? 0;
                     const change = d.count - prevCount;
                     return (
-                      <div key={d.name} className="flex items-center gap-2 text-xs">
+                      <div key={d.name} className="flex items-center gap-2 text-sm">
                         <span className="w-28 truncate text-muted-foreground">{d.name}</span>
                         <span className="font-mono">{prevCount}</span>
                         <ArrowRight className="h-2.5 w-2.5 text-muted-foreground" />
                         <span className="font-mono">{d.count}</span>
                         <Badge
                           variant="secondary"
-                          className={`text-[9px] ${
+                          className={`text-sm ${
                             change < 0
                               ? "text-[#00E676] bg-[#00E676]/10"
                               : change > 0
@@ -670,7 +670,7 @@ export function ClinicalReport({
                     <p className="text-sm font-medium">{rec.technique}</p>
                     <Badge
                       variant="secondary"
-                      className={`text-[9px] ${
+                      className={`text-sm ${
                         rec.priority === "high"
                           ? "text-[#FF5252] bg-[#FF5252]/10"
                           : rec.priority === "medium"
@@ -681,7 +681,7 @@ export function ClinicalReport({
                       {rec.priority} priority
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground">{rec.reason}</p>
+                  <p className="text-sm text-muted-foreground">{rec.reason}</p>
                 </div>
               ))}
             </div>
@@ -724,11 +724,11 @@ export function ClinicalReport({
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-[10px] text-muted-foreground mb-2">%SS (lower is better)</p>
+              <p className="text-sm text-muted-foreground mb-2">%SS (lower is better)</p>
               <TrendChart data={history} metric="percentSS" />
             </div>
             <div>
-              <p className="text-[10px] text-muted-foreground mb-2">Fluency Score (higher is better)</p>
+              <p className="text-sm text-muted-foreground mb-2">Fluency Score (higher is better)</p>
               <TrendChart data={history} metric="fluencyScore" />
             </div>
           </CardContent>
@@ -743,21 +743,21 @@ export function ClinicalReport({
               <p className="text-2xl font-bold">
                 {report.percentSS != null ? `${report.percentSS.toFixed(1)}%` : "—"}
               </p>
-              <p className="text-[9px] text-muted-foreground">%SS</p>
+              <p className="text-sm text-muted-foreground">%SS</p>
             </div>
             <div>
               <p className="text-2xl font-bold">{report.fluencyScore ?? "—"}</p>
-              <p className="text-[9px] text-muted-foreground">Fluency</p>
+              <p className="text-sm text-muted-foreground">Fluency</p>
             </div>
             <div>
               <p className="text-2xl font-bold">
                 {report.speakingRate != null ? Math.round(report.speakingRate) : "—"}
               </p>
-              <p className="text-[9px] text-muted-foreground">syl/min</p>
+              <p className="text-sm text-muted-foreground">syl/min</p>
             </div>
             <div>
               <p className="text-2xl font-bold">{report.totalSyllables ?? "—"}</p>
-              <p className="text-[9px] text-muted-foreground">Syllables</p>
+              <p className="text-sm text-muted-foreground">Syllables</p>
             </div>
           </div>
         </CardContent>

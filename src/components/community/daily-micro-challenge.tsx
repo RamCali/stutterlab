@@ -183,8 +183,8 @@ export function DailyMicroChallenge() {
       <CardContent className="py-4">
         <div className="flex items-center gap-2 mb-3">
           <Zap className="h-4 w-4 text-primary" />
-          <p className="text-xs font-semibold">Daily Micro-Challenge</p>
-          <Badge variant="secondary" className="text-[9px] ml-auto flex items-center gap-0.5">
+          <p className="text-sm font-semibold">Daily Micro-Challenge</p>
+          <Badge variant="secondary" className="text-sm ml-auto flex items-center gap-0.5">
             <Clock className="h-2.5 w-2.5" />
             {timeLeft} left
           </Badge>
@@ -197,16 +197,16 @@ export function DailyMicroChallenge() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
               <h3 className="font-medium text-sm">{challenge.title}</h3>
-              <Badge className={`text-[9px] ${difficultyColors[challenge.difficulty]}`}>
+              <Badge className={`text-sm ${difficultyColors[challenge.difficulty]}`}>
                 {challenge.difficulty}
               </Badge>
             </div>
-            <p className="text-xs text-muted-foreground mb-2">{challenge.description}</p>
+            <p className="text-sm text-muted-foreground mb-2">{challenge.description}</p>
             <div className="flex items-center gap-3">
-              <span className="text-[10px] text-muted-foreground">
+              <span className="text-sm text-muted-foreground">
                 Technique: <span className="font-medium text-foreground">{challenge.technique}</span>
               </span>
-              <span className="text-[10px] text-muted-foreground">
+              <span className="text-sm text-muted-foreground">
                 <Sparkles className="h-2.5 w-2.5 inline text-amber-500" /> +{challenge.xp} XP
               </span>
             </div>
@@ -217,7 +217,7 @@ export function DailyMicroChallenge() {
           {completed ? (
             <div className="flex items-center gap-2 p-2 rounded-lg bg-[#00E676]/10">
               <CheckCircle2 className="h-4 w-4 text-[#00E676]" />
-              <p className="text-xs font-medium text-[#00E676]">
+              <p className="text-sm font-medium text-[#00E676]">
                 Completed! +{challenge.xp} XP earned. Come back tomorrow for a new challenge.
               </p>
             </div>
@@ -268,8 +268,8 @@ export function DailyMicroChallengeCompact() {
           <div className="flex items-center gap-3">
             <CheckCircle2 className="h-5 w-5 text-[#00E676]" />
             <div className="flex-1">
-              <p className="text-xs font-medium text-[#00E676]">Daily Challenge Complete!</p>
-              <p className="text-[10px] text-muted-foreground">
+              <p className="text-sm font-medium text-[#00E676]">Daily Challenge Complete!</p>
+              <p className="text-sm text-muted-foreground">
                 +{challenge.xp} XP — New challenge tomorrow
               </p>
             </div>
@@ -287,12 +287,12 @@ export function DailyMicroChallengeCompact() {
             <challenge.icon className={`h-4 w-4 ${challenge.color}`} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium">{challenge.title}</p>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-sm font-medium">{challenge.title}</p>
+            <p className="text-sm text-muted-foreground">
               +{challenge.xp} XP — {timeLeft} left
             </p>
           </div>
-          <Badge variant="outline" className="text-[9px]">
+          <Badge variant="outline" className="text-sm">
             <Zap className="h-2.5 w-2.5 mr-0.5" />
             Daily
           </Badge>

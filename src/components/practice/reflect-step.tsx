@@ -40,7 +40,7 @@ export function ReflectStep({ onComplete }: ReflectStepProps) {
           onChange={(e) => setFluencyRating(Number(e.target.value))}
           className="w-full accent-primary"
         />
-        <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+        <div className="flex justify-between text-sm text-muted-foreground mt-1">
           <span>Very disfluent</span>
           <span>Very fluent</span>
         </div>
@@ -59,7 +59,7 @@ export function ReflectStep({ onComplete }: ReflectStepProps) {
           onChange={(e) => setConfidenceAfter(Number(e.target.value))}
           className="w-full accent-primary"
         />
-        <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+        <div className="flex justify-between text-sm text-muted-foreground mt-1">
           <span>Not confident</span>
           <span>Very confident</span>
         </div>
@@ -78,7 +78,7 @@ export function ReflectStep({ onComplete }: ReflectStepProps) {
             }`}
           >
             <span className="text-4xl">{mood.emoji}</span>
-            <span className="text-xs font-medium">{mood.label}</span>
+            <span className="text-sm font-medium">{mood.label}</span>
           </button>
         ))}
       </div>

@@ -39,7 +39,7 @@ export function TechniqueIndicators({
 
   return (
     <div>
-      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+      <span className="text-sm text-muted-foreground uppercase tracking-wider">
         Techniques
       </span>
       <div className="flex flex-wrap gap-1 mt-1">
@@ -51,7 +51,7 @@ export function TechniqueIndicators({
             <Badge
               key={type}
               variant={isActive ? "default" : "secondary"}
-              className={`text-[9px] gap-0.5 transition-colors duration-300 ${
+              className={`text-sm gap-0.5 transition-colors duration-300 ${
                 isActive
                   ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
                   : "opacity-50"

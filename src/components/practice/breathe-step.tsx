@@ -37,7 +37,7 @@ export function BreatheStep({ onComplete, confidenceBefore = 5, onConfidenceChan
             onChange={(e) => onConfidenceChange(Number(e.target.value))}
             className="w-full accent-primary"
           />
-          <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+          <div className="flex justify-between text-sm text-muted-foreground mt-1">
             <span>Not confident</span>
             <span>Very confident</span>
           </div>
@@ -55,7 +55,7 @@ export function BreatheStep({ onComplete, confidenceBefore = 5, onConfidenceChan
       />
       <button
         onClick={onComplete}
-        className="mt-4 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+        className="mt-4 text-sm text-muted-foreground/60 hover:text-muted-foreground transition-colors"
       >
         Skip warm-up
       </button>

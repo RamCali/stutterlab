@@ -36,7 +36,7 @@ function TrendBadge({
 
   return (
     <span
-      className={`flex items-center gap-0.5 text-[10px] ${
+      className={`flex items-center gap-0.5 text-sm ${
         trend === "improving" ? "text-[#00E676]" : "text-[#FF5252]"
       }`}
     >
@@ -78,13 +78,13 @@ export function SessionScorecard({ scorecard }: SessionScorecardProps) {
             >
               {scorecard.overall.grade}
             </span>
-            <span className="text-[10px] text-muted-foreground">Overall</span>
+            <span className="text-sm text-muted-foreground">Overall</span>
           </div>
           <div className="text-sm text-muted-foreground">
             <p className="font-medium text-foreground">
               {scorecard.overall.score}/100
             </p>
-            <p className="text-xs">Weighted score across 5 dimensions</p>
+            <p className="text-sm">Weighted score across 5 dimensions</p>
           </div>
         </div>
 
@@ -101,7 +101,7 @@ export function SessionScorecard({ scorecard }: SessionScorecardProps) {
                     <span className="text-sm font-medium">{dim.name}</span>
                     <Badge
                       variant="outline"
-                      className={`text-[9px] px-1.5 ${getGradeBg(dim.grade)}`}
+                      className={`text-sm px-1.5 ${getGradeBg(dim.grade)}`}
                     >
                       <span className={getGradeColor(dim.grade)}>
                         {dim.grade}
@@ -112,12 +112,12 @@ export function SessionScorecard({ scorecard }: SessionScorecardProps) {
                       change={comparison?.delta}
                     />
                   </div>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-sm text-muted-foreground">
                     {dim.score}
                   </span>
                 </div>
                 <Progress value={dim.score} className="h-1.5" />
-                <p className="text-[10px] text-muted-foreground">{dim.notes}</p>
+                <p className="text-sm text-muted-foreground">{dim.notes}</p>
               </div>
             );
           })}
@@ -126,7 +126,7 @@ export function SessionScorecard({ scorecard }: SessionScorecardProps) {
         {/* vs. Previous Session */}
         {scorecard.comparisonToPrevious && (
           <div className="pt-2 border-t">
-            <p className="text-[10px] text-muted-foreground mb-2">
+            <p className="text-sm text-muted-foreground mb-2">
               vs. Previous Session
             </p>
             <div className="grid grid-cols-5 gap-1.5">
@@ -136,7 +136,7 @@ export function SessionScorecard({ scorecard }: SessionScorecardProps) {
                   className="text-center p-1.5 rounded-lg bg-muted/20"
                 >
                   <span
-                    className={`text-xs font-bold ${
+                    className={`text-sm font-bold ${
                       c.change > 0
                         ? "text-[#00E676]"
                         : c.change < 0

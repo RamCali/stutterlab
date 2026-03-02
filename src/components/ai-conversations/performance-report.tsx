@@ -203,7 +203,7 @@ export function PerformanceReport({
             <span className="text-sm font-semibold">
               +{xpEarned} XP earned
             </span>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-sm text-muted-foreground">
               from this conversation
             </span>
           </CardContent>
@@ -217,7 +217,7 @@ export function PerformanceReport({
             <div className="flex items-center gap-2">
               <Shield className="h-4 w-4 text-amber-500" />
               <span className="text-sm font-semibold">Stress Resilience</span>
-              <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-400">
+              <Badge variant="outline" className="text-sm border-amber-500/30 text-amber-400">
                 Level {stressLevel}
               </Badge>
             </div>
@@ -231,22 +231,22 @@ export function PerformanceReport({
                 <div className="grid grid-cols-3 gap-3">
                   <div className="text-center p-2.5 rounded-lg bg-background/50">
                     <p className="text-xl font-bold text-amber-400">{resilienceScore}</p>
-                    <p className="text-[10px] text-muted-foreground">Resilience Score</p>
+                    <p className="text-sm text-muted-foreground">Resilience Score</p>
                   </div>
                   <div className="text-center p-2.5 rounded-lg bg-background/50">
                     <p className="text-xl font-bold text-amber-400">{multiplierLabel}</p>
-                    <p className="text-[10px] text-muted-foreground">XP Multiplier</p>
+                    <p className="text-sm text-muted-foreground">XP Multiplier</p>
                   </div>
                   <div className="text-center p-2.5 rounded-lg bg-background/50">
                     <p className="text-xl font-bold">{fluencyScore}</p>
-                    <p className="text-[10px] text-muted-foreground">Base Fluency</p>
+                    <p className="text-sm text-muted-foreground">Base Fluency</p>
                   </div>
                 </div>
               );
             })()}
 
             <div className="p-2.5 rounded-lg bg-background/50 border border-amber-500/10">
-              <p className="text-xs leading-relaxed text-muted-foreground">
+              <p className="text-sm leading-relaxed text-muted-foreground">
                 {fluencyScore >= 80
                   ? `Excellent performance under Level ${stressLevel} stress! You maintained strong fluency despite ambient noise and pressure — this shows real-world readiness.`
                   : fluencyScore >= 60
@@ -269,7 +269,7 @@ export function PerformanceReport({
             <BarChart3 className="h-4 w-4 text-primary" />
             Voice Conversation Report
           </CardTitle>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             {scenario} — {formatTime(durationSeconds)} duration
           </p>
         </CardHeader>
@@ -288,26 +288,26 @@ export function PerformanceReport({
               >
                 {fluencyScore}
               </p>
-              <p className="text-xs text-muted-foreground">Fluency</p>
+              <p className="text-sm text-muted-foreground">Fluency</p>
             </div>
             <div className="text-center p-3 rounded-lg bg-muted/10">
               <p className="text-2xl font-bold">{userTurns.length}</p>
-              <p className="text-xs text-muted-foreground">Your Turns</p>
+              <p className="text-sm text-muted-foreground">Your Turns</p>
             </div>
             <div className="text-center p-3 rounded-lg bg-muted/10">
               <p className="text-2xl font-bold">{avgRate}</p>
-              <p className="text-xs text-muted-foreground">Avg syl/min</p>
+              <p className="text-sm text-muted-foreground">Avg syl/min</p>
             </div>
             <div className="text-center p-3 rounded-lg bg-muted/10">
               <p className="text-2xl font-bold">{totalDisfluencies}</p>
-              <p className="text-xs text-muted-foreground">Disfluencies</p>
+              <p className="text-sm text-muted-foreground">Disfluencies</p>
             </div>
           </div>
 
           {/* Per-turn fluency timeline */}
           {userTurns.length > 1 && (
             <div>
-              <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+              <p className="text-sm text-muted-foreground mb-2 flex items-center gap-1">
                 <TrendingUp className="h-3 w-3" />
                 Fluency per Turn
               </p>
@@ -336,7 +336,7 @@ export function PerformanceReport({
                   );
                 })}
               </div>
-              <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+              <div className="flex justify-between text-sm text-muted-foreground mt-1">
                 <span>Turn 1</span>
                 <span>Turn {userTurns.length}</span>
               </div>
@@ -346,7 +346,7 @@ export function PerformanceReport({
           {/* Speaking rate trend */}
           {userTurns.length > 1 && (
             <div>
-              <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+              <p className="text-sm text-muted-foreground mb-2 flex items-center gap-1">
                 <Gauge className="h-3 w-3" />
                 Speaking Rate per Turn (syl/min)
               </p>
@@ -373,7 +373,7 @@ export function PerformanceReport({
                   );
                 })}
               </div>
-              <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+              <div className="flex justify-between text-sm text-muted-foreground mt-1">
                 <span>Turn 1</span>
                 <span className="text-muted-foreground/60">
                   {rateVariance > 0 ? `±${rateVariance} variance` : "Steady rate"}
@@ -386,14 +386,14 @@ export function PerformanceReport({
           {/* Hardest moment */}
           {hardestTurn && hardestTurn.disfluencyCount > 0 && (
             <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20">
-              <p className="text-xs font-medium flex items-center gap-1 text-amber-600">
+              <p className="text-sm font-medium flex items-center gap-1 text-amber-600">
                 <AlertTriangle className="h-3 w-3" />
                 Hardest Moment
               </p>
               <p className="text-sm mt-1 line-clamp-2">
                 &ldquo;{hardestTurn.text}&rdquo;
               </p>
-              <Badge variant="outline" className="mt-2 text-xs">
+              <Badge variant="outline" className="mt-2 text-sm">
                 {hardestTurn.disfluencyCount} disfluencies detected
               </Badge>
             </div>
@@ -402,7 +402,7 @@ export function PerformanceReport({
           {/* Technique breakdown */}
           {hasTechniques && (
             <div>
-              <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+              <p className="text-sm text-muted-foreground mb-2 flex items-center gap-1">
                 <CheckCircle2 className="h-3 w-3" />
                 Techniques Detected
               </p>
@@ -415,13 +415,13 @@ export function PerformanceReport({
                     <span className="text-sm">
                       {techniqueLabels[tech] || tech}
                     </span>
-                    <Badge variant="secondary" className="text-xs bg-emerald-500/10 text-emerald-600">
+                    <Badge variant="secondary" className="text-sm bg-emerald-500/10 text-emerald-600">
                       {count}x
                     </Badge>
                   </div>
                 ))}
               </div>
-              <p className="text-[10px] text-muted-foreground mt-1.5">
+              <p className="text-sm text-muted-foreground mt-1.5">
                 {allTechniques.length} technique use{allTechniques.length !== 1 ? "s" : ""} detected across {userTurns.length} turn{userTurns.length !== 1 ? "s" : ""}
               </p>
             </div>
@@ -433,7 +433,7 @@ export function PerformanceReport({
               {/* Vocal effort */}
               {avgEffort != null && (
                 <div className="p-3 rounded-lg bg-muted/10">
-                  <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
+                  <p className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
                     <Activity className="h-3 w-3" />
                     Avg Vocal Effort
                   </p>
@@ -453,7 +453,7 @@ export function PerformanceReport({
                   </div>
                   <p className="text-sm font-medium mt-1">
                     {Math.round(avgEffort * 100)}%{" "}
-                    <span className="text-xs font-normal text-muted-foreground">
+                    <span className="text-sm font-normal text-muted-foreground">
                       {avgEffort < 0.4
                         ? "— Relaxed"
                         : avgEffort < 0.7
@@ -467,7 +467,7 @@ export function PerformanceReport({
               {/* Pace distribution */}
               {totalZoned > 0 && (
                 <div className="p-3 rounded-lg bg-muted/10">
-                  <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
+                  <p className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
                     <Gauge className="h-3 w-3" />
                     Pace Distribution
                   </p>
@@ -497,7 +497,7 @@ export function PerformanceReport({
                       />
                     )}
                   </div>
-                  <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                  <div className="flex justify-between text-sm text-muted-foreground mt-1">
                     <span>Slow: {zoneCount.slow}</span>
                     <span className="text-[#00E676]">Target: {zoneCount.target}</span>
                     <span>Fast: {zoneCount.fast}</span>
@@ -510,7 +510,7 @@ export function PerformanceReport({
           {/* Coaching Insights */}
           {coachingInsights.length > 0 && (
             <div>
-              <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+              <p className="text-sm text-muted-foreground mb-2 flex items-center gap-1">
                 <Lightbulb className="h-3 w-3" />
                 SLP Coaching Insights
               </p>
@@ -521,7 +521,7 @@ export function PerformanceReport({
                     className="flex items-start gap-2 p-2.5 rounded-lg bg-primary/5 border border-primary/10"
                   >
                     <Zap className="h-3.5 w-3.5 text-primary mt-0.5 flex-shrink-0" />
-                    <p className="text-xs leading-relaxed">{insight.text}</p>
+                    <p className="text-sm leading-relaxed">{insight.text}</p>
                   </div>
                 ))}
               </div>
@@ -530,7 +530,7 @@ export function PerformanceReport({
 
           {/* Conversation transcript */}
           <div>
-            <p className="text-xs text-muted-foreground mb-2">
+            <p className="text-sm text-muted-foreground mb-2">
               Full Conversation
             </p>
             <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -543,7 +543,7 @@ export function PerformanceReport({
                       : "bg-muted/10 mr-8"
                   }`}
                 >
-                  <span className="text-[10px] text-muted-foreground uppercase">
+                  <span className="text-sm text-muted-foreground uppercase">
                     {turn.role === "user" ? "You" : "AI"}
                   </span>
                   <p className="text-sm">{turn.text}</p>

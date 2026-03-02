@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -18,12 +18,18 @@ export default function LoginPage() {
 
   return (
     <div className="w-full max-w-sm mx-auto px-4">
-      <div className="text-center mb-8">
-        <div className="flex items-center justify-center mb-4">
-          <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={200} height={50} className="h-10 w-auto dark:hidden" />
-          <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={200} height={50} className="h-10 w-auto hidden dark:block" />
-        </div>
-        <p className="text-muted-foreground text-sm">
+      <div className="mb-6">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="h-4 w-4" />
+          Back to home
+        </Link>
+      </div>
+      <div className="text-center mb-10">
+        <Link href="/" className="inline-flex items-center justify-center mb-6">
+          <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={320} height={80} className="h-16 w-auto dark:hidden" />
+          <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={320} height={80} className="h-16 w-auto hidden dark:block" />
+        </Link>
+        <p className="text-muted-foreground text-lg">
           Evidence-based stuttering training, in your browser
         </p>
       </div>
@@ -62,7 +68,7 @@ export default function LoginPage() {
           </Button>
 
           <div className="text-center">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               By signing in, you agree to our Terms of Service and Privacy Policy
             </p>
           </div>

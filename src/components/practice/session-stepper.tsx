@@ -42,7 +42,7 @@ export function SessionStepper({ currentStep }: SessionStepperProps) {
               </div>
               <span
                 className={cn(
-                  "text-[10px] mt-1.5 font-medium",
+                  "text-sm mt-1.5 font-medium",
                   isCurrent
                     ? "text-primary"
                     : isCompleted

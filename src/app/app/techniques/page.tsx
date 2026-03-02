@@ -121,11 +121,11 @@ export default function TechniquesPage() {
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Wrench className="h-6 w-6 text-primary" />
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          <Wrench className="h-7 w-7 text-primary" />
           Technique Reference
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-lg text-muted-foreground mt-1.5">
           Quick reference for all evidence-based speech techniques
         </p>
       </div>
@@ -140,12 +140,12 @@ export default function TechniquesPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-medium text-sm">{tech.name}</h3>
-                    <Badge variant="secondary" className="text-[10px]">
+                    <h3 className="font-medium text-base">{tech.name}</h3>
+                    <Badge variant="secondary" className="text-xs">
                       {tech.category}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-2">{tech.description}</p>
+                  <p className="text-base text-muted-foreground mb-2">{tech.description}</p>
                   <div className="space-y-1">
                     <p className="text-xs">
                       <span className="font-medium">When to use: </span>

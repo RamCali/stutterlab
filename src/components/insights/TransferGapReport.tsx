@@ -30,11 +30,11 @@ function GapBridge({ gap }: { gap: TransferGap }) {
       <div className="flex items-center gap-2">
         <Badge
           variant="outline"
-          className={`text-[9px] ${getSeverityColor(gap.severity)}`}
+          className={`text-sm ${getSeverityColor(gap.severity)}`}
         >
           {gap.severity}
         </Badge>
-        <span className="text-[10px] text-muted-foreground">
+        <span className="text-sm text-muted-foreground">
           {gap.dataPoints} data points
         </span>
       </div>
@@ -45,12 +45,12 @@ function GapBridge({ gap }: { gap: TransferGap }) {
           <p className={`text-lg font-bold ${getScoreColor(gap.fromScore)}`}>
             {gap.fromScore}
           </p>
-          <p className="text-[10px] text-muted-foreground">{gap.from}</p>
+          <p className="text-sm text-muted-foreground">{gap.from}</p>
         </div>
 
         <div className="flex flex-col items-center gap-0.5">
           <ArrowRight className="h-4 w-4 text-muted-foreground" />
-          <span className="text-[10px] font-bold text-[#FF5252]">
+          <span className="text-sm font-bold text-[#FF5252]">
             -{gap.fluencyDrop}
           </span>
         </div>
@@ -59,11 +59,11 @@ function GapBridge({ gap }: { gap: TransferGap }) {
           <p className={`text-lg font-bold ${getScoreColor(gap.toScore)}`}>
             {gap.toScore}
           </p>
-          <p className="text-[10px] text-muted-foreground">{gap.to}</p>
+          <p className="text-sm text-muted-foreground">{gap.to}</p>
         </div>
       </div>
 
-      <p className="text-[10px] text-muted-foreground">{gap.suggestedBridge}</p>
+      <p className="text-sm text-muted-foreground">{gap.suggestedBridge}</p>
     </div>
   );
 }
@@ -73,14 +73,14 @@ function ExerciseCard({ exercise }: { exercise: BridgingExercise }) {
     <div className="flex items-start gap-3 p-2.5 rounded-lg bg-primary/5 border border-primary/10">
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium">{exercise.title}</p>
-        <p className="text-[10px] text-muted-foreground leading-relaxed mt-0.5">
+        <p className="text-sm text-muted-foreground leading-relaxed mt-0.5">
           {exercise.description}
         </p>
         <div className="flex items-center gap-2 mt-1.5">
-          <Badge variant="secondary" className="text-[9px]">
+          <Badge variant="secondary" className="text-sm">
             {exercise.difficulty}
           </Badge>
-          <span className="text-[9px] text-muted-foreground">
+          <span className="text-sm text-muted-foreground">
             ~{exercise.estimatedMinutes} min
           </span>
         </div>
@@ -135,7 +135,7 @@ export function TransferGapReport({ data }: TransferGapReportProps) {
           </CardTitle>
           <Badge
             variant="outline"
-            className={`text-xs ${getScoreColor(data.overallTransferScore)}`}
+            className={`text-sm ${getScoreColor(data.overallTransferScore)}`}
           >
             Transfer: {data.overallTransferScore}/100
           </Badge>
@@ -152,14 +152,14 @@ export function TransferGapReport({ data }: TransferGapReportProps) {
         {/* Recommendations */}
         {data.recommendations.length > 0 && (
           <div className="space-y-1.5 pt-2 border-t">
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
+            <p className="text-sm text-muted-foreground flex items-center gap-1">
               <Lightbulb className="h-3 w-3" />
               Recommendations
             </p>
             {data.recommendations.map((rec, i) => (
               <p
                 key={i}
-                className="text-xs leading-relaxed p-2 rounded-lg bg-muted/10"
+                className="text-sm leading-relaxed p-2 rounded-lg bg-muted/10"
               >
                 {rec}
               </p>
@@ -170,7 +170,7 @@ export function TransferGapReport({ data }: TransferGapReportProps) {
         {/* Bridging Exercises */}
         {data.bridgingExercises.length > 0 && (
           <div className="space-y-2 pt-2 border-t">
-            <p className="text-xs font-medium">Bridging Exercises</p>
+            <p className="text-sm font-medium">Bridging Exercises</p>
             {data.bridgingExercises.slice(0, 3).map((ex, i) => (
               <ExerciseCard key={i} exercise={ex} />
             ))}

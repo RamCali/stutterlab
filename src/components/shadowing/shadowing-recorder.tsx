@@ -183,7 +183,7 @@ export function ShadowingRecorder({ clip, onSubmit, onCancel }: ShadowingRecorde
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-sm font-semibold">Shadow: {clip.title}</h3>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Technique: {clip.technique} — Listen, then record yourself repeating
             </p>
           </div>
@@ -195,8 +195,8 @@ export function ShadowingRecorder({ clip, onSubmit, onCancel }: ShadowingRecorde
         {/* Step 1: Listen to original */}
         <div className="mb-4 p-3 rounded-lg bg-muted/30">
           <div className="flex items-center gap-2 mb-2">
-            <Badge variant="secondary" className="text-[9px]">Step 1</Badge>
-            <span className="text-xs font-medium">Listen to the Echo</span>
+            <Badge variant="secondary" className="text-sm">Step 1</Badge>
+            <span className="text-sm font-medium">Listen to the Echo</span>
           </div>
           <div className="flex items-center gap-3">
             <Button
@@ -207,7 +207,7 @@ export function ShadowingRecorder({ clip, onSubmit, onCancel }: ShadowingRecorde
             >
               {isPlayingOriginal ? <Pause className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
             </Button>
-            <p className="text-xs text-muted-foreground italic flex-1">
+            <p className="text-sm text-muted-foreground italic flex-1">
               &ldquo;{clip.transcript}&rdquo;
             </p>
           </div>
@@ -216,8 +216,8 @@ export function ShadowingRecorder({ clip, onSubmit, onCancel }: ShadowingRecorde
         {/* Step 2: Record */}
         <div className="p-3 rounded-lg bg-muted/30">
           <div className="flex items-center gap-2 mb-3">
-            <Badge variant="secondary" className="text-[9px]">Step 2</Badge>
-            <span className="text-xs font-medium">
+            <Badge variant="secondary" className="text-sm">Step 2</Badge>
+            <span className="text-sm font-medium">
               {state === "recorded" ? "Review Your Recording" : "Record Your Shadow"}
             </span>
           </div>
@@ -227,7 +227,7 @@ export function ShadowingRecorder({ clip, onSubmit, onCancel }: ShadowingRecorde
               <Button size="lg" className="rounded-full h-16 w-16 p-0" onClick={startRecording}>
                 <Mic className="h-6 w-6" />
               </Button>
-              <p className="text-xs text-muted-foreground mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 Tap to start recording ({clip.durationSeconds}s)
               </p>
             </div>
@@ -250,7 +250,7 @@ export function ShadowingRecorder({ clip, onSubmit, onCancel }: ShadowingRecorde
               >
                 <Square className="h-5 w-5" />
               </Button>
-              <p className="text-xs text-muted-foreground mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 Recording... {formatTime(elapsed)}
               </p>
             </div>
@@ -263,7 +263,7 @@ export function ShadowingRecorder({ clip, onSubmit, onCancel }: ShadowingRecorde
                 <Button
                   variant="outline"
                   size="sm"
-                  className="text-xs"
+                  className="text-sm"
                   onClick={playOriginal}
                 >
                   {isPlayingOriginal ? <Pause className="h-3 w-3 mr-1" /> : <Play className="h-3 w-3 mr-1" />}
@@ -272,7 +272,7 @@ export function ShadowingRecorder({ clip, onSubmit, onCancel }: ShadowingRecorde
                 <Button
                   variant="outline"
                   size="sm"
-                  className="text-xs"
+                  className="text-sm"
                   onClick={playRecording}
                 >
                   {isPlayingRecording ? <Pause className="h-3 w-3 mr-1" /> : <Play className="h-3 w-3 mr-1" />}

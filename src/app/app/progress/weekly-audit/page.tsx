@@ -512,7 +512,7 @@ export default function WeeklyAuditPage() {
                           {report.weekOverWeekChange.percentSSDelta > 0 ? "+" : ""}
                           {report.weekOverWeekChange.percentSSDelta.toFixed(1)}%
                         </p>
-                        <p className="text-[10px] text-muted-foreground">%SS Change</p>
+                        <p className="text-xs text-muted-foreground">%SS Change</p>
                       </div>
                       <div className="text-center">
                         <p className={`text-sm font-bold ${
@@ -521,14 +521,14 @@ export default function WeeklyAuditPage() {
                           {report.weekOverWeekChange.fluencyDelta > 0 ? "+" : ""}
                           {report.weekOverWeekChange.fluencyDelta}
                         </p>
-                        <p className="text-[10px] text-muted-foreground">Fluency Change</p>
+                        <p className="text-xs text-muted-foreground">Fluency Change</p>
                       </div>
                       <div className="text-center">
                         <p className="text-sm font-bold">
                           {report.weekOverWeekChange.rateDelta > 0 ? "+" : ""}
                           {report.weekOverWeekChange.rateDelta.toFixed(0)}
                         </p>
-                        <p className="text-[10px] text-muted-foreground">SPM Change</p>
+                        <p className="text-xs text-muted-foreground">SPM Change</p>
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground mt-2 text-center">
@@ -554,7 +554,7 @@ export default function WeeklyAuditPage() {
                           <Badge variant="secondary" className="text-xs">{data.count}</Badge>
                         </div>
                         {data.examples.length > 0 && (
-                          <p className="text-[10px] text-muted-foreground mt-1 line-clamp-1">
+                          <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
                             e.g. {data.examples.slice(0, 2).join(", ")}
                           </p>
                         )}
@@ -585,7 +585,7 @@ export default function WeeklyAuditPage() {
                         );
                       })}
                     </div>
-                    <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                    <div className="flex justify-between text-xs text-muted-foreground mt-1">
                       <span>0:00</span>
                       <span>{formatTime(elapsedSeconds)}</span>
                     </div>

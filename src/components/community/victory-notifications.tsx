@@ -121,11 +121,11 @@ export function VictoryNotificationToast() {
               <Icon className="h-4 w-4 text-[#00E676]" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs">
+              <p className="text-sm">
                 <span className="font-medium">{notification.anonymousName}</span>{" "}
                 <span className="text-muted-foreground">{label}</span>
               </p>
-              <p className="text-[9px] text-muted-foreground">just now</p>
+              <p className="text-sm text-muted-foreground">just now</p>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
               <button
@@ -174,18 +174,18 @@ export function VictoryFeed() {
   if (victories.length === 0) {
     return (
       <div className="space-y-1.5">
-        <p className="text-xs font-semibold flex items-center gap-1.5">
+        <p className="text-sm font-semibold flex items-center gap-1.5">
           <PartyPopper className="h-3.5 w-3.5 text-primary" />
           Live Victory Feed
         </p>
-        <p className="text-[10px] text-muted-foreground">No victories yet. Be the first!</p>
+        <p className="text-sm text-muted-foreground">No victories yet. Be the first!</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-1.5">
-      <p className="text-xs font-semibold flex items-center gap-1.5">
+      <p className="text-sm font-semibold flex items-center gap-1.5">
         <PartyPopper className="h-3.5 w-3.5 text-primary" />
         Live Victory Feed
       </p>
@@ -197,11 +197,11 @@ export function VictoryFeed() {
         return (
           <div key={notif.id} className="flex items-center gap-2 py-1">
             <Icon className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               <span className="font-medium text-foreground">{notif.anonymousName}</span>{" "}
               {label}
             </p>
-            <span className="text-[9px] text-muted-foreground/60 ml-auto">
+            <span className="text-sm text-muted-foreground/60 ml-auto">
               {minutesAgo}m
             </span>
           </div>

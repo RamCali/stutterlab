@@ -23,10 +23,10 @@ export function SpeedGauge({ currentSPM, target, zone }: SpeedGaugeProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+        <span className="text-sm text-muted-foreground uppercase tracking-wider">
           Speed
         </span>
-        <span className={`text-xs font-mono font-semibold ${zoneColors[zone]}`}>
+        <span className={`text-sm font-mono font-semibold ${zoneColors[zone]}`}>
           {currentSPM > 0 ? `${currentSPM} syl/min` : "—"}
         </span>
       </div>

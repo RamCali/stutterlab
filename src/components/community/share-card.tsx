@@ -71,7 +71,7 @@ export function ShareProgressCard({ data }: { data: ShareCardData }) {
                 <AudioWaveform className="h-3.5 w-3.5 text-white" />
               </div>
               <span className="text-sm font-bold tracking-tight">StutterLab</span>
-              <span className="text-[10px] text-white/50 ml-auto">
+              <span className="text-sm text-white/50 ml-auto">
                 stutterlab.com
               </span>
             </div>
@@ -85,7 +85,7 @@ export function ShareProgressCard({ data }: { data: ShareCardData }) {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{data.streak} day streak</p>
-                  <p className="text-[10px] text-white/50">
+                  <p className="text-sm text-white/50">
                     Consistency rewires neural pathways
                   </p>
                 </div>
@@ -101,7 +101,7 @@ export function ShareProgressCard({ data }: { data: ShareCardData }) {
                     <p className="text-2xl font-bold">
                       {data.fluencyImprovement}% improvement
                     </p>
-                    <p className="text-[10px] text-white/50">
+                    <p className="text-sm text-white/50">
                       Measurable fluency score progress
                     </p>
                   </div>
@@ -112,16 +112,16 @@ export function ShareProgressCard({ data }: { data: ShareCardData }) {
               <div className="flex gap-4 pt-2">
                 <div className="flex-1 p-3 rounded-lg bg-white/5 text-center">
                   <p className="text-lg font-bold">{data.totalSessions}</p>
-                  <p className="text-[9px] text-white/50">Sessions</p>
+                  <p className="text-sm text-white/50">Sessions</p>
                 </div>
                 <div className="flex-1 p-3 rounded-lg bg-white/5 text-center">
                   <p className="text-lg font-bold">{data.daysPracticed}</p>
-                  <p className="text-[9px] text-white/50">Days Practiced</p>
+                  <p className="text-sm text-white/50">Days Practiced</p>
                 </div>
                 {data.favoritetechnique && (
                   <div className="flex-1 p-3 rounded-lg bg-white/5 text-center">
-                    <p className="text-xs font-bold">{data.favoritetechnique}</p>
-                    <p className="text-[9px] text-white/50">Top Technique</p>
+                    <p className="text-sm font-bold">{data.favoritetechnique}</p>
+                    <p className="text-sm text-white/50">Top Technique</p>
                   </div>
                 )}
               </div>
@@ -129,7 +129,7 @@ export function ShareProgressCard({ data }: { data: ShareCardData }) {
 
             {/* Footer */}
             <div className="relative mt-5 pt-3 border-t border-white/10">
-              <p className="text-[10px] text-white/40 text-center">
+              <p className="text-sm text-white/40 text-center">
                 Member since {data.memberSince} — Evidence-based stuttering training
               </p>
             </div>
@@ -160,7 +160,7 @@ export function ShareProgressCard({ data }: { data: ShareCardData }) {
         </Button>
       </div>
 
-      <p className="text-[10px] text-muted-foreground text-center">
+      <p className="text-sm text-muted-foreground text-center">
         Screenshot the card above or tap Share to spread the word.
         Your identity is never shared.
       </p>
@@ -216,12 +216,12 @@ export function ShareProgressPrompt({
         <div className="flex items-center gap-3">
           <Share2 className="h-4 w-4 text-primary flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium">Share your progress</p>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-sm font-medium">Share your progress</p>
+            <p className="text-sm text-muted-foreground">
               Inspire others on their journey
             </p>
           </div>
-          <Button size="sm" variant="outline" className="text-xs" onClick={handleShare}>
+          <Button size="sm" variant="outline" className="text-sm" onClick={handleShare}>
             {shared ? "Shared!" : "Share"}
           </Button>
         </div>

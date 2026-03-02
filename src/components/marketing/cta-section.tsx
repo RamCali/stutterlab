@@ -26,7 +26,7 @@ export function CtaSection({
             <ArrowRight className="h-4 w-4 ml-2" />
           </Link>
         </Button>
-        <p className="text-xs text-muted-foreground mt-3">
+        <p className="text-sm text-muted-foreground mt-3">
           No credit card required. Free tier available forever.
         </p>
       </div>

@@ -73,9 +73,9 @@ function AppShell({ children }: { children: React.ReactNode }) {
           <Flame className="h-4 w-4 text-orange-500" />
           <div className="flex flex-col">
             <span className="text-sm font-semibold leading-tight">{streak} day{streak !== 1 ? "s" : ""}</span>
-            <span className="text-[9px] text-muted-foreground/60 leading-tight">3 of 5 days to keep</span>
+            <span className="text-xs text-muted-foreground/60 leading-tight">3 of 5 days to keep</span>
           </div>
-          <span className="ml-auto text-xs text-muted-foreground font-medium">
+          <span className="ml-auto text-sm text-muted-foreground font-medium">
             {xp.toLocaleString()} XP
           </span>
         </div>
@@ -115,7 +115,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
             Settings
           </Link>
           <div className="flex items-center justify-between px-3 py-1">
-            <span className="text-xs text-muted-foreground">Theme</span>
+            <span className="text-sm text-muted-foreground">Theme</span>
             <ThemeToggle />
           </div>
           <div className="px-3 pt-2">

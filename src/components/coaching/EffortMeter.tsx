@@ -19,10 +19,10 @@ export function EffortMeter({ effort, zone }: EffortMeterProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+        <span className="text-sm text-muted-foreground uppercase tracking-wider">
           Tension
         </span>
-        <span className={`text-[10px] font-medium ${textClass}`}>{label}</span>
+        <span className={`text-sm font-medium ${textClass}`}>{label}</span>
       </div>
       <div className="relative h-1.5 rounded-full bg-muted overflow-hidden">
         <div

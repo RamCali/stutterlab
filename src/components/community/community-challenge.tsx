@@ -88,7 +88,7 @@ export function CommunityChallenges() {
           <Target className="h-5 w-5 text-primary" />
           30-Day Community Challenges
         </h2>
-        <p className="text-xs text-muted-foreground mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Together we achieve what no one can alone. February 2026.
         </p>
       </div>
@@ -108,14 +108,14 @@ export function CommunityChallenges() {
                   <div className="flex items-center gap-2 mb-0.5">
                     <h3 className="font-medium text-sm">{challenge.title}</h3>
                     {isComplete && (
-                      <Badge className="bg-[#00E676] text-black text-[9px]">COMPLETE</Badge>
+                      <Badge className="bg-[#00E676] text-black text-sm">COMPLETE</Badge>
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground mb-3">{challenge.description}</p>
+                  <p className="text-sm text-muted-foreground mb-3">{challenge.description}</p>
 
                   {/* Progress bar */}
                   <div className="space-y-1.5">
-                    <div className="flex items-center justify-between text-[10px]">
+                    <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">
                         {challenge.currentValue.toLocaleString()} / {challenge.goalValue.toLocaleString()} {challenge.goalUnit}
                       </span>
@@ -133,15 +133,15 @@ export function CommunityChallenges() {
 
                   {/* Meta row */}
                   <div className="flex items-center gap-4 mt-2">
-                    <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <span className="flex items-center gap-1 text-sm text-muted-foreground">
                       <Users className="h-3 w-3" />
                       {challenge.participants.toLocaleString()} joined
                     </span>
-                    <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <span className="flex items-center gap-1 text-sm text-muted-foreground">
                       <Clock className="h-3 w-3" />
                       {challenge.endsIn} left
                     </span>
-                    <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <span className="flex items-center gap-1 text-sm text-muted-foreground">
                       <Sparkles className="h-3 w-3 text-amber-500" />
                       +{challenge.xpReward} XP
                     </span>
@@ -149,7 +149,7 @@ export function CommunityChallenges() {
 
                   {/* Your contribution */}
                   {challenge.yourContribution > 0 && (
-                    <p className="text-[10px] text-primary mt-1.5">
+                    <p className="text-sm text-primary mt-1.5">
                       Your contribution: {challenge.yourContribution} {challenge.goalUnit === "streakers" ? "(active)" : challenge.goalUnit}
                     </p>
                   )}
@@ -173,12 +173,12 @@ export function CommunityChallengeCompact() {
       <CardContent className="py-3">
         <div className="flex items-center gap-3 mb-2">
           <Target className="h-4 w-4 text-primary" />
-          <p className="text-xs font-semibold">Community Challenge</p>
-          <Badge variant="secondary" className="text-[9px] ml-auto">
+          <p className="text-sm font-semibold">Community Challenge</p>
+          <Badge variant="secondary" className="text-sm ml-auto">
             {top.endsIn} left
           </Badge>
         </div>
-        <p className="text-xs font-medium mb-1.5">{top.title}</p>
+        <p className="text-sm font-medium mb-1.5">{top.title}</p>
         <div className="flex items-center gap-2">
           <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
             <div
@@ -186,11 +186,11 @@ export function CommunityChallengeCompact() {
               style={{ width: `${pct}%` }}
             />
           </div>
-          <span className="text-[10px] text-muted-foreground font-medium">
+          <span className="text-sm text-muted-foreground font-medium">
             {pct}%
           </span>
         </div>
-        <p className="text-[10px] text-muted-foreground mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           {top.currentValue.toLocaleString()} / {top.goalValue.toLocaleString()} {top.goalUnit} — {top.participants.toLocaleString()} participants
         </p>
       </CardContent>

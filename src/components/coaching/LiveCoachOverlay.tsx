@@ -58,7 +58,7 @@ export function LiveCoachOverlay({
           <div className="flex justify-between items-center">
             <Badge
               variant="outline"
-              className="text-[9px] gap-1 border-primary/30"
+              className="text-sm gap-1 border-primary/30"
             >
               <span className="relative flex h-1.5 w-1.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />

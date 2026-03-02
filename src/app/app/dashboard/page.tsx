@@ -45,12 +45,12 @@ export default function DashboardPage() {
     <div className="p-6 max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold">{greeting}</h1>
-        <div className="flex items-center gap-2 mt-1">
-          <span className="text-sm text-muted-foreground">
+        <h1 className="text-3xl font-bold">{greeting}</h1>
+        <div className="flex items-center gap-2 mt-1.5">
+          <span className="text-base text-muted-foreground">
             Day {currentDay} of 90
           </span>
-          <Badge variant="secondary" className="text-xs">
+          <Badge variant="secondary" className="text-sm">
             {phase.label}
           </Badge>
         </div>
@@ -59,10 +59,10 @@ export default function DashboardPage() {
       {/* Overall Progress */}
       <div>
         <div className="flex items-center justify-between mb-1.5">
-          <span className="text-xs font-medium text-muted-foreground">
+          <span className="text-sm font-medium text-muted-foreground">
             Program Progress
           </span>
-          <span className="text-xs font-bold text-primary">
+          <span className="text-sm font-bold text-primary">
             {progressPercent}%
           </span>
         </div>

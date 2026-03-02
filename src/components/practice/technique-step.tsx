@@ -182,23 +182,23 @@ export function TechniqueStep({
         <Lightbulb className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
         <div>
           <p className="text-sm font-medium">{technique.name}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">{technique.tip}</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{technique.tip}</p>
         </div>
       </div>
 
       {/* Progress + DAF toggle */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Badge variant="secondary" className="text-xs">
+          <Badge variant="secondary" className="text-sm">
             {completedItems.size}/{Math.min(5, items.length)} items
           </Badge>
-          <span className="text-xs text-muted-foreground capitalize">
+          <span className="text-sm text-muted-foreground capitalize">
             {contentLevel}
           </span>
         </div>
         <Badge
           variant={dafEnabled ? "default" : "outline"}
-          className="text-xs cursor-pointer"
+          className="text-sm cursor-pointer"
           onClick={() => setDafEnabled(!dafEnabled)}
         >
           <AudioWaveform className="h-3 w-3 mr-1" />
@@ -308,7 +308,7 @@ export function TechniqueStep({
             </Button>
           )}
 
-          <span className="text-xs text-muted-foreground w-12">
+          <span className="text-sm text-muted-foreground w-12">
             {isRecording ? (
               <span className="text-red-500 animate-pulse flex items-center gap-1">
                 <span className="h-2 w-2 rounded-full bg-red-500" />
@@ -321,7 +321,7 @@ export function TechniqueStep({
         </div>
 
         {dafEnabled && (
-          <p className="text-center text-xs text-primary mt-2 flex items-center justify-center gap-1">
+          <p className="text-center text-sm text-primary mt-2 flex items-center justify-center gap-1">
             <AudioWaveform className="h-3 w-3" />
             DAF Active — 70ms delay
           </p>

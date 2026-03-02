@@ -132,7 +132,7 @@
   --secondary-foreground: #E4E7EB;
   /* Muted */
   --muted: #242A33;
-  --muted-foreground: #8B949E;
+  --muted-foreground: #9CA3AF;
   /* Accent */
   --accent: #242A33;
   --accent-foreground: #E4E7EB;
@@ -165,9 +165,19 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body), var(--font-sans), system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading), var(--font-sans), system-ui, sans-serif;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  p {
+    line-height: 1.6;
   }
 }
 

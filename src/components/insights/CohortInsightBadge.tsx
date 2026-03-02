@@ -51,12 +51,12 @@ export function CohortInsightBadge({ context }: CohortInsightBadgeProps) {
     <div className="flex items-start gap-2.5 p-3 rounded-lg bg-gradient-to-r from-primary/5 to-amber-500/5 border border-primary/10">
       <Users className="h-3.5 w-3.5 text-primary mt-0.5 flex-shrink-0" />
       <div className="space-y-1 min-w-0">
-        <p className="text-[10px] font-medium text-primary uppercase tracking-wide">
+        <p className="text-sm font-medium text-primary uppercase tracking-wide">
           Community Insight
         </p>
-        <p className="text-xs leading-relaxed">{insight.text}</p>
+        <p className="text-sm leading-relaxed">{insight.text}</p>
         {insight.source && (
-          <p className="text-[10px] text-muted-foreground italic">
+          <p className="text-sm text-muted-foreground italic">
             Source: {insight.source}
           </p>
         )}

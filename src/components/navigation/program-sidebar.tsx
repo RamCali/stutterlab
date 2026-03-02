@@ -52,7 +52,7 @@ export function ProgramSidebar({ currentDay }: ProgramSidebarProps) {
             {/* Phase header */}
             <div
               className={cn(
-                "flex items-center gap-2 px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider",
+                "flex items-center gap-2 px-2 py-1.5 text-sm font-bold uppercase tracking-wider",
                 phaseCurrent && "text-primary",
                 phaseCompleted && "text-muted-foreground",
                 phaseFuture && "text-muted-foreground/40"
@@ -148,7 +148,7 @@ function WeekAccordion({
         </span>
 
         {isCurrent && (
-          <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium">
+          <span className="text-sm bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium">
             Now
           </span>
         )}
@@ -166,7 +166,7 @@ function WeekAccordion({
                 href={day.isLocked ? "#" : "/app/practice"}
                 onClick={(e) => day.isLocked && e.preventDefault()}
                 className={cn(
-                  "flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-all",
+                  "flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-all",
                   day.isCurrent && "bg-primary/10 text-primary font-semibold",
                   day.isCompleted && "text-sidebar-foreground/60 hover:bg-sidebar-accent",
                   day.isLocked && "text-muted-foreground/30 cursor-default",
@@ -181,7 +181,7 @@ function WeekAccordion({
                   <Circle className="h-3 w-3 text-muted-foreground/20 flex-shrink-0" />
                 )}
                 <span className="flex-1 truncate">Day {day.dayNumber}</span>
-                <span className="text-[10px] text-muted-foreground/60">
+                <span className="text-sm text-muted-foreground/60">
                   {day.taskCount} tasks
                 </span>
               </Link>

@@ -262,11 +262,11 @@ export default function ProgressPage() {
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <LineChart className="h-6 w-6 text-primary" />
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          <LineChart className="h-7 w-7 text-primary" />
           Progress
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-lg text-muted-foreground mt-1.5">
           Track your improvement with objective data and insights
         </p>
       </div>
@@ -282,12 +282,12 @@ export default function ProgressPage() {
               <div>
                 <h3 className="font-semibold flex items-center gap-2">
                   Monthly Clinical Assessment
-                  <Badge variant="outline" className="text-[10px]">
+                  <Badge variant="outline" className="text-xs">
                     <Crown className="h-2.5 w-2.5 mr-0.5" />
                     PRO
                   </Badge>
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   Read a standardized passage aloud. Get your %SS score, severity rating, and shareable report.
                 </p>
               </div>
@@ -319,12 +319,12 @@ export default function ProgressPage() {
               <div>
                 <h3 className="font-semibold flex items-center gap-2">
                   Weekly Clinical Audit
-                  <Badge variant="outline" className="text-[10px]">
+                  <Badge variant="outline" className="text-xs">
                     <Crown className="h-2.5 w-2.5 mr-0.5" />
                     PRO
                   </Badge>
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   Record a 2-min narrative. Get SSI-4 grade %SS scoring, disfluency breakdown, and week-over-week trends.
                 </p>
               </div>
@@ -370,7 +370,7 @@ export default function ProgressPage() {
             <CardContent className="pt-5 pb-4">
               <stat.icon className={`h-5 w-5 ${stat.color} mb-2`} />
               <p className="text-2xl font-bold">{stat.value}</p>
-              <p className="text-xs text-muted-foreground">{stat.label}</p>
+              <p className="text-sm text-muted-foreground">{stat.label}</p>
             </CardContent>
           </Card>
         ))}
@@ -496,12 +496,12 @@ export default function ProgressPage() {
                   className="flex items-center justify-between p-3 rounded-lg border"
                 >
                   <div>
-                    <p className="text-sm font-medium">
+                    <p className="text-base font-medium">
                       {session.exerciseType?.includes("ai-conversation")
                         ? "AI Conversation"
                         : session.exerciseType?.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Practice Session"}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       {session.exerciseType?.includes(":")
                         ? session.exerciseType.split(":")[1]?.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
                         : ""}{" "}
@@ -516,7 +516,7 @@ export default function ProgressPage() {
                           : `${session.selfRatedFluency}/10`}
                       </Badge>
                     )}
-                    <p className="text-[10px] text-muted-foreground mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       {session.startedAt ? timeAgo(session.startedAt) : ""}
                     </p>
                   </div>
@@ -540,7 +540,7 @@ export default function ProgressPage() {
           {/* Section Header */}
           <div className="flex items-center gap-2 pt-4">
             <Crown className="h-5 w-5 text-amber-500" />
-            <h2 className="text-lg font-bold">Premium Analytics</h2>
+            <h2 className="text-xl font-bold">Premium Analytics</h2>
           </div>
 
           {/* Predictive Coach Card */}
@@ -571,7 +571,7 @@ export default function ProgressPage() {
                 <div className="grid grid-cols-3 gap-3">
                   <div className="text-center p-3 rounded-lg bg-muted/30">
                     <p className="text-2xl font-bold">{aiAnalytics.totalConversations}</p>
-                    <p className="text-[10px] text-muted-foreground">Conversations</p>
+                    <p className="text-xs text-muted-foreground">Conversations</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-muted/30">
                     <p className={`text-2xl font-bold ${
@@ -583,11 +583,11 @@ export default function ProgressPage() {
                     }`}>
                       {aiAnalytics.avgFluency ?? "--"}
                     </p>
-                    <p className="text-[10px] text-muted-foreground">Avg Fluency</p>
+                    <p className="text-xs text-muted-foreground">Avg Fluency</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-muted/30">
                     <p className="text-2xl font-bold">{aiAnalytics.totalAIMinutes}</p>
-                    <p className="text-[10px] text-muted-foreground">Minutes</p>
+                    <p className="text-xs text-muted-foreground">Minutes</p>
                   </div>
                 </div>
 
@@ -642,7 +642,7 @@ export default function ProgressPage() {
                             <span className="text-sm capitalize">
                               {s.name.replace(/-/g, " ")}
                             </span>
-                            <Badge variant="secondary" className="text-[9px]">
+                            <Badge variant="secondary" className="text-xs">
                               {s.count}x
                             </Badge>
                           </div>
@@ -680,7 +680,7 @@ export default function ProgressPage() {
                           <span className="text-xs capitalize">
                             {t.name.replace(/_/g, " ")}
                           </span>
-                          <Badge variant="secondary" className="text-[9px] bg-emerald-500/10 text-emerald-600">
+                          <Badge variant="secondary" className="text-xs bg-emerald-500/10 text-emerald-600">
                             {t.count}x
                           </Badge>
                         </div>
@@ -706,17 +706,17 @@ export default function ProgressPage() {
                 <div className="grid grid-cols-3 gap-3">
                   <div className="text-center p-3 rounded-lg bg-muted/30">
                     <p className="text-2xl font-bold">{fearedWordsData.total}</p>
-                    <p className="text-[10px] text-muted-foreground">Total Words</p>
+                    <p className="text-xs text-muted-foreground">Total Words</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-muted/30">
                     <p className="text-2xl font-bold text-[#00E676]">
                       {fearedWordsData.mastered}
                     </p>
-                    <p className="text-[10px] text-muted-foreground">Mastered</p>
+                    <p className="text-xs text-muted-foreground">Mastered</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-muted/30">
                     <p className="text-2xl font-bold">{fearedWordsData.totalPracticeReps}</p>
-                    <p className="text-[10px] text-muted-foreground">Total Reps</p>
+                    <p className="text-xs text-muted-foreground">Total Reps</p>
                   </div>
                 </div>
 
@@ -746,7 +746,7 @@ export default function ProgressPage() {
                       <p className="text-sm font-bold">
                         {fearedWordsData.byDifficulty[diff]}
                       </p>
-                      <p className="text-[9px] text-muted-foreground capitalize">
+                      <p className="text-xs text-muted-foreground capitalize">
                         {diff}
                       </p>
                     </div>
@@ -812,7 +812,7 @@ export default function ProgressPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="text-center p-3 rounded-lg bg-muted/30">
                     <p className="text-2xl font-bold">{anxietyData.totalSituations}</p>
-                    <p className="text-[10px] text-muted-foreground">Situations Logged</p>
+                    <p className="text-xs text-muted-foreground">Situations Logged</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-muted/30">
                     <div className="flex items-center justify-center gap-1">
@@ -828,7 +828,7 @@ export default function ProgressPage() {
                         {Math.abs(anxietyData.avgAnxietyReduction)}
                       </p>
                     </div>
-                    <p className="text-[10px] text-muted-foreground">Avg Anxiety Drop</p>
+                    <p className="text-xs text-muted-foreground">Avg Anxiety Drop</p>
                   </div>
                 </div>
 
@@ -867,7 +867,7 @@ export default function ProgressPage() {
                         </AreaChart>
                       </ResponsiveContainer>
                     </div>
-                    <div className="flex items-center gap-4 mt-2 text-[10px] text-muted-foreground">
+                    <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <span className="w-2 h-2 rounded-full bg-[#FF5252]" /> Before
                       </span>
@@ -892,7 +892,7 @@ export default function ProgressPage() {
                             {t.type.replace(/_/g, " ")}
                           </span>
                           <div className="flex items-center gap-2">
-                            <Badge variant="secondary" className="text-[9px]">
+                            <Badge variant="secondary" className="text-xs">
                               {t.count}x
                             </Badge>
                             <Badge
@@ -926,8 +926,8 @@ export default function ProgressPage() {
           <CardContent className="py-6">
             <div className="text-center space-y-3">
               <Crown className="h-8 w-8 text-amber-500 mx-auto" />
-              <h3 className="font-bold text-lg">Unlock Premium Analytics</h3>
-              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              <h3 className="font-bold text-xl">Unlock Premium Analytics</h3>
+              <p className="text-base text-muted-foreground max-w-md mx-auto">
                 Get AI conversation insights, feared words mastery tracking,
                 anxiety reduction trends, and technique effectiveness analysis.
               </p>

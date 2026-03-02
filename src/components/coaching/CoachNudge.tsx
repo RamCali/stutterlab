@@ -31,7 +31,7 @@ export function CoachNudge({ nudge }: CoachNudgeProps) {
       className={`border-l-2 rounded-r-md px-2 py-1.5 flex items-center gap-2 animate-in slide-in-from-bottom-2 duration-300 ${styles}`}
     >
       <Icon className="h-3.5 w-3.5 flex-shrink-0" />
-      <span className="text-[11px] font-medium">{nudge.message}</span>
+      <span className="text-sm font-medium">{nudge.message}</span>
     </div>
   );
 }

@@ -352,7 +352,7 @@ export default function AIConversationPage() {
                   <div className="flex items-center gap-2">
                     <Shield className="h-4 w-4 text-amber-500" />
                     <span className="text-sm font-semibold">Stress Simulator</span>
-                    <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-500">BETA</Badge>
+                    <Badge variant="outline" className="text-xs border-amber-500/30 text-amber-500">BETA</Badge>
                   </div>
                   <button
                     onClick={() => setStressMode(!stressMode)}
@@ -442,7 +442,7 @@ export default function AIConversationPage() {
                       Push-to-Talk
                     </button>
                   </div>
-                  <p className="text-[10px] text-muted-foreground/70">
+                  <p className="text-xs text-muted-foreground/70">
                     {turnMode === "auto"
                       ? "Waits 5 seconds of silence (instead of 2) before responding. You can tap \"I'm not done\" for more time."
                       : "You control when your turn ends. Tap \"Done Speaking\" when you're ready for the AI to respond."}

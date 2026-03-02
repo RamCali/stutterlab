@@ -152,11 +152,11 @@ export default function MindfulnessPage() {
 
       <div className="p-6 max-w-5xl mx-auto space-y-6">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Heart className="h-6 w-6 text-primary" />
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <Heart className="h-7 w-7 text-primary" />
             Mindfulness & CBT
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-lg text-muted-foreground mt-1.5">
             Address speaking anxiety with breathing exercises, guided meditation, and cognitive behavioral therapy tools
           </p>
         </div>
@@ -171,12 +171,12 @@ export default function MindfulnessPage() {
               <div className="flex-1">
                 <h3 className="font-semibold flex items-center gap-2">
                   Pre-Speaking Toolkit
-                  <Badge variant="secondary" className="text-[10px]">
+                  <Badge variant="secondary" className="text-xs">
                     <Sparkles className="h-3 w-3 mr-1" />
                     Quick Access
                   </Badge>
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   About to make a phone call or give a presentation? Use the 2-minute calm-down routine.
                 </p>
               </div>
@@ -214,7 +214,7 @@ export default function MindfulnessPage() {
                       <div className="flex items-start justify-between mb-2">
                         <h3 className="font-medium text-sm">{item.title}</h3>
                         {item.isPremium && (
-                          <Badge variant="outline" className="text-[10px]">
+                          <Badge variant="outline" className="text-xs">
                             <Crown className="h-2.5 w-2.5 mr-0.5" />
                             PRO
                           </Badge>

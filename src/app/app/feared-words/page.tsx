@@ -118,11 +118,11 @@ export default function FearedWordsPage() {
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <AlertTriangle className="h-6 w-6 text-primary" />
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          <AlertTriangle className="h-7 w-7 text-primary" />
           Feared Words
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-lg text-muted-foreground mt-1.5">
           Track words you find difficult and practice them at word, phrase, sentence, and story level
         </p>
       </div>
@@ -133,21 +133,21 @@ export default function FearedWordsPage() {
           <CardContent className="pt-5 pb-4 text-center">
             <AlertTriangle className="h-5 w-5 text-amber-500 mx-auto mb-1" />
             <p className="text-2xl font-bold">{stats.total}</p>
-            <p className="text-[10px] text-muted-foreground">Total Words</p>
+            <p className="text-xs text-muted-foreground">Total Words</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5 pb-4 text-center">
             <Star className="h-5 w-5 text-emerald-500 mx-auto mb-1" />
             <p className="text-2xl font-bold">{stats.mastered}</p>
-            <p className="text-[10px] text-muted-foreground">Mastered</p>
+            <p className="text-xs text-muted-foreground">Mastered</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5 pb-4 text-center">
             <RotateCcw className="h-5 w-5 text-blue-500 mx-auto mb-1" />
             <p className="text-2xl font-bold">{stats.practices}</p>
-            <p className="text-[10px] text-muted-foreground">Practices</p>
+            <p className="text-xs text-muted-foreground">Practices</p>
           </CardContent>
         </Card>
       </div>
@@ -216,10 +216,10 @@ export default function FearedWordsPage() {
                         {word.word}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className={`text-[10px] ${diffColors[word.difficulty]}`}>
+                        <span className={`text-xs ${diffColors[word.difficulty]}`}>
                           {word.difficulty}
                         </span>
-                        <span className="text-[10px] text-muted-foreground">
+                        <span className="text-xs text-muted-foreground">
                           {word.practiceCount}x practiced
                         </span>
                       </div>
@@ -259,7 +259,7 @@ export default function FearedWordsPage() {
                       return (
                         <div key={level} className="flex items-center">
                           <div
-                            className={`text-[9px] font-medium w-5 h-5 rounded-full flex items-center justify-center ${
+                            className={`text-xs font-medium w-5 h-5 rounded-full flex items-center justify-center ${
                               isComplete
                                 ? "bg-emerald-500 text-white"
                                 : isCurrent
@@ -282,7 +282,7 @@ export default function FearedWordsPage() {
                     {!hasContent && !isGenerating && (
                       <button
                         onClick={() => generateContent(word)}
-                        className="text-[10px] text-primary ml-2 hover:underline"
+                        className="text-xs text-primary ml-2 hover:underline"
                       >
                         Generate content
                       </button>
@@ -300,12 +300,12 @@ export default function FearedWordsPage() {
         <CardContent className="pt-5 pb-4">
           <div className="flex items-center gap-3">
             <div className="flex-1">
-              <p className="text-sm font-medium">AI Word Suggestions</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-base font-medium">AI Word Suggestions</p>
+              <p className="text-sm text-muted-foreground">
                 Get personalized feared word suggestions based on your speech patterns.
               </p>
             </div>
-            <Badge variant="outline" className="text-[10px]">
+            <Badge variant="outline" className="text-xs">
               <Crown className="h-2.5 w-2.5 mr-0.5" />
               PRO
             </Badge>

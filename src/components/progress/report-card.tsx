@@ -144,7 +144,7 @@ export function ReportCard({ report, previousReport, history }: ReportCardProps)
                   ? `${report.percentSS.toFixed(1)}%`
                   : "—"}
               </p>
-              <p className="text-xs text-muted-foreground">%SS Score</p>
+              <p className="text-sm text-muted-foreground">%SS Score</p>
               {percentSSTrend && (
                 <div className="flex items-center justify-center gap-1 mt-1">
                   {percentSSTrend === "improved" ? (
@@ -155,7 +155,7 @@ export function ReportCard({ report, previousReport, history }: ReportCardProps)
                     <Minus className="h-3 w-3 text-muted-foreground" />
                   )}
                   <span
-                    className={`text-[10px] ${
+                    className={`text-sm ${
                       percentSSTrend === "improved"
                         ? "text-[#00E676]"
                         : percentSSTrend === "worsened"
@@ -177,11 +177,11 @@ export function ReportCard({ report, previousReport, history }: ReportCardProps)
                 {(report.severityRating || "—").charAt(0).toUpperCase() +
                   (report.severityRating || "—").slice(1)}
               </Badge>
-              <p className="text-xs text-muted-foreground mt-2">Severity</p>
+              <p className="text-sm text-muted-foreground mt-2">Severity</p>
             </div>
             <div className="text-center p-4 rounded-lg bg-muted/10">
               <p className="text-2xl font-bold">{report.fluencyScore ?? "—"}</p>
-              <p className="text-xs text-muted-foreground">Fluency Score</p>
+              <p className="text-sm text-muted-foreground">Fluency Score</p>
             </div>
             <div className="text-center p-4 rounded-lg bg-muted/10">
               <p className="text-2xl font-bold">
@@ -189,7 +189,7 @@ export function ReportCard({ report, previousReport, history }: ReportCardProps)
                   ? Math.round(report.speakingRate)
                   : "—"}
               </p>
-              <p className="text-xs text-muted-foreground">syl/min</p>
+              <p className="text-sm text-muted-foreground">syl/min</p>
             </div>
           </div>
 
@@ -208,7 +208,7 @@ export function ReportCard({ report, previousReport, history }: ReportCardProps)
 
           {/* Severity scale */}
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Clinical Severity Scale (%SS)
             </p>
             <div className="flex h-3 rounded-full overflow-hidden">
@@ -217,7 +217,7 @@ export function ReportCard({ report, previousReport, history }: ReportCardProps)
               <div className="bg-[#FF8C00] flex-[3]" title="Moderate: 5-8%" />
               <div className="bg-[#FF5252] flex-[4]" title="Severe: >8%" />
             </div>
-            <div className="flex justify-between text-[10px] text-muted-foreground">
+            <div className="flex justify-between text-sm text-muted-foreground">
               <span>0%</span>
               <span>3%</span>
               <span>5%</span>
@@ -241,7 +241,7 @@ export function ReportCard({ report, previousReport, history }: ReportCardProps)
           {/* Recommendations */}
           {recommendations?.recommendations && (
             <div>
-              <p className="text-xs text-muted-foreground mb-2">
+              <p className="text-sm text-muted-foreground mb-2">
                 Recommendations
               </p>
               <ul className="space-y-1">

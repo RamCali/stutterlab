@@ -36,7 +36,7 @@ export function PremiumGate({
       <div className="relative">
         {trialDaysLeft !== undefined && trialDaysLeft > 0 && (
           <div className="mb-3 flex justify-end">
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-sm">
               <Clock className="h-3 w-3 mr-1" />
               {trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} left in trial
             </Badge>
@@ -61,7 +61,7 @@ export function PremiumGate({
               <Sparkles className="h-4 w-4 text-primary" />
               {featureName}
             </h3>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-base text-muted-foreground mt-1">
               {isExpiredTrial
                 ? "Your free trial has ended. Upgrade to Premium to keep using this feature."
                 : description}
@@ -72,7 +72,7 @@ export function PremiumGate({
           <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-muted">
             <button
               onClick={() => setInterval("month")}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 interval === "month"
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
@@ -82,14 +82,14 @@ export function PremiumGate({
             </button>
             <button
               onClick={() => setInterval("year")}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 interval === "year"
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
               $999/yr
-              <span className="ml-1 text-[10px] text-emerald-500">Save $189</span>
+              <span className="ml-1 text-sm text-emerald-500">Save $189</span>
             </button>
           </div>
 
@@ -100,7 +100,7 @@ export function PremiumGate({
               : "Start 7-Day Free Trial"}
           </Button>
           {!isExpiredTrial && (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Full access for 7 days, then {interval === "month" ? "$99/month" : "$999/year"}. Cancel anytime.
             </p>
           )}

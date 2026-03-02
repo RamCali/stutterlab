@@ -45,17 +45,17 @@ export function NorthStarCard() {
             <Star className="h-5 w-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-muted-foreground mb-1">
+            <p className="text-sm font-medium text-muted-foreground mb-1">
               Your North Star
             </p>
-            <p className="text-sm font-semibold leading-snug">{goal}</p>
+            <p className="text-base font-semibold leading-snug">{goal}</p>
             {challengeLabels.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {challengeLabels.map((c) => (
                   <Badge
                     key={c!.id}
                     variant="secondary"
-                    className="text-[10px] px-1.5 py-0"
+                    className="text-sm px-1.5 py-0.5"
                   >
                     {c!.emoji} {c!.label}
                   </Badge>

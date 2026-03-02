@@ -385,7 +385,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
         <p className="text-sm text-muted-foreground mb-2 text-center max-w-sm">
           {scenarioInfo.prompt}
         </p>
-        <p className="text-xs text-muted-foreground mb-6 text-center max-w-xs">
+        <p className="text-sm text-muted-foreground mb-6 text-center max-w-xs">
           Use your techniques from the previous step. The AI will speak first — then tap the mic to reply with your voice.
         </p>
         <Button size="lg" onClick={startConversation}>
@@ -404,7 +404,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
       <div className="flex items-center justify-between mb-3">
         <div>
           <p className="text-sm font-medium">{scenarioInfo.title}</p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Turn {turnCount} — {canFinish ? "You can finish anytime" : `${3 - turnCount} more turn${3 - turnCount !== 1 ? "s" : ""}`}
           </p>
         </div>
@@ -427,7 +427,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
                 : "bg-muted/50 mr-8"
             }`}
           >
-            <span className="text-[10px] text-muted-foreground uppercase block mb-1">
+            <span className="text-sm text-muted-foreground uppercase block mb-1">
               {msg.role === "user" ? "You" : "AI"}
             </span>
             {msg.content}
@@ -440,7 +440,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
         )}
         {listening && transcript && (
           <div className="bg-primary/10 ml-8 p-3 rounded-lg border border-primary/20">
-            <span className="text-[10px] text-muted-foreground uppercase block mb-1">
+            <span className="text-sm text-muted-foreground uppercase block mb-1">
               You (listening...)
             </span>
             <span className="text-sm italic text-muted-foreground">{transcript}</span>
@@ -452,7 +452,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
       {/* Voice controls */}
       <div className="border-t pt-4">
         {/* Status */}
-        <p className="text-center text-xs text-muted-foreground mb-3">
+        <p className="text-center text-sm text-muted-foreground mb-3">
           {speaking && <Volume2 className="h-3 w-3 inline mr-1 animate-pulse" />}
           {statusText}
         </p>
@@ -487,7 +487,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
         </div>
 
         {listening && (
-          <p className="text-center text-xs text-red-500 animate-pulse mt-2 flex items-center justify-center gap-1">
+          <p className="text-center text-sm text-red-500 animate-pulse mt-2 flex items-center justify-center gap-1">
             <span className="h-2 w-2 rounded-full bg-red-500" />
             Listening...
           </p>

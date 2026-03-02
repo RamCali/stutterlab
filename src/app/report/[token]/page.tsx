@@ -118,7 +118,7 @@ export default async function SharedReportPage({
                 <div className="bg-[#FF8C00] flex-[3]" title="Moderate: 5-8%" />
                 <div className="bg-[#FF5252] flex-[4]" title="Severe: >8%" />
               </div>
-              <div className="flex justify-between text-[10px] text-muted-foreground">
+              <div className="flex justify-between text-xs text-muted-foreground">
                 <span>0%</span>
                 <span>3%</span>
                 <span>5%</span>

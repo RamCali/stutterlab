@@ -80,7 +80,7 @@ export function AccountabilityBuddy() {
         <CardContent className="py-6 text-center">
           <UserCheck className="h-8 w-8 text-primary mx-auto mb-3" />
           <h3 className="font-semibold text-sm mb-1">Accountability Buddy</h3>
-          <p className="text-xs text-muted-foreground mb-4 max-w-sm mx-auto">
+          <p className="text-sm text-muted-foreground mb-4 max-w-sm mx-auto">
             Get paired with an anonymous practice partner. See each other&apos;s streaks
             and cheer each other on — without revealing identities.
           </p>
@@ -98,7 +98,7 @@ export function AccountabilityBuddy() {
       <CardContent className="py-4">
         <div className="flex items-center gap-2 mb-3">
           <UserCheck className="h-4 w-4 text-primary" />
-          <p className="text-xs font-semibold">Your Accountability Buddy</p>
+          <p className="text-sm font-semibold">Your Accountability Buddy</p>
         </div>
 
         <div className="flex items-center gap-4">
@@ -114,14 +114,14 @@ export function AccountabilityBuddy() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <p className="text-sm font-medium">{buddy.buddyName}</p>
-              <Badge variant="secondary" className="text-[9px]">Paired</Badge>
+              <Badge variant="secondary" className="text-sm">Paired</Badge>
             </div>
             <div className="flex items-center gap-3 mt-1">
-              <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+              <span className="flex items-center gap-1 text-sm text-muted-foreground">
                 <Flame className="h-3 w-3 text-orange-500" />
                 {buddy.sharedStreak} day streak
               </span>
-              <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+              <span className="flex items-center gap-1 text-sm text-muted-foreground">
                 <Clock className="h-3 w-3" />
                 {timeAgo(buddy.lastActiveAt)}
               </span>
@@ -132,7 +132,7 @@ export function AccountabilityBuddy() {
             <Button
               size="sm"
               variant={cheered ? "default" : "outline"}
-              className="text-xs"
+              className="text-sm"
               onClick={cheerBuddy}
             >
               {cheered ? (
@@ -152,11 +152,11 @@ export function AccountabilityBuddy() {
 
         {/* Streak shield offer */}
         <div className="mt-3 flex items-center justify-between p-2 rounded-lg bg-muted/30">
-          <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+          <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Shield className="h-3 w-3 text-blue-500" />
             Send a Streak Shield to protect their streak
           </span>
-          <Button size="sm" variant="ghost" className="text-[10px] h-6 px-2">
+          <Button size="sm" variant="ghost" className="text-sm h-6 px-2">
             Gift
           </Button>
         </div>
@@ -203,8 +203,8 @@ export function AccountabilityBuddyCompact() {
               <UserCheck className="h-4 w-4 text-primary" />
             </div>
             <div className="flex-1">
-              <p className="text-xs font-medium">Find an Accountability Buddy</p>
-              <p className="text-[10px] text-muted-foreground">
+              <p className="text-sm font-medium">Find an Accountability Buddy</p>
+              <p className="text-sm text-muted-foreground">
                 Anonymous partner to keep you on track
               </p>
             </div>
@@ -219,14 +219,14 @@ export function AccountabilityBuddyCompact() {
       <CardContent className="py-3">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-xs">
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-sm">
               {buddy.buddyName.split(" ").map((w) => w[0]).join("")}
             </div>
             <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#00E676] border-2 border-background" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium">{buddy.buddyName}</p>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-sm font-medium">{buddy.buddyName}</p>
+            <p className="text-sm text-muted-foreground">
               <Flame className="h-2.5 w-2.5 inline text-orange-500" /> {buddy.sharedStreak} day streak
             </p>
           </div>

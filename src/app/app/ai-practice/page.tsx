@@ -159,11 +159,11 @@ export default function AIPracticePage() {
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Brain className="h-6 w-6 text-primary" />
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          <Brain className="h-7 w-7 text-primary" />
           AI Situation Simulators
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-lg text-muted-foreground mt-1.5">
           Practice real-world speaking scenarios with an AI partner that adapts
           to your fluency level. Not scripted -- every conversation is unique.
         </p>
@@ -187,14 +187,14 @@ export default function AIPracticePage() {
               <Phone className="h-6 w-6 text-red-500" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold flex items-center gap-2">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
                 Phone Call Simulator
-                <Badge variant="secondary" className="text-[10px]">
+                <Badge variant="secondary" className="text-xs">
                   <Sparkles className="h-3 w-3 mr-1" />
                   New
                 </Badge>
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-base text-muted-foreground">
                 The most realistic phone practice available. The AI &ldquo;calls&rdquo; you
                 with a ring sound -- pick up and have a natural conversation.
                 Designed specifically for phone anxiety.
@@ -206,8 +206,8 @@ export default function AIPracticePage() {
 
       {/* Scenarios Grid */}
       {prioritizedIds.size > 0 && (
-        <p className="text-xs text-muted-foreground flex items-center gap-1">
-          <Star className="h-3 w-3 text-amber-500" />
+        <p className="text-sm text-muted-foreground flex items-center gap-1">
+          <Star className="h-3.5 w-3.5 text-amber-500" />
           Scenarios marked with a star are prioritized based on your profile
         </p>
       )}
@@ -225,23 +225,23 @@ export default function AIPracticePage() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-sm">{scenario.title}</h3>
+                      <h3 className="font-semibold text-base">{scenario.title}</h3>
                       {isLocked && <Lock className="h-3 w-3 text-muted-foreground" />}
                       {prioritizedIds.has(scenario.id) && (
                         <Star className="h-3 w-3 text-amber-500 fill-amber-500 flex-shrink-0" />
                       )}
                       {scenario.isPhoneSimulator && (
-                        <Badge variant="outline" className="text-[10px]">
+                        <Badge variant="outline" className="text-xs">
                           Phone Sim
                         </Badge>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-sm text-muted-foreground mt-1.5">
                       {scenario.description}
                     </p>
                     <Badge
                       variant="secondary"
-                      className={`mt-3 text-[10px] ${difficultyColors[scenario.difficulty]}`}
+                      className={`mt-3 text-xs ${difficultyColors[scenario.difficulty]}`}
                     >
                       {scenario.difficulty}
                     </Badge>

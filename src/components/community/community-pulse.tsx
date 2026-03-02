@@ -102,8 +102,8 @@ export function CommunityPulseCompact() {
       <CardContent className="py-4">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="h-4 w-4 text-primary" />
-          <p className="text-xs font-semibold">Community Pulse</p>
-          <Badge variant="secondary" className="text-[9px] ml-auto">
+          <p className="text-sm font-semibold">Community Pulse</p>
+          <Badge variant="secondary" className="text-sm ml-auto">
             LIVE
           </Badge>
         </div>
@@ -112,19 +112,19 @@ export function CommunityPulseCompact() {
             <p className="text-lg font-bold text-primary">
               <AnimatedCounter target={stats.activePractitioners} />
             </p>
-            <p className="text-[9px] text-muted-foreground">Practicing</p>
+            <p className="text-sm text-muted-foreground">Practicing</p>
           </div>
           <div>
             <p className="text-lg font-bold text-[#00E676]">
               <AnimatedCounter target={stats.percentFeelBetter} suffix="%" />
             </p>
-            <p className="text-[9px] text-muted-foreground">Feel Better</p>
+            <p className="text-sm text-muted-foreground">Feel Better</p>
           </div>
           <div>
             <p className="text-lg font-bold text-orange-500">
               <AnimatedCounter target={stats.realWorldVictories} />
             </p>
-            <p className="text-[9px] text-muted-foreground">Victories</p>
+            <p className="text-sm text-muted-foreground">Victories</p>
           </div>
         </div>
       </CardContent>
@@ -200,7 +200,7 @@ export function CommunityPulseFull() {
           <Sparkles className="h-5 w-5 text-primary" />
           Weekly Community Pulse
         </h2>
-        <p className="text-xs text-muted-foreground mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           {stats.weekLabel} — Anonymous, aggregate stats from our community
         </p>
       </div>
@@ -214,7 +214,7 @@ export function CommunityPulseFull() {
           <p className="text-sm text-muted-foreground mt-1">
             people practiced this week
           </p>
-          <p className="text-xs text-muted-foreground/70 mt-2">
+          <p className="text-sm text-muted-foreground/70 mt-2">
             Every session rewires neural pathways. Together, we&apos;re stronger.
           </p>
         </CardContent>
@@ -231,8 +231,8 @@ export function CommunityPulseFull() {
               <p className={`text-2xl font-bold ${stat.color}`}>
                 <AnimatedCounter target={stat.value} suffix={stat.suffix} />
               </p>
-              <p className="text-[10px] font-medium mt-0.5">{stat.label}</p>
-              <p className="text-[9px] text-muted-foreground mt-0.5">{stat.detail}</p>
+              <p className="text-sm font-medium mt-0.5">{stat.label}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">{stat.detail}</p>
             </CardContent>
           </Card>
         ))}

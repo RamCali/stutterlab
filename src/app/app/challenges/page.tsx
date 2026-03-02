@@ -101,11 +101,11 @@ export default function ChallengesPage() {
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Zap className="h-6 w-6 text-primary" />
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          <Zap className="h-7 w-7 text-primary" />
           Challenges & Achievements
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-lg text-muted-foreground mt-1.5">
           Real-world practice missions to build lasting confidence
         </p>
       </div>
@@ -116,21 +116,21 @@ export default function ChallengesPage() {
           <CardContent className="pt-5 pb-4 text-center">
             <Trophy className="h-5 w-5 text-yellow-500 mx-auto mb-1" />
             <p className="text-2xl font-bold">{loading ? "..." : stats?.totalXp ?? 0}</p>
-            <p className="text-[10px] text-muted-foreground">Total XP</p>
+            <p className="text-xs text-muted-foreground">Total XP</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5 pb-4 text-center">
             <Star className="h-5 w-5 text-primary mx-auto mb-1" />
             <p className="text-2xl font-bold">{loading ? "..." : level?.level ?? 1}</p>
-            <p className="text-[10px] text-muted-foreground">{level?.title ?? "Beginner"}</p>
+            <p className="text-xs text-muted-foreground">{level?.title ?? "Beginner"}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5 pb-4 text-center">
             <Flame className="h-5 w-5 text-orange-500 mx-auto mb-1" />
             <p className="text-2xl font-bold">{loading ? "..." : stats?.currentStreak ?? 0}</p>
-            <p className="text-[10px] text-muted-foreground">Day Streak</p>
+            <p className="text-xs text-muted-foreground">Day Streak</p>
           </CardContent>
         </Card>
         <Card>
@@ -139,7 +139,7 @@ export default function ChallengesPage() {
             <p className="text-2xl font-bold">
               {loading ? "..." : `${unlockedCount}/${achievements.length}`}
             </p>
-            <p className="text-[10px] text-muted-foreground">Achievements</p>
+            <p className="text-xs text-muted-foreground">Achievements</p>
           </CardContent>
         </Card>
       </div>
@@ -180,15 +180,15 @@ export default function ChallengesPage() {
                     <h3 className="font-semibold">{todayData.challenge.title}</h3>
                     <Badge
                       variant="outline"
-                      className={`text-[10px] ${DIFFICULTY_COLORS[todayData.challenge.difficulty]}`}
+                      className={`text-xs ${DIFFICULTY_COLORS[todayData.challenge.difficulty]}`}
                     >
                       {todayData.challenge.difficulty}
                     </Badge>
-                    <Badge variant="secondary" className="text-[10px]">
+                    <Badge variant="secondary" className="text-xs">
                       +{todayData.challenge.xpReward} XP
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-base text-muted-foreground">
                     {todayData.challenge.description}
                   </p>
                 </div>
@@ -224,7 +224,7 @@ export default function ChallengesPage() {
                     )}
                     I Did It!
                   </Button>
-                  <p className="text-[10px] text-muted-foreground mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     Complete this challenge in real life, then tap &quot;I Did It&quot; to earn XP.
                   </p>
                 </div>
@@ -240,16 +240,16 @@ export default function ChallengesPage() {
 
       {/* Achievements */}
       <div>
-        <h2 className="text-lg font-semibold mb-3">Achievements</h2>
+        <h2 className="text-xl font-semibold mb-3">Achievements</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {achievements.map((a) => (
             <Card key={a.id} className={a.unlocked ? "border-primary/20" : "opacity-40"}>
               <CardContent className="pt-4 pb-3 text-center">
                 <span className="text-2xl">{a.emoji}</span>
                 <p className="font-medium text-xs mt-1">{a.title}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{a.description}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{a.description}</p>
                 {a.unlocked && (
-                  <Badge variant="secondary" className="mt-1.5 text-[9px]">
+                  <Badge variant="secondary" className="mt-1.5 text-xs">
                     +{a.xpReward} XP
                   </Badge>
                 )}

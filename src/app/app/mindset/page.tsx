@@ -74,11 +74,11 @@ export default function MindsetPage() {
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Lightbulb className="h-6 w-6 text-primary" />
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <Lightbulb className="h-7 w-7 text-primary" />
             Mindset
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-lg text-muted-foreground mt-1.5">
             Challenge unhelpful thoughts and test your predictions
           </p>
         </div>
@@ -90,7 +90,7 @@ export default function MindsetPage() {
           <CardContent className="pt-5 pb-4 text-center">
             <Brain className="h-5 w-5 text-purple-500 mx-auto mb-1" />
             <p className="text-2xl font-bold">{stats.total}</p>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               Thoughts Challenged
             </p>
           </CardContent>
@@ -99,7 +99,7 @@ export default function MindsetPage() {
           <CardContent className="pt-5 pb-4 text-center">
             <Target className="h-5 w-5 text-red-500 mx-auto mb-1" />
             <p className="text-2xl font-bold">{stats.totalTraps}</p>
-            <p className="text-[10px] text-muted-foreground">Traps Caught</p>
+            <p className="text-xs text-muted-foreground">Traps Caught</p>
           </CardContent>
         </Card>
         <Card>
@@ -108,7 +108,7 @@ export default function MindsetPage() {
             <p className="text-2xl font-bold">
               {store.predictions.filter((p) => p.completed).length}
             </p>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               Predictions Tested
             </p>
           </CardContent>
@@ -149,7 +149,7 @@ export default function MindsetPage() {
               <Card className="border-dashed border-muted-foreground/30">
                 <CardContent className="pt-4 pb-3">
                   <div className="flex items-center gap-2 mb-3">
-                    <Badge variant="secondary" className="text-[10px] bg-amber-500/10 text-amber-600">
+                    <Badge variant="secondary" className="text-xs bg-amber-500/10 text-amber-600">
                       Example
                     </Badge>
                     <span className="text-xs text-muted-foreground">
@@ -191,8 +191,8 @@ export default function MindsetPage() {
 
               <div className="text-center py-8 text-muted-foreground">
                 <Brain className="h-10 w-10 mx-auto mb-3 opacity-50" />
-                <p className="font-medium">No thought records yet</p>
-                <p className="text-sm mt-1">
+                <p className="text-lg font-medium">No thought records yet</p>
+                <p className="text-base mt-1">
                   Capture an unhelpful thought to start challenging thinking traps.
                 </p>
               </div>
@@ -226,8 +226,8 @@ export default function MindsetPage() {
           {store.predictions.length === 0 && (
             <div className="text-center py-12 text-muted-foreground">
               <FlaskConical className="h-10 w-10 mx-auto mb-3 opacity-50" />
-              <p className="font-medium">No predictions yet</p>
-              <p className="text-sm mt-1">
+              <p className="text-lg font-medium">No predictions yet</p>
+              <p className="text-base mt-1">
                 Before a scary situation, predict what will happen — then see how
                 reality compares.
               </p>
@@ -280,8 +280,8 @@ export default function MindsetPage() {
                 <BookOpen className="h-5 w-5 text-purple-500" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium">Learn About Thinking Traps</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-base font-medium">Learn About Thinking Traps</p>
+                <p className="text-sm text-muted-foreground">
                   Understand the 6 common thought patterns that increase
                   stuttering anxiety
                 </p>
@@ -324,7 +324,7 @@ function ThoughtRecordCard({
                 <Badge
                   key={e.name}
                   variant="secondary"
-                  className="text-[10px] bg-amber-500/10 text-amber-600"
+                  className="text-xs bg-amber-500/10 text-amber-600"
                 >
                   {e.name}
                 </Badge>
@@ -340,7 +340,7 @@ function ThoughtRecordCard({
                   <Badge
                     key={trap}
                     variant="secondary"
-                    className={`text-[9px] ${info?.color ?? ""}`}
+                    className={`text-xs ${info?.color ?? ""}`}
                   >
                     {info?.emoji} {info?.name}
                   </Badge>
@@ -426,14 +426,14 @@ function PredictionCard({
           </span>
           <Badge
             variant="secondary"
-            className="text-[10px] bg-blue-500/10 text-blue-600"
+            className="text-xs bg-blue-500/10 text-blue-600"
           >
             Anxiety: {prediction.anxietyBefore}/10
           </Badge>
           {prediction.completed && prediction.anxietyAfter !== null && (
             <Badge
               variant="secondary"
-              className={`text-[10px] ${
+              className={`text-xs ${
                 prediction.anxietyAfter < prediction.anxietyBefore
                   ? "bg-emerald-500/10 text-emerald-600"
                   : "bg-amber-500/10 text-amber-600"

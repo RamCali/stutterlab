@@ -51,18 +51,18 @@ function TechniqueRow({ data }: { data: TechniqueMasteryData }) {
           <span className="text-sm font-medium">{label}</span>
           <Badge
             variant="outline"
-            className={`text-[9px] ${getMasteryColor(data.masteryLevel)}`}
+            className={`text-sm ${getMasteryColor(data.masteryLevel)}`}
           >
             {data.masteryLevel}
           </Badge>
           <TrendIcon trend={data.trend} />
         </div>
-        <span className="text-xs text-muted-foreground">
+        <span className="text-sm text-muted-foreground">
           {data.totalDetections} uses
         </span>
       </div>
       <Progress value={progressPercent} className="h-1.5" />
-      <div className="flex justify-between text-[10px] text-muted-foreground">
+      <div className="flex justify-between text-sm text-muted-foreground">
         <span>
           {Math.round(data.highConfidenceRate * 100)}% high confidence
         </span>
@@ -107,7 +107,7 @@ export function TechniqueMastery({ data }: TechniqueMasteryProps) {
             <Zap className="h-4 w-4 text-primary" />
             Technique Mastery
           </CardTitle>
-          <Badge variant="secondary" className="text-xs">
+          <Badge variant="secondary" className="text-sm">
             {data.overallMasteryScore}/100
           </Badge>
         </div>
@@ -126,7 +126,7 @@ export function TechniqueMastery({ data }: TechniqueMasteryProps) {
         {/* Unpracticed techniques */}
         {data.techniques.some((t) => t.totalDetections === 0) && (
           <div>
-            <p className="text-[10px] text-muted-foreground mb-1.5">
+            <p className="text-sm text-muted-foreground mb-1.5">
               Not yet practiced:
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -136,7 +136,7 @@ export function TechniqueMastery({ data }: TechniqueMasteryProps) {
                   <Badge
                     key={t.technique}
                     variant="outline"
-                    className="text-[10px] text-muted-foreground"
+                    className="text-sm text-muted-foreground"
                   >
                     {TECHNIQUE_LABELS[t.technique] || t.technique}
                   </Badge>
@@ -148,14 +148,14 @@ export function TechniqueMastery({ data }: TechniqueMasteryProps) {
         {/* Recommendations */}
         {data.recommendations.length > 0 && (
           <div className="space-y-1.5 pt-2 border-t">
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
+            <p className="text-sm text-muted-foreground flex items-center gap-1">
               <Lightbulb className="h-3 w-3" />
               Recommendations
             </p>
             {data.recommendations.map((rec, i) => (
               <p
                 key={i}
-                className="text-xs leading-relaxed p-2 rounded-lg bg-primary/5"
+                className="text-sm leading-relaxed p-2 rounded-lg bg-primary/5"
               >
                 {rec}
               </p>

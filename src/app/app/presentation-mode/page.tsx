@@ -319,7 +319,7 @@ export default function PresentationModePage() {
             <Mic className="h-12 w-12" />
           )}
           {running && (
-            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[10px] font-medium px-2 py-0.5 rounded-full bg-red-500/20 text-red-400">
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-xs font-medium px-2 py-0.5 rounded-full bg-red-500/20 text-red-400">
               TAP TO STOP
             </span>
           )}
@@ -335,7 +335,7 @@ export default function PresentationModePage() {
             </p>
             {/* Compact Level Meter */}
             <div className="w-48 mx-auto">
-              <div className="flex items-center gap-2 text-[10px] text-muted-foreground mb-1">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
                 <Volume2 className="h-3 w-3" />
                 Input
               </div>

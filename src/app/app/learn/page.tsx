@@ -167,11 +167,11 @@ export default function LearnPage() {
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <GraduationCap className="h-6 w-6 text-primary" />
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          <GraduationCap className="h-7 w-7 text-primary" />
           Learn
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-lg text-muted-foreground mt-1.5">
           10 evidence-based modules covering everything from breathing to real-world confidence
         </p>
       </div>
@@ -179,7 +179,7 @@ export default function LearnPage() {
       {/* Science banner */}
       <Card className="border-primary/20 bg-primary/5">
         <CardContent className="py-3">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             <span className="font-medium text-foreground">Backed by neuroscience.</span>{" "}
             Stuttering is a neurodevelopmental disorder with ~70% genetic basis. fMRI studies show
             structural differences in speech motor areas. Every technique in this app targets these
@@ -210,7 +210,7 @@ export default function LearnPage() {
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-muted-foreground">Module {mod.id}</span>
                       {mod.isPremium && (
-                        <Badge variant="outline" className="text-[10px]">
+                        <Badge variant="outline" className="text-xs">
                           <Crown className="h-2.5 w-2.5 mr-0.5" />
                           PRO
                         </Badge>
