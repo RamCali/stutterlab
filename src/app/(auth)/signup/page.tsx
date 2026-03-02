@@ -54,7 +54,7 @@ export default function SignupPage() {
           </div>
 
           <Badge variant="secondary" className="w-full justify-center py-1">
-            7 days free, then $9.99/month
+            7 days free, then $99/month
           </Badge>
 
           <Button
