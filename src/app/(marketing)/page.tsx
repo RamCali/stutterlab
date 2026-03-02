@@ -28,6 +28,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { SuccessStoriesLanding } from "@/components/community/success-stories";
 
 const painPoints = [
   {
@@ -537,6 +538,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ═══ Real Stories ═══ */}
+      <SuccessStoriesLanding />
 
       {/* ═══ The Science ═══ */}
       <section className="py-20 px-6">

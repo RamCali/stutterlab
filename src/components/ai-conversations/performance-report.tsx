@@ -22,6 +22,9 @@ import {
   Shield,
 } from "lucide-react";
 import type { TurnMetrics } from "@/lib/audio/VoiceConversation";
+import { SessionScorecard } from "@/components/insights/SessionScorecard";
+import { CohortInsightBadge } from "@/components/insights/CohortInsightBadge";
+import type { SessionScorecard as SessionScorecardType, SessionComparison } from "@/lib/analysis/types";
 
 interface PerformanceReportProps {
   turns: TurnMetrics[];
@@ -30,6 +33,8 @@ interface PerformanceReportProps {
   onBack: () => void;
   xpEarned?: number;
   stressLevel?: number;
+  scorecard?: SessionScorecardType;
+  comparison?: SessionComparison;
 }
 
 export function PerformanceReport({
@@ -39,6 +44,8 @@ export function PerformanceReport({
   onBack,
   xpEarned,
   stressLevel,
+  scorecard,
+  comparison,
 }: PerformanceReportProps) {
   const userTurns = turns.filter((t) => t.role === "user");
   const totalDisfluencies = userTurns.reduce(
@@ -249,6 +256,11 @@ export function PerformanceReport({
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Multi-Dimension Scorecard */}
+      {scorecard && (
+        <SessionScorecard scorecard={scorecard} />
       )}
 
       <Card>
@@ -541,6 +553,14 @@ export function PerformanceReport({
           </div>
         </CardContent>
       </Card>
+
+      {/* Community Insight */}
+      <CohortInsightBadge
+        context={{
+          page: "ai-practice",
+          scenario: scenario.toLowerCase().replace(/\s+/g, "-"),
+        }}
+      />
     </div>
   );
 }

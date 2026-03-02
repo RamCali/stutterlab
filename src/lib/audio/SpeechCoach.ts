@@ -15,6 +15,8 @@ import {
   type TranscriptSegment,
 } from "./SpeechAnalyzer";
 import { CoachAudioCues, type AudioCueConfig } from "./CoachAudioCues";
+import { EmotionDetector } from "./EmotionDetector";
+import type { EmotionalState, EmotionSnapshot } from "@/lib/analysis/types";
 
 // ======================== TYPES ========================
 
@@ -73,6 +75,10 @@ export interface CoachingSnapshot {
   sessionTechniqueCounts: Record<TechniqueType, number>;
   metrics: SpeechMetrics;
   totalNudgesGiven: number;
+  // Emotional state (Feature 3)
+  emotionalState?: EmotionalState;
+  emotionConfidence?: number;
+  emotionIndicators?: string[];
 }
 
 export interface SpeechCoachCallbacks {
@@ -122,6 +128,8 @@ const EMPTY_METRICS: SpeechMetrics = {
 
 export class SpeechCoach {
   private analyzer: SpeechAnalyzer | null = null;
+  private emotionDetector: EmotionDetector | null = null;
+  private latestEmotion: EmotionSnapshot | null = null;
   private analyserNode: AnalyserNode | null;
   private config: CoachingConfig;
   private callbacks: SpeechCoachCallbacks;
@@ -199,6 +207,16 @@ export class SpeechCoach {
 
     this.isRunning = true;
 
+    // Start EmotionDetector (Feature 3)
+    if (this.analyserNode) {
+      this.emotionDetector = new EmotionDetector(this.analyserNode, {
+        onStateChange: (snapshot) => {
+          this.latestEmotion = snapshot;
+        },
+      });
+      this.emotionDetector.start();
+    }
+
     // Start amplitude envelope tracking (~30fps) for gentle onset
     if (this.analyserNode) {
       this.timeDomainData = new Uint8Array(this.analyserNode.fftSize);
@@ -219,6 +237,11 @@ export class SpeechCoach {
     if (this.analyzer) {
       this.latestMetrics = this.analyzer.stop();
       this.analyzer = null;
+    }
+
+    if (this.emotionDetector) {
+      this.emotionDetector.stop();
+      this.emotionDetector = null;
     }
 
     if (this.amplitudeFrameId) {
@@ -261,6 +284,9 @@ export class SpeechCoach {
       sessionTechniqueCounts: { ...this.techniqueCounts },
       metrics: { ...this.latestMetrics },
       totalNudgesGiven: this.totalNudgesGiven,
+      emotionalState: this.latestEmotion?.state,
+      emotionConfidence: this.latestEmotion?.confidence,
+      emotionIndicators: this.latestEmotion?.indicators,
     };
   }
 

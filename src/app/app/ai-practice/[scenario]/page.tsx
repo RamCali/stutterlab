@@ -27,6 +27,10 @@ import { checkAISimUsage } from "@/lib/auth/premium";
 import type { PlanTier } from "@/lib/auth/premium";
 import { saveAIConversation } from "@/lib/actions/exercises";
 import { StressEngine, type StressLevel } from "@/lib/audio/StressEngine";
+import { scoreSession } from "@/lib/analysis/session-scorer";
+import { getSessionComparison } from "@/lib/actions/analytics";
+import type { SessionScorecard, SessionComparison } from "@/lib/analysis/types";
+import { CohortInsightBadge } from "@/components/insights/CohortInsightBadge";
 
 type Message = {
   role: "user" | "assistant";
@@ -63,6 +67,8 @@ export default function AIConversationPage() {
   const [voiceTurns, setVoiceTurns] = useState<TurnMetrics[]>([]);
   const [showReport, setShowReport] = useState(false);
   const [earnedXp, setEarnedXp] = useState<number | undefined>();
+  const [sessionScorecard, setSessionScorecard] = useState<SessionScorecard | undefined>();
+  const [sessionComparison, setSessionComparison] = useState<SessionComparison | undefined>();
   const voiceConvRef = useRef<VoiceConversation | null>(null);
   const [voiceAnalyserNode, setVoiceAnalyserNode] = useState<AnalyserNode | null>(null);
   const [usingElevenLabs, setUsingElevenLabs] = useState(false);
@@ -201,6 +207,24 @@ export default function AIConversationPage() {
     setCountdownSeconds(null);
 
     if (turns.filter((t) => t.role === "user").length > 0) {
+      // Compute session scorecard (client-side, no DB needed)
+      const scoringTurns = turns.map((t) => ({
+        role: t.role as "user" | "assistant",
+        text: t.text,
+        disfluencyCount: t.disfluencyCount,
+        speakingRate: t.speakingRate,
+        techniquesUsed: t.techniquesUsed || [],
+        vocalEffort: t.vocalEffort,
+        spmZone: t.spmZone,
+      }));
+      const card = scoreSession(scoringTurns, scenario, elapsedSeconds);
+      setSessionScorecard(card);
+
+      // Fetch comparison data (non-blocking)
+      getSessionComparison(scenario)
+        .then((comp) => { if (comp) setSessionComparison(comp); })
+        .catch(() => {});
+
       // Persist to DB and capture XP
       saveAIConversation({
         scenarioType: scenario,
@@ -216,6 +240,7 @@ export default function AIConversationPage() {
         })),
         durationSeconds: elapsedSeconds,
         stressLevel: stressMode ? stressLevel : undefined,
+        sessionScorecard: card,
       })
         .then((result) => setEarnedXp(result.xp))
         .catch((err) => console.error("Failed to save AI conversation:", err));
@@ -242,6 +267,8 @@ export default function AIConversationPage() {
           onBack={() => router.push("/app/ai-practice")}
           xpEarned={earnedXp}
           stressLevel={stressMode ? stressLevel : undefined}
+          scorecard={sessionScorecard}
+          comparison={sessionComparison}
         />
       </div>
     );
@@ -422,6 +449,15 @@ export default function AIConversationPage() {
                   </p>
                 </div>
               )}
+            </div>
+            {/* Community Insight */}
+            <div className="mt-4 max-w-md w-full">
+              <CohortInsightBadge
+                context={{
+                  page: "ai-practice",
+                  scenario,
+                }}
+              />
             </div>
             <Button
               className="mt-6"

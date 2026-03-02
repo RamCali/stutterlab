@@ -4,6 +4,7 @@ import { getUserId } from "@/lib/auth/helpers";
 import { db } from "@/lib/db/client";
 import { profiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { getPhonemeHeatmap, getTechniqueMastery, getTransferGaps } from "@/lib/actions/analytics";
 
 const SCENARIO_PROMPTS: Record<string, string> = {
   "phone-call":
@@ -97,6 +98,46 @@ Adapt naturally: if they're practicing a feared situation, be extra patient and 
   const firstMessage =
     FIRST_MESSAGES[scenario] || "Hi there! How are you doing today?";
 
+  // Fetch intelligence context (non-critical — continue without it if fails)
+  let phonemeContext = "";
+  let techniqueContext = "";
+  let transferContext = "";
+  try {
+    const [phonemeData, techniqueData, transferData] = await Promise.all([
+      getPhonemeHeatmap().catch(() => null),
+      getTechniqueMastery().catch(() => null),
+      getTransferGaps().catch(() => null),
+    ]);
+
+    if (phonemeData && phonemeData.phonemes.length > 0) {
+      const hardPhonemes = phonemeData.phonemes
+        .filter((p) => p.difficultyScore > 0.4)
+        .slice(0, 5)
+        .map((p) => p.phoneme);
+      if (hardPhonemes.length > 0) {
+        phonemeContext = `PHONEME CONTEXT: The user finds these sounds challenging: ${hardPhonemes.join(", ")}. Naturally incorporate words starting with these sounds to give practice opportunities. Don't mention this explicitly.`;
+      }
+    }
+
+    if (techniqueData) {
+      const weak = techniqueData.techniques
+        .filter((t) => t.masteryLevel === "beginner" && t.totalDetections > 0)
+        .map((t) => t.technique.replace(/_/g, " "));
+      const strong = techniqueData.techniques
+        .filter((t) => t.masteryLevel === "advanced")
+        .map((t) => t.technique.replace(/_/g, " "));
+      if (weak.length > 0 || strong.length > 0) {
+        techniqueContext = `TECHNIQUE CONTEXT: ${weak.length > 0 ? `Weakest techniques: ${weak.join(", ")}. Create natural moments for practice.` : ""} ${strong.length > 0 ? `Strong techniques: ${strong.join(", ")}.` : ""}`;
+      }
+    }
+
+    if (transferData && transferData.gaps.length > 0) {
+      transferContext = `TRANSFER CONTEXT: The user has gaps between practice and real-world fluency. Make scenarios feel more realistic and conversational to help bridge this gap.`;
+    }
+  } catch {
+    // Intelligence context is non-critical
+  }
+
   return {
     dynamicVariables: {
       scenario_prompt: scenarioPrompt,
@@ -104,6 +145,9 @@ Adapt naturally: if they're practicing a feared situation, be extra patient and 
       stress_context: stressContext,
       adaptive_context: "",
       first_message: firstMessage,
+      phoneme_context: phonemeContext,
+      technique_context: techniqueContext,
+      transfer_context: transferContext,
     },
   };
 }

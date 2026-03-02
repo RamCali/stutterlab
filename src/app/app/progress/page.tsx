@@ -49,9 +49,19 @@ import {
   getAIConversationAnalytics,
   getFearedWordsAnalytics,
   getAnxietyTrend,
+  getPhonemeHeatmap,
+  getTechniqueMastery,
+  getCoachingInsights,
+  getTransferGaps,
 } from "@/lib/actions/analytics";
 import { checkAISimUsage } from "@/lib/auth/premium";
 import type { PlanTier } from "@/lib/auth/premium";
+import { PredictiveCoachCard } from "@/components/insights/PredictiveCoachCard";
+import { PhonemeHeatmap } from "@/components/insights/PhonemeHeatmap";
+import { TechniqueMastery } from "@/components/insights/TechniqueMastery";
+import { TransferGapReport } from "@/components/insights/TransferGapReport";
+import { CohortInsightBadge } from "@/components/insights/CohortInsightBadge";
+import type { PhonemeHeatmapData, TechniqueHistory, CoachingInsight, TransferReport } from "@/lib/analysis/types";
 
 /* ─── Heatmap helpers ─── */
 
@@ -179,6 +189,10 @@ export default function ProgressPage() {
   const [aiAnalytics, setAiAnalytics] = useState<AIAnalytics | null>(null);
   const [fearedWordsData, setFearedWordsData] = useState<FearedWordsData | null>(null);
   const [anxietyData, setAnxietyData] = useState<AnxietyData | null>(null);
+  const [phonemeData, setPhonemeData] = useState<PhonemeHeatmapData | null>(null);
+  const [techniqueData, setTechniqueData] = useState<TechniqueHistory | null>(null);
+  const [coachingData, setCoachingData] = useState<CoachingInsight | null>(null);
+  const [transferData, setTransferData] = useState<TransferReport | null>(null);
 
   const isPremium = plan !== "free";
 
@@ -199,11 +213,19 @@ export default function ProgressPage() {
             getAIConversationAnalytics(),
             getFearedWordsAnalytics(),
             getAnxietyTrend(),
+            getPhonemeHeatmap(),
+            getTechniqueMastery(),
+            getCoachingInsights(),
+            getTransferGaps(),
           ])
-            .then(([ai, fw, anxiety]) => {
+            .then(([ai, fw, anxiety, phonemes, techniques, coaching, transfer]) => {
               setAiAnalytics(ai);
               setFearedWordsData(fw);
               setAnxietyData(anxiety);
+              setPhonemeData(phonemes);
+              setTechniqueData(techniques);
+              setCoachingData(coaching);
+              setTransferData(transfer);
             })
             .catch(() => {});
         }
@@ -521,6 +543,20 @@ export default function ProgressPage() {
             <h2 className="text-lg font-bold">Premium Analytics</h2>
           </div>
 
+          {/* Predictive Coach Card */}
+          {coachingData && (
+            <PredictiveCoachCard data={coachingData} />
+          )}
+
+          {/* Community Insight */}
+          <CohortInsightBadge
+            context={{
+              page: "progress",
+              day: stats?.currentStreak ?? undefined,
+              streak: stats?.currentStreak ?? undefined,
+            }}
+          />
+
           {/* AI Conversation Analytics */}
           {aiAnalytics && aiAnalytics.totalConversations > 0 && (
             <Card>
@@ -752,6 +788,16 @@ export default function ProgressPage() {
             </Card>
           )}
 
+          {/* Phoneme Difficulty Heatmap */}
+          {phonemeData && phonemeData.phonemes.length > 0 && (
+            <PhonemeHeatmap data={phonemeData} />
+          )}
+
+          {/* Technique Mastery */}
+          {techniqueData && techniqueData.techniques.length > 0 && (
+            <TechniqueMastery data={techniqueData} />
+          )}
+
           {/* Anxiety Reduction Trend */}
           {anxietyData && (
             <Card>
@@ -869,6 +915,10 @@ export default function ProgressPage() {
               </CardContent>
             </Card>
           )}
+          {/* Transfer Gap Analysis */}
+          {transferData && (
+            <TransferGapReport data={transferData} />
+          )}
         </>
       ) : (
         /* Premium Upsell for Free Users */
@@ -884,10 +934,14 @@ export default function ProgressPage() {
               <div className="flex flex-wrap justify-center gap-2">
                 {[
                   "AI Fluency Trends",
-                  "Scenario Breakdown",
+                  "Phoneme Difficulty Map",
+                  "Technique Mastery",
+                  "Predictive Coaching",
+                  "Session Scorecard",
+                  "Transfer Gap Detection",
+                  "Community Insights",
                   "Feared Words Mastery",
                   "Anxiety Tracking",
-                  "Technique Analysis",
                 ].map((feature) => (
                   <Badge key={feature} variant="secondary" className="text-xs">
                     <CheckCircle2 className="h-3 w-3 mr-1" />

@@ -16,6 +16,12 @@ export interface ExposureRung {
   suggestedTechniques: string[];
   /** Example missions for this rung */
   missions: string[];
+  /** Optional motivational quote from a real success story */
+  inspirationalStory?: {
+    quote: string;
+    name: string;
+    storyId: string;
+  };
 }
 
 export interface ExposureAttempt {
@@ -135,6 +141,12 @@ export const EXPOSURE_LADDER: ExposureRung[] = [
       "Call a store to check if an item is in stock",
       "Schedule a haircut appointment by phone",
     ],
+    inspirationalStory: {
+      quote:
+        "I worked through the uncomfortable radio calls, pushed through the blocks, and kept showing up. Little by little, confidence replaced fear.",
+      name: "A fellow stutterer who became a commercial pilot",
+      storyId: "stutter-to-pilot",
+    },
   },
   {
     id: "group-conversation",
@@ -169,6 +181,12 @@ export const EXPOSURE_LADDER: ExposureRung[] = [
     description: "The peak: speaking to an audience with all eyes on you.",
     category: "high-stakes",
     suggestedTechniques: ["Gentle Onset", "Pausing", "Preparatory Set", "Voluntary Stuttering"],
+    inspirationalStory: {
+      quote:
+        "The fear of stuttering is a mile wide and an inch deep. The anticipation is always worse than the moment itself.",
+      name: "A fellow stutterer who became a commercial pilot",
+      storyId: "stutter-to-pilot",
+    },
     missions: [
       "Give a 2-minute presentation at work or school",
       "Tell a story at a social gathering",

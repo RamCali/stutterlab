@@ -88,6 +88,36 @@ Rules:
 - If many disfluencies: Give extra time. Use simple, direct language. Do NOT finish their sentences.
 - If good techniques detected: Respond naturally and warmly. Let conversation flow.
 - NEVER mention stuttering, speech rate, tension, or techniques. Stay fully in character.`;
+
+      // Feature 3: Emotional state adaptation
+      if (speechMetrics.emotionalState) {
+        const emotionRules: Record<string, string> = {
+          anxious:
+            "The speaker appears anxious. Be extra calm and patient. Use shorter responses. Don't rush them. Pause naturally between your sentences.",
+          frustrated:
+            "The speaker seems frustrated. Be warm and encouraging. You may ask a simpler question or change to an easier topic. Add brief encouragement like 'That's a great point'.",
+          confident:
+            "The speaker sounds confident. Allow more natural, complex conversation flow. You can ask deeper follow-up questions.",
+          calm:
+            "The speaker is calm. Maintain natural conversation pace.",
+        };
+        adaptiveContext += `\n- Emotional state: ${speechMetrics.emotionalState}\n- ${emotionRules[speechMetrics.emotionalState] || ""}`;
+      }
+
+      // Feature 1: Phoneme challenge context
+      if (speechMetrics.difficultPhonemes && speechMetrics.difficultPhonemes.length > 0) {
+        adaptiveContext += `\n\nPHONEME CHALLENGE (DO NOT mention this to the user):\nThe user finds these sounds difficult: ${speechMetrics.difficultPhonemes.join(", ")}\nNaturally incorporate words starting with these sounds into your responses to give them practice opportunities.`;
+      }
+
+      // Feature 2: Technique context
+      if (speechMetrics.techniqueContext) {
+        adaptiveContext += `\n\nTECHNIQUE CONTEXT (DO NOT mention this):\n${speechMetrics.techniqueContext}`;
+      }
+
+      // Feature 7: Transfer gap context
+      if (speechMetrics.transferContext) {
+        adaptiveContext += `\n\nTRANSFER CONTEXT (DO NOT mention this):\n${speechMetrics.transferContext}`;
+      }
     }
 
     // Build stress context based on optional stress level

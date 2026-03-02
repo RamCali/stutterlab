@@ -24,6 +24,7 @@ import { CommunityChallenges } from "@/components/community/community-challenge"
 import { StreakShields } from "@/components/community/streak-shields";
 import { DailyMicroChallenge } from "@/components/community/daily-micro-challenge";
 import { VictoryFeed } from "@/components/community/victory-notifications";
+import { SuccessStoriesSection } from "@/components/community/success-stories";
 
 const categories = [
   { id: "wins", label: "Wins & Milestones", icon: Trophy, color: "text-yellow-500" },
@@ -115,6 +116,9 @@ export default function CommunityPage() {
 
       {/* I Did It Celebration Wall */}
       <IDidItWall />
+
+      {/* Real Success Stories */}
+      <SuccessStoriesSection />
 
       {/* 30-Day Community Challenges */}
       <CommunityChallenges />

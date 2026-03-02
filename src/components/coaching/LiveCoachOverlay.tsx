@@ -11,6 +11,8 @@ import { SpeedGauge } from "./SpeedGauge";
 import { EffortMeter } from "./EffortMeter";
 import { TechniqueIndicators } from "./TechniqueIndicators";
 import { CoachNudge } from "./CoachNudge";
+import { EmotionIndicator } from "@/components/insights/EmotionIndicator";
+import type { EmotionalState } from "@/lib/analysis/types";
 
 interface LiveCoachOverlayProps {
   analyserNode: AnalyserNode | null;
@@ -86,6 +88,14 @@ export function LiveCoachOverlay({
             effort={snapshot.vocalEffort}
             zone={snapshot.effortZone}
           />
+
+          {/* Emotion Indicator */}
+          {snapshot.emotionalState && (
+            <EmotionIndicator
+              state={snapshot.emotionalState as EmotionalState}
+              confidence={snapshot.emotionConfidence ?? 0}
+            />
+          )}
 
           {/* Technique Indicators */}
           <TechniqueIndicators

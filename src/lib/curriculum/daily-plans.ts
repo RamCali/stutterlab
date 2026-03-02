@@ -89,6 +89,7 @@ const affirmations = [
   "Stress doesn't cause stuttering — it just raises tension temporarily. I have techniques for that.",
   "I speak not because it's easy, but because what I have to say matters.",
   "Singing and reading aloud use different neural pathways. I'm building those alternative circuits right now.",
+  "The fear of stuttering is a mile wide and an inch deep. The anticipation is always worse than the moment itself.",
 ];
 
 function getAffirmation(day: number): string {

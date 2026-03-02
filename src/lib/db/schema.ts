@@ -250,7 +250,19 @@ export const aiConversations = pgTable("ai_conversations", {
   techniquesUsed: jsonb("techniques_used"),
   durationSeconds: integer("duration_seconds"),
   stressLevel: integer("stress_level"), // null = calm, 1-3 = stress levels
+  sessionScorecard: jsonb("session_scorecard"), // SessionScorecard from session-scorer
+  emotionalJourney: jsonb("emotional_journey"), // EmotionSnapshot[] timeline
   completedAt: timestamp("completed_at").defaultNow().notNull(),
+});
+
+// ==================== COHORT AGGREGATES ====================
+
+export const cohortAggregates = pgTable("cohort_aggregates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  metricKey: text("metric_key").notNull().unique(),
+  metricValue: real("metric_value").notNull(),
+  sampleSize: integer("sample_size").notNull(),
+  computedAt: timestamp("computed_at").defaultNow().notNull(),
 });
 
 // ==================== GAMIFICATION ====================

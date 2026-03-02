@@ -6,9 +6,36 @@ import {
   fearedWords,
   speechSituations,
   sessions,
+  speechAnalyses,
+  monthlyReports,
+  userStats,
 } from "@/lib/db/schema";
 import { eq, desc, sql, and, gte } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth/helpers";
+import {
+  extractDisfluencyWords,
+  mapDisfluenciesToPhonemes,
+  computeDifficultyScore,
+  getPhonemeLabel,
+} from "@/lib/analysis/phoneme-mapper";
+import {
+  computeTechniqueMastery,
+  getTechniqueRecommendations,
+  computeOverallMasteryScore,
+} from "@/lib/analysis/technique-tracker";
+import { analyzePatterns } from "@/lib/analysis/predictive-coach";
+import { detectTransferGaps } from "@/lib/analysis/transfer-gap";
+import { scoreSession } from "@/lib/analysis/session-scorer";
+import { generatePhonemeTargetedPractice as genPractice } from "@/lib/analysis/phoneme-word-bank";
+import type {
+  PhonemeHeatmapData,
+  TechniqueHistory,
+  CoachingInsight,
+  TransferReport,
+  SessionScorecard,
+  SessionComparison,
+  PhonemeDifficulty,
+} from "@/lib/analysis/types";
 
 /* ─── AI Conversation Analytics ─── */
 
@@ -230,4 +257,298 @@ export async function getAnxietyTrend() {
       avgReduction: data.avgReduction,
     })),
   };
+}
+
+/* ─── Feature 1: Phoneme Heatmap ─── */
+
+export async function getPhonemeHeatmap(): Promise<PhonemeHeatmapData> {
+  const user = await requireAuth();
+
+  // Fetch disfluency data from two sources
+  const [analyses, conversations] = await Promise.all([
+    db
+      .select({
+        triggerPhonemes: speechAnalyses.triggerPhonemes,
+        analyzedAt: speechAnalyses.analyzedAt,
+      })
+      .from(speechAnalyses)
+      .where(eq(speechAnalyses.userId, user.id))
+      .orderBy(desc(speechAnalyses.analyzedAt))
+      .limit(50),
+    db
+      .select({
+        disfluencyMoments: aiConversations.disfluencyMoments,
+        completedAt: aiConversations.completedAt,
+      })
+      .from(aiConversations)
+      .where(eq(aiConversations.userId, user.id))
+      .orderBy(desc(aiConversations.completedAt))
+      .limit(50),
+  ]);
+
+  // Aggregate phoneme data from disfluency moments in conversations
+  const phonemeMap = new Map<
+    string,
+    { attempts: number; disfluencyCount: number; words: Set<string>; lastSeen: Date }
+  >();
+
+  for (const conv of conversations) {
+    const events = extractDisfluencyWords(conv.disfluencyMoments);
+    const phonemeAggs = mapDisfluenciesToPhonemes(events);
+
+    for (const [phoneme, agg] of phonemeAggs) {
+      const existing = phonemeMap.get(phoneme) || {
+        attempts: 0,
+        disfluencyCount: 0,
+        words: new Set<string>(),
+        lastSeen: conv.completedAt,
+      };
+      existing.attempts += agg.attempts;
+      existing.disfluencyCount += agg.disfluencyCount;
+      for (const w of agg.words) existing.words.add(w);
+      if (conv.completedAt > existing.lastSeen) {
+        existing.lastSeen = conv.completedAt;
+      }
+      phonemeMap.set(phoneme, existing);
+    }
+  }
+
+  // Also merge data from speechAnalyses.triggerPhonemes
+  for (const analysis of analyses) {
+    const raw = analysis.triggerPhonemes;
+    if (Array.isArray(raw)) {
+      for (const item of raw) {
+        // Handle both string[] and { phoneme, words, count }[] formats
+        const phoneme = typeof item === "string" ? item : (item as Record<string, unknown>)?.phoneme;
+        if (typeof phoneme !== "string") continue;
+
+        const existing = phonemeMap.get(phoneme) || {
+          attempts: 0,
+          disfluencyCount: 0,
+          words: new Set<string>(),
+          lastSeen: analysis.analyzedAt,
+        };
+        existing.attempts += 1;
+        existing.disfluencyCount += 1;
+        if (analysis.analyzedAt > existing.lastSeen) {
+          existing.lastSeen = analysis.analyzedAt;
+        }
+        phonemeMap.set(phoneme, existing);
+      }
+    }
+  }
+
+  // Build phoneme difficulty array
+  const phonemes: PhonemeDifficulty[] = [];
+  for (const [phoneme, data] of phonemeMap) {
+    phonemes.push({
+      phoneme,
+      totalAttempts: data.attempts,
+      disfluencyCount: data.disfluencyCount,
+      difficultyScore: computeDifficultyScore(data.disfluencyCount, data.attempts),
+      trend: "stable", // TODO: compute from time-window comparison
+      lastSeen: data.lastSeen.toISOString(),
+      triggerWords: [...data.words].slice(0, 10),
+    });
+  }
+
+  // Sort by difficulty
+  phonemes.sort((a, b) => b.difficultyScore - a.difficultyScore);
+
+  return {
+    phonemes,
+    topDifficult: phonemes.slice(0, 5).map((p) => p.phoneme),
+    totalAnalyzed: analyses.length + conversations.length,
+    lastUpdated: new Date().toISOString(),
+  };
+}
+
+export async function generatePhonemeTargetedPractice(
+  phonemes: string[]
+): Promise<string[]> {
+  return genPractice(phonemes, 8);
+}
+
+/* ─── Feature 2: Technique Mastery ─── */
+
+export async function getTechniqueMastery(): Promise<TechniqueHistory> {
+  const user = await requireAuth();
+
+  const conversations = await db
+    .select({
+      techniquesUsed: aiConversations.techniquesUsed,
+      completedAt: aiConversations.completedAt,
+    })
+    .from(aiConversations)
+    .where(eq(aiConversations.userId, user.id))
+    .orderBy(desc(aiConversations.completedAt))
+    .limit(100);
+
+  const mastery = computeTechniqueMastery(
+    conversations.map((c) => ({
+      techniquesUsed: c.techniquesUsed,
+      completedAt: c.completedAt,
+    }))
+  );
+
+  const recommendations = getTechniqueRecommendations(mastery);
+  const overallMasteryScore = computeOverallMasteryScore(mastery);
+
+  return { techniques: mastery, recommendations, overallMasteryScore };
+}
+
+/* ─── Feature 4: Predictive Coaching ─── */
+
+export async function getCoachingInsights(): Promise<CoachingInsight> {
+  const user = await requireAuth();
+
+  const [recentSessions, recentConversations, recentSituations, stats] =
+    await Promise.all([
+      db
+        .select({
+          startedAt: sessions.startedAt,
+          aiFluencyScore: sessions.aiFluencyScore,
+          exerciseType: sessions.exerciseType,
+          durationSeconds: sessions.durationSeconds,
+        })
+        .from(sessions)
+        .where(eq(sessions.userId, user.id))
+        .orderBy(desc(sessions.startedAt))
+        .limit(60),
+      db
+        .select({
+          scenarioType: aiConversations.scenarioType,
+          fluencyScore: aiConversations.fluencyScore,
+          stressLevel: aiConversations.stressLevel,
+          completedAt: aiConversations.completedAt,
+        })
+        .from(aiConversations)
+        .where(eq(aiConversations.userId, user.id))
+        .orderBy(desc(aiConversations.completedAt))
+        .limit(30),
+      db
+        .select({
+          situationType: speechSituations.situationType,
+          anxietyBefore: speechSituations.anxietyBefore,
+          fluencyRating: speechSituations.fluencyRating,
+          createdAt: speechSituations.createdAt,
+        })
+        .from(speechSituations)
+        .where(eq(speechSituations.userId, user.id))
+        .orderBy(desc(speechSituations.createdAt))
+        .limit(20),
+      db
+        .select({
+          currentStreak: userStats.currentStreak,
+          lastPracticeDate: userStats.lastPracticeDate,
+        })
+        .from(userStats)
+        .where(eq(userStats.userId, user.id))
+        .limit(1),
+    ]);
+
+  return analyzePatterns({
+    sessions: recentSessions,
+    conversations: recentConversations,
+    situations: recentSituations,
+    currentStreak: stats[0]?.currentStreak ?? 0,
+    lastPracticeDate: stats[0]?.lastPracticeDate ?? null,
+  });
+}
+
+/* ─── Feature 5: Session Comparison ─── */
+
+export async function getSessionComparison(
+  scenarioType: string
+): Promise<SessionComparison> {
+  const user = await requireAuth();
+
+  const conversations = await db
+    .select({
+      sessionScorecard: aiConversations.sessionScorecard,
+      completedAt: aiConversations.completedAt,
+    })
+    .from(aiConversations)
+    .where(
+      and(
+        eq(aiConversations.userId, user.id),
+        eq(aiConversations.scenarioType, scenarioType)
+      )
+    )
+    .orderBy(desc(aiConversations.completedAt))
+    .limit(20);
+
+  // Compute averages across all scorecards
+  const scorecards = conversations
+    .map((c) => c.sessionScorecard as SessionScorecard | null)
+    .filter((s): s is SessionScorecard => s != null);
+
+  const averages: Record<string, number> = {};
+  if (scorecards.length > 0) {
+    // Get dimension names from the first scorecard
+    const dimNames = scorecards[0].dimensions.map((d) => d.name);
+    for (const name of dimNames) {
+      const scores = scorecards
+        .map((s) => s.dimensions.find((d) => d.name === name)?.score)
+        .filter((s): s is number => s != null);
+      averages[name] =
+        scores.length > 0
+          ? scores.reduce((s, v) => s + v, 0) / scores.length
+          : 0;
+    }
+  }
+
+  // Previous session (the most recent completed scorecard, excluding current)
+  const previousSession =
+    scorecards.length >= 2 ? scorecards[1] : null;
+
+  return {
+    averages,
+    previousSession,
+    totalSessionsForScenario: conversations.length,
+  };
+}
+
+/* ─── Feature 7: Transfer Gap Detection ─── */
+
+export async function getTransferGaps(): Promise<TransferReport | null> {
+  const user = await requireAuth();
+
+  const [conversations, situations, reports] = await Promise.all([
+    db
+      .select({
+        fluencyScore: aiConversations.fluencyScore,
+        stressLevel: aiConversations.stressLevel,
+        techniquesUsed: aiConversations.techniquesUsed,
+        completedAt: aiConversations.completedAt,
+      })
+      .from(aiConversations)
+      .where(eq(aiConversations.userId, user.id))
+      .orderBy(desc(aiConversations.completedAt))
+      .limit(50),
+    db
+      .select({
+        fluencyRating: speechSituations.fluencyRating,
+        anxietyBefore: speechSituations.anxietyBefore,
+        anxietyAfter: speechSituations.anxietyAfter,
+        techniquesUsed: speechSituations.techniquesUsed,
+        createdAt: speechSituations.createdAt,
+      })
+      .from(speechSituations)
+      .where(eq(speechSituations.userId, user.id))
+      .limit(30),
+    db
+      .select({
+        fluencyScore: monthlyReports.fluencyScore,
+        createdAt: monthlyReports.createdAt,
+      })
+      .from(monthlyReports)
+      .where(eq(monthlyReports.userId, user.id))
+      .limit(10),
+  ]);
+
+  // Need minimum data to detect gaps
+  if (conversations.length < 5) return null;
+
+  return detectTransferGaps({ conversations, situations, reports });
 }

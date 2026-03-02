@@ -144,13 +144,59 @@ export default function MindsetPage() {
           </Link>
 
           {store.thoughtRecords.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground">
-              <Brain className="h-10 w-10 mx-auto mb-3 opacity-50" />
-              <p className="font-medium">No thought records yet</p>
-              <p className="text-sm mt-1">
-                Capture an unhelpful thought to start challenging thinking traps.
-              </p>
-            </div>
+            <>
+              {/* Example thought record — teaches by showing */}
+              <Card className="border-dashed border-muted-foreground/30">
+                <CardContent className="pt-4 pb-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Badge variant="secondary" className="text-[10px] bg-amber-500/10 text-amber-600">
+                      Example
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      From the stuttering community
+                    </span>
+                  </div>
+                  <div className="space-y-3 text-sm">
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground">Situation</p>
+                      <p className="mt-0.5">Considering a career in aviation despite stuttering</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground">Automatic Thought</p>
+                      <p className="mt-0.5 italic">
+                        &ldquo;Aviation isn&apos;t realistic for me — communication is everything in that field and I stutter&rdquo;
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground">Evidence For</p>
+                      <p className="mt-0.5">Radio communication is critical for pilots; I do stutter on some calls</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground">Evidence Against</p>
+                      <p className="mt-0.5">
+                        Passed commercial pilot certification; worked through uncomfortable radio calls;
+                        confidence replaced fear over time; the anticipation was always worse than the moment itself
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
+                      <p className="text-xs font-medium text-emerald-600 mb-0.5">Balanced Thought</p>
+                      <p className="mt-0.5">
+                        The fear of stuttering is a mile wide and an inch deep. My stutter doesn&apos;t prevent me
+                        from communicating effectively — it just makes communication different.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="text-center py-8 text-muted-foreground">
+                <Brain className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                <p className="font-medium">No thought records yet</p>
+                <p className="text-sm mt-1">
+                  Capture an unhelpful thought to start challenging thinking traps.
+                </p>
+              </div>
+            </>
           )}
 
           {store.thoughtRecords.map((record) => (

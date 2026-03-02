@@ -170,6 +170,8 @@ export async function saveAIConversation(data: {
   }[];
   durationSeconds: number;
   stressLevel?: number;
+  sessionScorecard?: unknown;
+  emotionalJourney?: unknown;
 }) {
   const user = await requireAuth();
   await ensureUserStats(user.id);
@@ -195,6 +197,8 @@ export async function saveAIConversation(data: {
     techniquesUsed,
     durationSeconds: data.durationSeconds,
     stressLevel: data.stressLevel ?? null,
+    sessionScorecard: data.sessionScorecard ?? null,
+    emotionalJourney: data.emotionalJourney ?? null,
   });
 
   // Also create a session row for streak/XP tracking

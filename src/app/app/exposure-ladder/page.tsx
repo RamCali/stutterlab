@@ -15,6 +15,7 @@ import {
   TrendingDown,
   Trophy,
   X,
+  Sparkles,
 } from "lucide-react";
 import {
   EXPOSURE_LADDER,
@@ -250,6 +251,23 @@ export default function ExposureLadderPage() {
                         </Badge>
                       ))}
                     </div>
+
+                    {/* Inspirational story */}
+                    {rung.inspirationalStory && (
+                      <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20">
+                        <div className="flex items-start gap-2">
+                          <Sparkles className="h-3.5 w-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-xs italic text-muted-foreground">
+                              &ldquo;{rung.inspirationalStory.quote}&rdquo;
+                            </p>
+                            <p className="text-[10px] text-muted-foreground/70 mt-1">
+                              &mdash; {rung.inspirationalStory.name}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Past attempts */}
                     {attempts.length > 0 && (
