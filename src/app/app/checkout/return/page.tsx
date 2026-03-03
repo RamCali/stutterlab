@@ -44,14 +44,13 @@ function CheckoutReturnContent() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10">
               <CheckCircle2 className="h-8 w-8 text-emerald-500" />
             </div>
-            <h1 className="text-2xl font-bold">Welcome to Premium!</h1>
+            <h1 className="text-2xl font-bold">Welcome to StutterLab!</h1>
             <p className="text-muted-foreground">
-              Your subscription is active. You now have full access to all
-              premium features including AI coaching, advanced analytics, and
-              personalized training plans.
+              Your 7-day free trial has started. You have full access to
+              AI coaching, advanced analytics, and personalized training plans.
             </p>
             <Button onClick={() => router.push("/app/dashboard")} className="w-full">
-              Go to Dashboard
+              Set Up My Program
             </Button>
           </CardContent>
         </Card>

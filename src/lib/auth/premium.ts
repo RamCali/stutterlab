@@ -142,6 +142,13 @@ export async function getAISimUsage(userId: string): Promise<{
   };
 }
 
+/** Auth-wrapped check: does the current user have an active/trialing subscription? */
+export async function checkHasActiveSubscription(): Promise<boolean> {
+  const user = await requireAuth();
+  const plan = await getUserPlan(user.id);
+  return plan !== "free";
+}
+
 /** Auth-wrapped version for client components to call as a server action */
 export async function checkAISimUsage(): Promise<{
   used: number;

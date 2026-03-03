@@ -169,40 +169,15 @@ const testimonials = [
   },
 ];
 
-const pricingTiers = [
-  {
-    name: "Free",
-    price: "$0",
-    period: "forever",
-    description: "See if StutterLab works for you",
-    features: [
-      "DAF in Audio Lab",
-      "3 exercises per day",
-      "Basic progress tracking",
-    ],
-    cta: "Start Free",
-    highlighted: false,
-  },
-  {
-    name: "Premium",
-    price: "$99",
-    period: "per month",
-    yearlyNote: "$999/year — save $189",
-    description: "The complete training program",
-    features: [
-      "Full Audio Lab (DAF + FAF + Choral + Metronome)",
-      "90-day SLP-designed curriculum",
-      "Unlimited AI conversations & phone simulator",
-      "Feared Words Trainer",
-      "CBT & Mindfulness module",
-      "Real-world challenges with XP & streaks",
-      "Voice Journal with AI fluency scoring",
-      "Clinical progress reports",
-      "7-day money-back guarantee",
-    ],
-    cta: "Start for $99/mo",
-    highlighted: true,
-  },
+const pricingFeatures = [
+  "Full Audio Lab (DAF + FAF + Choral + Metronome)",
+  "90-day SLP-designed curriculum",
+  "Unlimited AI conversations & phone simulator",
+  "Feared Words Trainer",
+  "CBT & Mindfulness module",
+  "Real-world challenges with XP & streaks",
+  "Voice Journal with AI fluency scoring",
+  "Clinical progress reports",
 ];
 
 const faqs = [
@@ -235,34 +210,41 @@ export default function LandingPage() {
             variant="secondary"
             className="mb-6 bg-primary/10 text-primary border-0 text-sm px-4 py-1.5"
           >
-            AI-powered speech training designed by an SLP
+            AI-powered speech training for people who stutter — designed by an SLP
           </Badge>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-center leading-tight">
-            Train Your Speech.
+            Built for people who stutter.
             <br />
-            <span className="text-primary">Build Your Confidence.</span>
+            <span className="text-primary">By an SLP who gets it.</span>
           </h1>
           <p className="text-xl text-muted-foreground mt-6 text-center max-w-xl">
-            A 90-day, clinically-designed program that puts SLP-grade tools in your browser — 10 minutes a day.
+            Evidence-based tools to help you speak with less fear and more freedom — 10 minutes a day.
           </p>
-          <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
-            <Button size="lg" className="px-8 text-lg h-13" asChild>
+          <div className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-sm text-muted-foreground/80">
+            {[
+              "Letting calls go to voicemail",
+              "Swapping words to avoid blocks",
+              "Staying quiet when you have the best idea",
+            ].map((item) => (
+              <span key={item} className="italic">&ldquo;{item}&rdquo;</span>
+            ))}
+          </div>
+          <p className="text-sm text-muted-foreground mt-1.5">
+            If any of these sound familiar — you&apos;re in the right place.
+          </p>
+          <div className="mt-8">
+            <Button size="lg" className="px-10 text-lg h-13" asChild>
               <Link href="/signup">
-                Start for $99/mo
+                Start Your 7-Day Free Trial
                 <ArrowRight className="h-5 w-5 ml-2" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 text-lg h-13" asChild>
-              <Link href="/signup?plan=free">
-                Try free — no card required
               </Link>
             </Button>
           </div>
           <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-base text-muted-foreground">
             {[
-              "Evidence based",
-              "24/7 private training",
-              "Cancel within 7 days for a full refund",
+              "Private 24/7 training",
+              "Evidence-based",
+              "Full refund within 7 days",
             ].map((item) => (
               <div key={item} className="flex items-center gap-2">
                 <Check className="h-4 w-4 text-primary flex-shrink-0" />
@@ -770,61 +752,43 @@ export default function LandingPage() {
               StutterLab gives you SLP-designed practice every day.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            {pricingTiers.map((tier) => (
-              <Card
-                key={tier.name}
-                className={
-                  tier.highlighted
-                    ? "border-primary border-2 shadow-lg relative"
-                    : "border-border/60"
-                }
-              >
-                {tier.highlighted && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-primary text-primary-foreground shadow-sm">
-                      Most Popular
-                    </Badge>
-                  </div>
-                )}
-                <CardContent className="pt-8 pb-6">
-                  <h3 className="font-semibold text-xl">{tier.name}</h3>
-                  <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-5xl font-bold">{tier.price}</span>
-                    <span className="text-muted-foreground text-base">
-                      /{tier.period}
-                    </span>
-                  </div>
-                  {tier.yearlyNote && (
-                    <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium mt-1">
-                      {tier.yearlyNote}
-                    </p>
-                  )}
-                  <p className="text-base text-muted-foreground mt-2">
-                    {tier.description}
-                  </p>
-                  <Button
-                    className="w-full mt-6"
-                    size="lg"
-                    variant={tier.highlighted ? "default" : "outline"}
-                    asChild
-                  >
-                    <Link href={tier.highlighted ? "/signup" : "/signup?plan=free"}>{tier.cta}</Link>
-                  </Button>
-                  <ul className="mt-6 space-y-2.5">
-                    {tier.features.map((feature) => (
-                      <li
-                        key={feature}
-                        className="flex items-start gap-2 text-base"
-                      >
-                        <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="max-w-md mx-auto">
+            <Card className="border-primary border-2 shadow-lg relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <Badge className="bg-primary text-primary-foreground shadow-sm">
+                  7-Day Free Trial
+                </Badge>
+              </div>
+              <CardContent className="pt-8 pb-6">
+                <h3 className="font-semibold text-xl">StutterLab</h3>
+                <div className="mt-2 flex items-baseline gap-1">
+                  <span className="text-5xl font-bold">$99</span>
+                  <span className="text-muted-foreground text-base">
+                    /month
+                  </span>
+                </div>
+                <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium mt-1">
+                  $999/year — save $189
+                </p>
+                <p className="text-base text-muted-foreground mt-2">
+                  Full access to everything. 7 days free.
+                </p>
+                <Button className="w-full mt-6" size="lg" asChild>
+                  <Link href="/signup">Start 7-Day Free Trial</Link>
+                </Button>
+                <ul className="mt-6 space-y-2.5">
+                  {pricingFeatures.map((feature) => (
+                    <li
+                      key={feature}
+                      className="flex items-start gap-2 text-base"
+                    >
+                      <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -925,21 +889,16 @@ export default function LandingPage() {
             That idea in the meeting. That joke on the date. That &ldquo;hi&rdquo;
             to the stranger. Your voice matters — and you can train it to show up when you need it.
           </p>
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="mt-10">
             <Button size="lg" className="px-10 text-lg h-13" asChild>
               <Link href="/signup">
-                Start for $99/mo
+                Start 7-Day Free Trial
                 <ArrowRight className="h-5 w-5 ml-2" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" className="px-10 text-lg h-13" asChild>
-              <Link href="/signup?plan=free">
-                Try free — no card required
               </Link>
             </Button>
           </div>
           <p className="text-sm text-muted-foreground mt-4">
-            Cancel within 7 days for a full refund.
+            7 days free. Cancel anytime.
           </p>
         </div>
       </section>

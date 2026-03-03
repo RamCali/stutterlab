@@ -336,12 +336,12 @@ export default function StutteringTherapyAppPage() {
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button size="lg" className="px-8" asChild>
               <Link href="/signup">
-                Start Free
+                Start 7-Day Free Trial
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="px-8" asChild>
-              <Link href="/#pricing">See All Plans</Link>
+              <Link href="/#pricing">See Pricing</Link>
             </Button>
           </div>
         </div>

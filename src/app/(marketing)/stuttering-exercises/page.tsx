@@ -294,7 +294,7 @@ export default function StutteringExercisesPage() {
       <CtaSection
         title="You're Not Broken. You Just Need the Right Practice."
         description="StutterLab structures these exercises into your personalized 90-day plan. See real progress, not just hope."
-        primaryCta="Start Free"
+        primaryCta="Start 7-Day Free Trial"
       />
     </>
   );

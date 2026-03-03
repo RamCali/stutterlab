@@ -63,7 +63,7 @@ export function PremiumGate({
             </h3>
             <p className="text-base text-muted-foreground mt-1">
               {isExpiredTrial
-                ? "Your free trial has ended. Upgrade to Premium to keep using this feature."
+                ? "Your trial has ended. Reactivate your subscription to keep using this feature."
                 : description}
             </p>
           </div>
@@ -96,12 +96,12 @@ export function PremiumGate({
           <Button onClick={() => setCheckoutOpen(true)} className="w-full">
             <Crown className="h-4 w-4 mr-2" />
             {isExpiredTrial
-              ? `Upgrade to Premium — ${interval === "month" ? "$99/mo" : "$999/yr"}`
+              ? `Reactivate — ${interval === "month" ? "$99/mo" : "$999/yr"}`
               : "Start 7-Day Free Trial"}
           </Button>
           {!isExpiredTrial && (
             <p className="text-sm text-muted-foreground">
-              Full access for 7 days, then {interval === "month" ? "$99/month" : "$999/year"}. Cancel anytime.
+              7 days free, then {interval === "month" ? "$99/month" : "$999/year"}. Cancel anytime.
             </p>
           )}
         </CardContent>

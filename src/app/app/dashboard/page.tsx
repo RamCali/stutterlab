@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { getDailyPlan, getPhaseInfo } from "@/lib/curriculum/daily-plans";
 import { isOnboardingComplete, getOnboardingData } from "@/lib/onboarding/feared-situations";
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
 import { getCurrentDay } from "@/lib/actions/user-progress";
+import { checkHasActiveSubscription } from "@/lib/auth/premium";
 import { PhaseTimeline } from "@/components/dashboard/phase-timeline";
 import { TodaysTasks } from "@/components/dashboard/todays-tasks";
 import { MilestoneCard } from "@/components/dashboard/milestone-card";
@@ -14,12 +16,16 @@ import { Badge } from "@/components/ui/badge";
 import { SLPAuthorityBadge } from "@/components/slp-authority-badge";
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [onboarded, setOnboarded] = useState(() => isOnboardingComplete());
   const [currentDay, setCurrentDay] = useState(1);
 
   useEffect(() => {
     getCurrentDay().then(setCurrentDay).catch(() => {});
-  }, []);
+    checkHasActiveSubscription().then((active) => {
+      if (!active) router.replace("/checkout/trial");
+    }).catch(() => {});
+  }, [router]);
 
   const dailyPlan = getDailyPlan(currentDay)!;
   const phase = getPhaseInfo(currentDay);

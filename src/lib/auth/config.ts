@@ -41,6 +41,6 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/login",
-    newUser: "/onboarding",
+    newUser: "/checkout/trial",
   },
 };

@@ -81,10 +81,7 @@ export function MarketingHeader() {
                   <Link href="/login" onClick={() => setOpen(false)}>Log in</Link>
                 </Button>
                 <Button size="lg" asChild>
-                  <Link href="/signup" onClick={() => setOpen(false)}>Get Started</Link>
-                </Button>
-                <Button variant="ghost" size="lg" className="text-primary" asChild>
-                  <Link href="/signup?plan=free" onClick={() => setOpen(false)}>Try for free</Link>
+                  <Link href="/signup" onClick={() => setOpen(false)}>Start Free Trial</Link>
                 </Button>
               </div>
             </div>

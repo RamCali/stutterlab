@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 export function CtaSection({
   title = "Ready to Transform Your Speech?",
   description = "Join thousands taking control of their fluency with evidence-based tools and AI-powered practice. Start your free trial today.",
-  primaryCta = "Start Free Trial",
+  primaryCta = "Start 7-Day Free Trial",
   primaryHref = "/signup",
 }: {
   title?: string;
@@ -27,7 +27,7 @@ export function CtaSection({
           </Link>
         </Button>
         <p className="text-sm text-muted-foreground mt-3">
-          No credit card required. Free tier available forever.
+          7 days free. Cancel anytime.
         </p>
       </div>
     </section>

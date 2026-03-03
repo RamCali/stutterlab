@@ -21,7 +21,7 @@ export default function SignupPage() {
 
   async function handleGoogleSignIn() {
     setLoading(true);
-    await signIn("google", { callbackUrl: "/app/dashboard" });
+    await signIn("google", { callbackUrl: "/checkout/trial" });
   }
 
   return (
@@ -77,7 +77,7 @@ export default function SignupPage() {
           </Button>
 
           <p className="text-sm text-muted-foreground text-center">
-            No credit card required for trial
+            Credit card required — you won&apos;t be charged for 7 days
           </p>
         </CardContent>
       </Card>
