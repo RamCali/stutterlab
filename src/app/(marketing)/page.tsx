@@ -203,14 +203,15 @@ export default function LandingPage() {
   return (
     <>
       {/* ═══ Hero ═══ */}
-      <section className="relative py-24 md:py-36 px-6 overflow-hidden">
+      <section className="relative py-14 md:py-36 px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/3 via-transparent to-transparent pointer-events-none" />
         <div className="max-w-3xl mx-auto relative flex flex-col items-center">
           <Badge
             variant="secondary"
-            className="mb-6 bg-primary/10 text-primary border-0 text-sm px-4 py-1.5"
+            className="mb-6 bg-primary/10 text-primary border-0 text-sm px-4 py-1.5 text-center"
           >
-            AI-powered speech training for people who stutter — designed by an SLP
+            <span className="hidden sm:inline">AI-powered speech training for people who stutter — designed by an SLP</span>
+            <span className="sm:hidden">Speech training for stutterers — by an SLP</span>
           </Badge>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-center leading-tight">
             Built for people who stutter.
