@@ -9,6 +9,10 @@ import {
   Shield,
   Zap,
   Mic2,
+  Users,
+  Headphones,
+  Music,
+  Eye,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { CoachingConfig, TechniqueType } from "@/lib/audio/SpeechCoach";
@@ -450,6 +454,161 @@ export const exercises: ExerciseDefinition[] = [
         "If a dog chews shoes, whose shoes does he choose?",
         "How can a clam cram in a clean cream can?",
       ],
+    },
+  },
+  {
+    id: "reading-to-ai",
+    title: "Reading to AI Listener",
+    description:
+      "Read passages aloud to an AI listener who reacts and asks questions — simulating reading to a real person.",
+    icon: Users,
+    color: "text-teal-500",
+    bg: "bg-teal-500/10",
+    difficulty: "Intermediate",
+    duration: "10-15 min",
+    isPremium: true,
+    techniqueId: null,
+    instructions: [
+      "Choose a passage to read.",
+      "Tap 'Start Reading' — the AI is now listening.",
+      "Read at your natural pace. Don't rush.",
+      "After each section, the AI will react and may ask a question.",
+      "Use your techniques (gentle onset, pausing) as needed.",
+      "The goal is to practice reading with someone listening — social pressure practice.",
+    ],
+    coachingTips: [
+      { doThis: "Read at your natural pace — the AI listener is patient", notThis: "Rushing through the passage to finish faster" },
+      { doThis: "Maintain eye contact with the text, not the mic button", notThis: "Watching the transcript — focus on the reading" },
+      { doThis: "Use your techniques (gentle onset, pausing) as needed", notThis: "Trying to be 'perfect' — the goal is social practice, not perfection" },
+    ],
+    feedbackRubric: {
+      checkpoints: [
+        "Did you read at a comfortable pace?",
+        "Did you use techniques when you felt a block coming?",
+        "Did the AI's presence change how you read?",
+      ],
+      successSignal: "You read with awareness that someone is listening, and you maintained your pace despite that social pressure.",
+    },
+  },
+  {
+    id: "daf-reading",
+    title: "DAF-Assisted Reading",
+    description:
+      "Read with delayed auditory feedback, then without — discover how DAF changes your fluency.",
+    icon: Headphones,
+    color: "text-violet-500",
+    bg: "bg-violet-500/10",
+    difficulty: "Beginner",
+    duration: "8-12 min",
+    isPremium: true,
+    techniqueId: null,
+    instructions: [
+      "Put on headphones (required for DAF to work properly).",
+      "Phase 1: Read the passage WITH DAF enabled. Notice how it feels.",
+      "Rate your fluency after reading with DAF.",
+      "Phase 2: Read the SAME passage WITHOUT DAF.",
+      "Rate your fluency again.",
+      "Phase 3: Compare your ratings and reflect on the difference.",
+    ],
+    coachingTips: [
+      { doThis: "Use headphones for the best DAF effect", notThis: "Using speakers — you'll get feedback loops" },
+      { doThis: "Read the same passage both times for a fair comparison", notThis: "Skipping the raw reading — the comparison is the whole point" },
+      { doThis: "Notice how your pace and tension change with DAF", notThis: "Judging yourself — this is exploration, not a test" },
+    ],
+    feedbackRubric: {
+      checkpoints: [
+        "Did DAF change your speaking pace?",
+        "Did you feel less tension with DAF on?",
+        "Could you notice the difference in your fluency?",
+      ],
+      successSignal: "You have a clear sense of how DAF affects YOUR speech — this awareness helps you use it strategically.",
+    },
+  },
+  {
+    id: "rhythm-reading",
+    title: "Rhythm Reading",
+    description:
+      "Read in cadence with a metronome beat — Syllable-Timed Speech (STS) technique for smoother flow.",
+    icon: Music,
+    color: "text-rose-500",
+    bg: "bg-rose-500/10",
+    difficulty: "Beginner",
+    duration: "5-10 min",
+    isPremium: false,
+    techniqueId: null,
+    instructions: [
+      "Put on headphones for the best effect.",
+      "Choose a tempo that feels comfortable (start slow!).",
+      "Read each syllable on a beat — don't rush between beats.",
+      "It will sound sing-songy at first. That's normal and expected.",
+      "Gradually increase the tempo as you get comfortable.",
+    ],
+    coachingTips: [
+      { doThis: "Match one syllable to each beat — 'beau-ti-ful' = 3 beats", notThis: "Trying to fit whole words into one beat" },
+      { doThis: "Start at 60 BPM and work up slowly", notThis: "Jumping to a fast tempo before you're ready" },
+      { doThis: "Let the rhythm carry your voice — like singing", notThis: "Fighting the rhythm or ignoring beats" },
+    ],
+    feedbackRubric: {
+      checkpoints: [
+        "Did you stay in sync with the metronome?",
+        "Did the rhythm help reduce blocks?",
+        "Could you gradually increase tempo?",
+      ],
+      successSignal: "You read smoothly in rhythm, and when you speed up, your fluency holds — the beat becomes your guide.",
+    },
+    practiceItems: {
+      poems: [
+        "Twinkle, twinkle, little star, how I wonder what you are",
+        "Roses are red, violets are blue, sugar is sweet, and so are you",
+        "I wandered lonely as a cloud that floats on high o'er vales and hills",
+        "Two roads diverged in a yellow wood, and sorry I could not travel both",
+        "Do not go gentle into that good night, rage, rage against the dying of the light",
+      ],
+      sentences: [
+        "The quick brown fox jumps over the lazy dog.",
+        "I would like to order a coffee with cream and sugar.",
+        "My name is and I am practicing my speech today.",
+        "The weather is beautiful and I feel great about my progress.",
+        "Could you please help me find the right section?",
+        "Thank you for your patience and understanding.",
+      ],
+      paragraphs: [
+        "Speaking is a skill that improves with practice. Every time you use your techniques — gentle onset, light contact, or pacing — you build new neural pathways. The key is consistency, not perfection.",
+        "The ocean waves rolled gently onto the shore as the sun began to set. A cool breeze carried the scent of salt and seaweed. Children played near the water's edge.",
+      ],
+    },
+  },
+  {
+    id: "mirror-practice",
+    title: "Mirror Practice",
+    description:
+      "Speak to your reflection using the front camera — practice eye contact, observe tension, build confidence.",
+    icon: Eye,
+    color: "text-emerald-500",
+    bg: "bg-emerald-500/10",
+    difficulty: "Intermediate",
+    duration: "5-10 min",
+    isPremium: false,
+    techniqueId: null,
+    instructions: [
+      "Allow camera access — your front camera becomes a mirror.",
+      "Read the speaking prompt on screen.",
+      "Speak to your reflection while maintaining eye contact.",
+      "Notice your facial tension — consciously relax your jaw and lips.",
+      "After each prompt, rate your eye contact, tension, and confidence.",
+    ],
+    coachingTips: [
+      { doThis: "Maintain eye contact with yourself — look at your eyes, not your mouth", notThis: "Avoiding your own gaze — lean into the discomfort" },
+      { doThis: "Consciously relax your jaw and facial muscles as you speak", notThis: "Ignoring facial tension — awareness is the first step" },
+      { doThis: "Speak at your natural volume, as if talking to a friend", notThis: "Whispering or mumbling to avoid hearing yourself" },
+    ],
+    feedbackRubric: {
+      checkpoints: [
+        "Did you maintain eye contact with your reflection?",
+        "Did you notice and release facial tension?",
+        "Did you speak at a natural, comfortable volume?",
+      ],
+      successSignal: "You speak to yourself naturally, maintaining eye contact, with visible relaxation in your face — you look and sound confident.",
     },
   },
 ];

@@ -373,11 +373,11 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
       });
     } else if (day === 6) {
       tasks.push({
-        title: "DAF Extended Reading",
-        subtitle: "Longer passage with delayed feedback",
+        title: "Rhythm Reading",
+        subtitle: "Read with a metronome beat — feel the flow of syllable-timed speech",
         duration: "4 min",
-        type: "audio-lab",
-        href: "/app/audio-lab",
+        type: "exercise",
+        href: "/app/rhythm-reading",
       });
       tasks.push({
         title: "FAF Preview",
@@ -579,34 +579,56 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         href: "/app/audio-lab",
       });
     } else if (rotation === 2) {
-      // Audio Lab day: FAF + combined
-      tasks.push({
-        title: dayInPhase <= 8 ? "FAF Training Session" : "DAF + FAF Combined",
-        subtitle: dayInPhase <= 8 ? "Practice with pitch-shifted feedback" : "Dual audio practice reading",
-        duration: "5 min",
-        type: "audio-lab",
-        href: "/app/audio-lab",
-        premium: true,
-      });
-      tasks.push({
-        title: "Rate Control Practice",
-        subtitle: "Read at 3 different speeds — slow, medium, natural",
-        duration: "3 min",
-        type: "exercise",
-        href: "/app/exercises",
-      });
+      // Audio Lab day: alternate FAF and DAF-Assisted Reading
+      if (dayInPhase % 2 === 0) {
+        tasks.push({
+          title: "DAF-Assisted Reading",
+          subtitle: "Read with DAF, then without — compare the difference",
+          duration: "8 min",
+          type: "exercise",
+          href: "/app/daf-reading",
+          premium: true,
+        });
+      } else {
+        tasks.push({
+          title: dayInPhase <= 8 ? "FAF Training Session" : "DAF + FAF Combined",
+          subtitle: dayInPhase <= 8 ? "Practice with pitch-shifted feedback" : "Dual audio practice reading",
+          duration: "5 min",
+          type: "audio-lab",
+          href: "/app/audio-lab",
+          premium: true,
+        });
+        tasks.push({
+          title: "Rate Control Practice",
+          subtitle: "Read at 3 different speeds — slow, medium, natural",
+          duration: "3 min",
+          type: "exercise",
+          href: "/app/exercises",
+        });
+      }
     } else if (rotation === 3) {
-      // AI day
-      const scenarios = ["Ordering Food", "Small Talk", "Asking Directions"];
-      const scenario = scenarios[(dayInPhase - 1) % scenarios.length];
-      tasks.push({
-        title: `AI Practice: ${scenario}`,
-        subtitle: "Apply your techniques in a practice conversation",
-        duration: "5 min",
-        type: "ai",
-        href: "/app/ai-practice",
-        premium: true,
-      });
+      // AI day: alternate AI Practice and Reading-to-AI
+      if (dayInPhase % 2 === 0) {
+        tasks.push({
+          title: "Reading to AI Listener",
+          subtitle: "Read a passage aloud to the AI — practice social reading",
+          duration: "8 min",
+          type: "exercise",
+          href: "/app/reading-to-ai",
+          premium: true,
+        });
+      } else {
+        const scenarios = ["Ordering Food", "Small Talk", "Asking Directions"];
+        const scenario = scenarios[(dayInPhase - 1) % scenarios.length];
+        tasks.push({
+          title: `AI Practice: ${scenario}`,
+          subtitle: "Apply your techniques in a practice conversation",
+          duration: "5 min",
+          type: "ai",
+          href: "/app/ai-practice",
+          premium: true,
+        });
+      }
       tasks.push({
         title: "Voice Journal",
         subtitle: "How did your techniques hold up in conversation?",
@@ -778,15 +800,25 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         href: "/app/voice-journal/new",
       });
     } else if (rotation === 4) {
-      // Choral speaking + audio
-      tasks.push({
-        title: "Choral Speaking Session",
-        subtitle: "Read along with an AI voice for the choral effect",
-        duration: "4 min",
-        type: "audio-lab",
-        href: "/app/audio-lab",
-        premium: true,
-      });
+      // Choral speaking + rhythm reading (alternate)
+      if (dayInPhase % 2 === 0) {
+        tasks.push({
+          title: "Rhythm Reading",
+          subtitle: "Read with a metronome — syllable-timed speech technique",
+          duration: "5 min",
+          type: "exercise",
+          href: "/app/rhythm-reading",
+        });
+      } else {
+        tasks.push({
+          title: "Choral Speaking Session",
+          subtitle: "Read along with an AI voice for the choral effect",
+          duration: "4 min",
+          type: "audio-lab",
+          href: "/app/audio-lab",
+          premium: true,
+        });
+      }
       tasks.push({
         title: "Voluntary Stuttering",
         subtitle: "Stutter on purpose — reduce the fear of stuttering",
@@ -796,7 +828,7 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         premium: true,
       });
     } else if (rotation === 5) {
-      // Real-world challenge
+      // Real-world challenge + mirror practice (alternate)
       tasks.push({
         title: "Real-World Challenge",
         subtitle: "Use a modification technique in a real interaction today",
@@ -805,13 +837,23 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         href: "/app/challenges",
         premium: true,
       });
-      tasks.push({
-        title: "DAF + Modification Combo",
-        subtitle: "Practice cancellation or pull-out with DAF support",
-        duration: "4 min",
-        type: "audio-lab",
-        href: "/app/audio-lab",
-      });
+      if (dayInPhase % 2 === 0) {
+        tasks.push({
+          title: "Mirror Practice",
+          subtitle: "Speak to your reflection — build eye contact and confidence",
+          duration: "5 min",
+          type: "exercise",
+          href: "/app/mirror-practice",
+        });
+      } else {
+        tasks.push({
+          title: "DAF + Modification Combo",
+          subtitle: "Practice cancellation or pull-out with DAF support",
+          duration: "4 min",
+          type: "audio-lab",
+          href: "/app/audio-lab",
+        });
+      }
     } else if (rotation === 6) {
       // Mixed technique + feared words
       tasks.push({
@@ -954,17 +996,25 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         premium: true,
       });
     } else if (rotation === 4) {
-      // Disclosure + technique
-      tasks.push({
-        title: dayInPhase <= 10 ? "Disclosure Practice" : "Advanced Technique Mix",
-        subtitle: dayInPhase <= 10
-          ? "Practice telling someone about your stutter — own it"
-          : "Combine fluency shaping + modification + breathing",
-        duration: "4 min",
-        type: "exercise",
-        href: "/app/exercises",
-        premium: true,
-      });
+      // Disclosure + mirror practice
+      if (dayInPhase <= 10) {
+        tasks.push({
+          title: "Mirror Practice: Disclosure",
+          subtitle: "Practice telling your reflection about your stutter — own it",
+          duration: "5 min",
+          type: "exercise",
+          href: "/app/mirror-practice",
+        });
+      } else {
+        tasks.push({
+          title: "Advanced Technique Mix",
+          subtitle: "Combine fluency shaping + modification + breathing",
+          duration: "4 min",
+          type: "exercise",
+          href: "/app/exercises",
+          premium: true,
+        });
+      }
       tasks.push({
         title: "DAF Conversation Practice",
         subtitle: "Talk freely with DAF — build transfer confidence",

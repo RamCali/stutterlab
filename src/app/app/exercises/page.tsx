@@ -9,6 +9,18 @@ import { Input } from "@/components/ui/input";
 import { BookOpen, Search, Crown } from "lucide-react";
 import { exercises } from "@/lib/exercises/exercise-data";
 
+/** Exercises with dedicated pages route there instead of /exercises/[id] */
+const CUSTOM_EXERCISE_ROUTES: Record<string, string> = {
+  "reading-to-ai": "/app/reading-to-ai",
+  "daf-reading": "/app/daf-reading",
+  "rhythm-reading": "/app/rhythm-reading",
+  "mirror-practice": "/app/mirror-practice",
+};
+
+function getExerciseHref(exerciseId: string): string {
+  return CUSTOM_EXERCISE_ROUTES[exerciseId] ?? `/exercises/${exerciseId}`;
+}
+
 const difficultyColors: Record<string, string> = {
   Beginner: "bg-green-500/10 text-green-600",
   Intermediate: "bg-amber-500/10 text-amber-600",
@@ -70,7 +82,7 @@ export default function ExercisesPage() {
       {/* Exercise Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filtered.map((ex) => (
-          <Link key={ex.id} href={`/exercises/${ex.id}`}>
+          <Link key={ex.id} href={getExerciseHref(ex.id)}>
             <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
               <CardContent className="pt-5 pb-4">
                 <div className="flex items-start gap-3">

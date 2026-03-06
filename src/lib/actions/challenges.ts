@@ -175,6 +175,26 @@ const DAILY_CHALLENGES: DailyChallenge[] = [
     icon: "📨",
     tips: ["Plan: name, reason, callback number", "Speak slowly and clearly", "It's okay to pause"],
   },
+  {
+    id: "mirror-practice-5",
+    title: "Mirror Talk: 5 Minutes",
+    description: "Spend 5 minutes talking to yourself in a mirror — practice eye contact and confidence.",
+    category: "general",
+    difficulty: "easy",
+    xpReward: 40,
+    icon: "🪞",
+    tips: ["Maintain eye contact with yourself", "Use gentle onset on your first words", "Notice your facial tension and consciously relax"],
+  },
+  {
+    id: "read-to-someone",
+    title: "Read Aloud to Someone",
+    description: "Read a passage or article aloud to a friend, family member, or even a pet.",
+    category: "social",
+    difficulty: "medium",
+    xpReward: 75,
+    icon: "📖",
+    tips: ["Choose a short passage you enjoy", "Read at your natural pace — no rushing", "Use your techniques (gentle onset, pausing) as needed"],
+  },
 ];
 
 /* ─── Get Daily Challenge ─── */

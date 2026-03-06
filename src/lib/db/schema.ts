@@ -42,6 +42,10 @@ export const exerciseTypeEnum = pgEnum("exercise_type", [
   "voluntary_stuttering",
   "tongue_twister",
   "phone_number",
+  "reading_to_ai",
+  "daf_reading",
+  "rhythm_reading",
+  "mirror_practice",
 ]);
 export const exerciseDifficultyEnum = pgEnum("exercise_difficulty", [
   "beginner",
