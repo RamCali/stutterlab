@@ -19,7 +19,10 @@ export async function POST(req: NextRequest) {
 
     const session = await createCheckoutSession(user.id, user.email!, interval);
     return NextResponse.json({ clientSecret: session.client_secret });
-  } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  } catch (err) {
+    console.error("Checkout error:", err);
+    const message = err instanceof Error ? err.message : "Unauthorized";
+    const status = message.includes("No price configured") ? 500 : 401;
+    return NextResponse.json({ error: message }, { status });
   }
 }

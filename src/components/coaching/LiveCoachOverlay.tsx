@@ -40,7 +40,7 @@ export function LiveCoachOverlay({
         variant="outline"
         size="sm"
         onClick={() => setCollapsed(false)}
-        className="fixed bottom-20 right-4 z-50 rounded-full h-10 w-10 p-0 shadow-lg border-primary/30 bg-background/90 backdrop-blur-sm md:bottom-4"
+        className="fixed top-16 right-4 z-40 rounded-full h-10 w-10 p-0 shadow-lg border-primary/30 bg-background/90 backdrop-blur-sm md:top-auto md:bottom-4"
       >
         <Activity className="h-4 w-4 text-primary" />
       </Button>
@@ -49,10 +49,10 @@ export function LiveCoachOverlay({
 
   return (
     <div
-      className="fixed bottom-20 right-4 z-50 w-64
-                 md:bottom-4 md:right-4"
+      className="fixed top-16 right-4 z-40 w-64 pointer-events-none
+                 md:top-auto md:bottom-4 md:right-4"
     >
-      <Card className="shadow-lg border-primary/20 bg-background/95 backdrop-blur-sm">
+      <Card className="shadow-lg border-primary/20 bg-background/95 backdrop-blur-sm pointer-events-auto">
         <CardContent className="p-3 space-y-2.5">
           {/* Header */}
           <div className="flex justify-between items-center">

@@ -12,6 +12,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { LiveCoachOverlay } from "@/components/coaching/LiveCoachOverlay";
+import { useDeepgramSTT } from "@/hooks/useDeepgramSTT";
 
 interface SpeakStepProps {
   scenario: string;
@@ -44,15 +45,16 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
   const [listening, setListening] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [speaking, setSpeaking] = useState(false);
-  const [transcript, setTranscript] = useState("");
+  const [liveTranscript, setLiveTranscript] = useState("");
   const [statusText, setStatusText] = useState("");
 
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const stoppedIntentionallyRef = useRef(false);
   const [coachAnalyser, setCoachAnalyser] = useState<AnalyserNode | null>(null);
   const coachAudioCtxRef = useRef<AudioContext | null>(null);
+  const [bars, setBars] = useState<number[]>(Array(40).fill(3));
+  const messagesRef = useRef<Message[]>([]);
+  messagesRef.current = messages;
 
   const scenarioInfo = SCENARIO_LABELS[scenario] || {
     title: "Conversation",
@@ -71,8 +73,6 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
     setSpeaking(true);
     setStatusText("AI is speaking...");
 
-    // Safety timeout — auto-recover if audio callbacks never fire
-    // (common on iOS: onended/onend don't fire reliably)
     const wordCount = text.split(/\s+/).length;
     const maxMs = Math.max(10000, wordCount * 600);
     const safetyTimer = setTimeout(() => {
@@ -112,7 +112,6 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
           await audio.play();
           return;
         } catch {
-          // Autoplay blocked (common on iOS) — fall through to speechSynthesis
           URL.revokeObjectURL(url);
         }
       }
@@ -126,14 +125,13 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
       utterance.rate = 0.92;
       utterance.pitch = 1.0;
 
-      // Pick a natural-sounding voice if available
       const voices = speechSynthesis.getVoices();
       const preferred = voices.find(
         (v) =>
-          v.name.includes("Samantha") ||   // macOS high-quality
-          v.name.includes("Karen") ||       // macOS
-          v.name.includes("Google") ||      // Chrome
-          v.name.includes("Natural")        // Edge
+          v.name.includes("Samantha") ||
+          v.name.includes("Karen") ||
+          v.name.includes("Google") ||
+          v.name.includes("Natural")
       );
       if (preferred) utterance.voice = preferred;
 
@@ -187,7 +185,6 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
   /* ─── Set up mic analyser for live coaching ─── */
   async function setupCoachAnalyser() {
     if (coachAnalyser) return;
-    // Create AudioContext synchronously in user-gesture context
     const ctx = new AudioContext();
     coachAudioCtxRef.current = ctx;
     try {
@@ -204,16 +201,16 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
     }
   }
 
+  /* ─── Deepgram STT hook ─── */
+  const deepgram = useDeepgramSTT({
+    onError: (msg) => {
+      setStatusText(msg);
+      setListening(false);
+    },
+  });
+
   /* ─── Speech recognition ─── */
-  function startListening() {
-    const SpeechRecognitionAPI =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (!SpeechRecognitionAPI) {
-      setStatusText("Speech recognition not supported — please use Chrome");
-      return;
-    }
-
+  async function startListening() {
     // Stop any playing audio
     if (audioRef.current) {
       audioRef.current.pause();
@@ -223,97 +220,38 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
       speechSynthesis.cancel();
     }
     setSpeaking(false);
-    stoppedIntentionallyRef.current = false;
 
-    const recognition = new SpeechRecognitionAPI();
-    recognition.lang = "en-US";
-    recognition.interimResults = true;
-    recognition.continuous = true;
-    recognition.maxAlternatives = 1;
-    recognitionRef.current = recognition;
-
-    let finalTranscript = "";
-    let hadError = false;
-    let restartCount = 0;
-
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let interim = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const result = event.results[i];
-        if (result.isFinal) {
-          finalTranscript += result[0].transcript;
-        } else {
-          interim += result[0].transcript;
-        }
-      }
-      setTranscript(finalTranscript || interim);
-    };
-
-    recognition.onend = () => {
-      const text = finalTranscript.trim();
-
-      // Chrome can randomly end recognition even with continuous=true.
-      // Auto-restart with a delay if user didn't tap stop and we have no text yet.
-      if (!stoppedIntentionallyRef.current && !text && !hadError && restartCount < 8) {
-        restartCount++;
-        // Delay restart — Chrome rejects rapid re-starts
-        setTimeout(() => {
-          if (stoppedIntentionallyRef.current) return;
-          try {
-            recognition.start();
-          } catch {
-            setListening(false);
-            setStatusText("Mic unavailable — tap to try again");
-          }
-        }, 300);
-        return; // Keep "Listening" state — don't update UI
-      }
-
-      setListening(false);
-      setTranscript("");
-
-      if (text) {
-        sendToAI(text, messages);
-      } else if (!hadError) {
-        setStatusText("Didn't catch that — tap the mic to try again");
-      }
-    };
-
-    recognition.onerror = (event) => {
-      const errorCode = (event as ErrorEvent & { error?: string }).error || "";
-
-      // "no-speech" and "aborted" are recoverable — don't mark as fatal error
-      if (errorCode === "no-speech" || errorCode === "aborted") {
-        return; // Let onend handle restart
-      }
-
-      hadError = true;
-      setListening(false);
-      setTranscript("");
-
-      const errorMap: Record<string, string> = {
-        "not-allowed": "Mic blocked — click the lock icon in the address bar to allow microphone",
-        "network": "Network error — check your connection",
-        "audio-capture": "No microphone found — connect a mic and try again",
-        "service-not-allowed": "Speech service unavailable — please use Chrome",
-      };
-
-      const msg = errorMap[errorCode] || `Mic error (${errorCode}) — tap to try again`;
-      setStatusText(msg);
-    };
-
-    recognition.start();
     setListening(true);
-    setTranscript("");
+    setLiveTranscript("");
     setStatusText("Listening — speak now...");
+
+    const success = await deepgram.start();
+    if (!success) {
+      setListening(false);
+      setStatusText("Failed to start listening — check mic permissions");
+    }
   }
 
   function stopListening() {
-    stoppedIntentionallyRef.current = true;
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
+    deepgram.stop();
+    setListening(false);
+
+    const text = deepgram.finalTranscript.trim();
+    setLiveTranscript("");
+
+    if (text) {
+      sendToAI(text, messagesRef.current);
+    } else {
+      setStatusText("Didn't catch that — tap the mic to try again");
     }
   }
+
+  // Sync deepgram transcript to liveTranscript for display
+  useEffect(() => {
+    if (listening) {
+      setLiveTranscript(deepgram.transcript);
+    }
+  }, [deepgram.transcript, listening]);
 
   /* ─── Start conversation (AI speaks first) ─── */
   async function startConversation() {
@@ -356,12 +294,31 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
     await speakText(fallback.content);
   }
 
+  /* ─── Waveform visualization ─── */
+  useEffect(() => {
+    if (!listening || !coachAnalyser) {
+      setBars(Array(40).fill(3));
+      return;
+    }
+    const interval = setInterval(() => {
+      const data = new Float32Array(coachAnalyser.fftSize);
+      coachAnalyser.getFloatTimeDomainData(data);
+      const segSize = Math.floor(data.length / 40);
+      const newBars = Array.from({ length: 40 }, (_, i) => {
+        let peak = 0;
+        for (let j = i * segSize; j < (i + 1) * segSize && j < data.length; j++) {
+          peak = Math.max(peak, Math.abs(data[j]));
+        }
+        return Math.min(100, peak * 400);
+      });
+      setBars(newBars);
+    }, 50);
+    return () => clearInterval(interval);
+  }, [listening, coachAnalyser]);
+
   /* ─── Cleanup ─── */
   useEffect(() => {
     return () => {
-      if (recognitionRef.current) {
-        try { recognitionRef.current.abort(); } catch { /* */ }
-      }
       if (audioRef.current) {
         audioRef.current.pause();
       }
@@ -438,24 +395,37 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
           </div>
         )}
-        {listening && transcript && (
+        {listening && liveTranscript && (
           <div className="bg-primary/10 ml-8 p-3 rounded-lg border border-primary/20">
             <span className="text-sm text-muted-foreground uppercase block mb-1">
               You (listening...)
             </span>
-            <span className="text-sm italic text-muted-foreground">{transcript}</span>
+            <span className="text-sm italic text-muted-foreground">{liveTranscript}</span>
           </div>
         )}
         <div ref={chatEndRef} />
       </div>
 
       {/* Voice controls */}
-      <div className="border-t pt-4">
+      <div className="border-t pt-4 relative z-50">
         {/* Status */}
         <p className="text-center text-sm text-muted-foreground mb-3">
           {speaking && <Volume2 className="h-3 w-3 inline mr-1 animate-pulse" />}
           {statusText}
         </p>
+
+        {/* Waveform */}
+        <div className="flex items-end justify-center gap-[2px] h-12 mb-3">
+          {bars.map((height, i) => (
+            <div
+              key={i}
+              className={`w-1 rounded-full transition-all duration-75 ${
+                listening ? "bg-primary" : "bg-muted"
+              }`}
+              style={{ height: `${Math.max(height, 3)}%` }}
+            />
+          ))}
+        </div>
 
         {/* Mic button */}
         <div className="flex items-center justify-center">

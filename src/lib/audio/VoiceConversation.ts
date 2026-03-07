@@ -4,7 +4,7 @@
  * State machine: IDLE → LISTENING → PROCESSING → SPEAKING → LISTENING → ...
  *
  * Flow:
- * 1. User speaks → Web Speech API transcribes
+ * 1. User speaks → Deepgram streaming STT transcribes
  * 2. Transcript → /api/ai-conversation → AI response text
  * 3. AI response → /api/tts → audio blob → play through speaker
  * 4. Audio ends → resume listening
@@ -15,6 +15,10 @@
  */
 
 import { countDisfluencies, estimateSyllables } from "@/lib/audio/speech-metrics";
+import {
+  DeepgramStreamingClient,
+  type DeepgramTranscriptEvent,
+} from "@/lib/audio/DeepgramStreamingClient";
 
 export type VoiceState = "idle" | "listening" | "processing" | "speaking";
 
@@ -58,7 +62,7 @@ interface VoiceConversationCallbacks {
 
 export class VoiceConversation {
   private state: VoiceState = "idle";
-  private recognition: SpeechRecognition | null = null;
+  private deepgramClient: DeepgramStreamingClient | null = null;
   private audioContext: AudioContext | null = null;
   private callbacks: VoiceConversationCallbacks;
   private scenario: string;
@@ -137,15 +141,6 @@ export class VoiceConversation {
   }
 
   async start(): Promise<boolean> {
-    const SpeechRecognitionAPI =
-      (window as unknown as Record<string, unknown>).SpeechRecognition ||
-      (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
-
-    if (!SpeechRecognitionAPI) {
-      this.callbacks.onError("Speech recognition not supported in this browser");
-      return false;
-    }
-
     this.audioContext = new AudioContext();
     this.isRunning = true;
     this.conversationHistory = [];
@@ -169,10 +164,9 @@ export class VoiceConversation {
       this.silenceTimeout = null;
     }
 
-    if (this.recognition) {
-      this.recognition.onend = null;
-      this.recognition.abort();
-      this.recognition = null;
+    if (this.deepgramClient) {
+      this.deepgramClient.stop();
+      this.deepgramClient = null;
     }
 
     if (this.audioContext) {
@@ -196,97 +190,70 @@ export class VoiceConversation {
     this.callbacks.onStateChange(newState);
   }
 
-  private startListening() {
+  private async startListening() {
     if (!this.isRunning) return;
-
-    const SpeechRecognitionAPI =
-      (window as unknown as Record<string, unknown>).SpeechRecognition ||
-      (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
-
-    this.recognition = new (SpeechRecognitionAPI as new () => SpeechRecognition)();
-    this.recognition.continuous = true;
-    this.recognition.interimResults = true;
-    this.recognition.lang = "en-US";
 
     this.currentTranscript = "";
     this.turnStartTime = Date.now();
     this.setState("listening");
 
-    this.recognition.onresult = (event: SpeechRecognitionEvent) => {
-      // Reset silence timer on any speech
-      if (this.silenceTimeout) clearTimeout(this.silenceTimeout);
+    this.deepgramClient = new DeepgramStreamingClient(
+      {
+        onTranscript: (event: DeepgramTranscriptEvent) => {
+          // Reset silence timer on any speech
+          if (this.silenceTimeout) clearTimeout(this.silenceTimeout);
 
-      let interimTranscript = "";
-      let finalTranscript = "";
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript;
-        } else {
-          interimTranscript += transcript;
-        }
-      }
-
-      if (finalTranscript) {
-        this.currentTranscript += finalTranscript;
-        this.callbacks.onUserTranscript(this.currentTranscript, false);
-      } else if (interimTranscript) {
-        this.callbacks.onUserTranscript(
-          this.currentTranscript + interimTranscript,
-          false
-        );
-      }
-
-      // In push-to-talk mode, don't auto-submit — wait for manual submitTurn()
-      if (this.blockAwareConfig.turnMode === "push-to-talk") return;
-
-      // Set silence timeout using configurable duration (block-aware = longer tolerance)
-      this.silenceTimeout = setTimeout(() => {
-        if (this.currentTranscript.trim() && this.isRunning) {
-          this.finishUserTurn();
-        }
-      }, this.blockAwareConfig.silenceTimeoutMs);
-    };
-
-    this.recognition.onerror = (event) => {
-      if (event.error === "no-speech") {
-        // Restart if no speech detected
-        if (this.isRunning && this.state === "listening") {
-          try {
-            this.recognition?.start();
-          } catch {
-            // Already started
+          if (event.isFinal) {
+            this.currentTranscript += event.text + " ";
+            this.callbacks.onUserTranscript(this.currentTranscript.trim(), false);
+          } else {
+            this.callbacks.onUserTranscript(
+              (this.currentTranscript + event.text).trim(),
+              false
+            );
           }
-        }
-        return;
-      }
-      if (event.error !== "aborted") {
-        this.callbacks.onError(`Speech recognition error: ${event.error}`);
-      }
-    };
 
-    this.recognition.onend = () => {
-      if (this.isRunning && this.state === "listening") {
-        try {
-          this.recognition?.start();
-        } catch {
-          // Already started
-        }
-      }
-    };
+          // In push-to-talk mode, don't auto-submit
+          if (this.blockAwareConfig.turnMode === "push-to-talk") return;
 
-    this.recognition.start();
+          // Set silence timeout using configurable duration
+          this.silenceTimeout = setTimeout(() => {
+            if (this.currentTranscript.trim() && this.isRunning) {
+              this.finishUserTurn();
+            }
+          }, this.blockAwareConfig.silenceTimeoutMs);
+        },
+        onUtteranceEnd: () => {
+          // Deepgram detected end of utterance — use as turn boundary in auto mode
+          if (this.blockAwareConfig.turnMode === "push-to-talk") return;
+          if (this.currentTranscript.trim() && this.isRunning) {
+            // Clear any existing silence timer and submit
+            if (this.silenceTimeout) clearTimeout(this.silenceTimeout);
+            this.finishUserTurn();
+          }
+        },
+        onError: (error) => {
+          this.callbacks.onError(error);
+        },
+      },
+      {
+        utteranceEndMs: this.blockAwareConfig.silenceTimeoutMs,
+      }
+    );
+
+    const success = await this.deepgramClient.start();
+    if (!success) {
+      this.callbacks.onError("Failed to start speech recognition");
+    }
   }
 
   private async finishUserTurn() {
     if (!this.currentTranscript.trim()) return;
 
     // Stop listening
-    if (this.recognition) {
-      this.recognition.onend = null;
-      this.recognition.abort();
-      this.recognition = null;
+    if (this.deepgramClient) {
+      this.deepgramClient.stop();
+      this.deepgramClient = null;
     }
 
     const userText = this.currentTranscript.trim();

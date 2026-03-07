@@ -65,12 +65,19 @@ export function getPlanForPriceId(priceId: string): PlanTier {
   return "pro"; // fallback — treat all paid as premium
 }
 
+function getAppUrl(): string {
+  const url = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL;
+  if (!url) throw new Error("NEXT_PUBLIC_APP_URL or NEXTAUTH_URL must be set");
+  return url;
+}
+
 export async function createCheckoutSession(
   userId: string,
   email: string,
   interval: BillingInterval = "year"
 ) {
   const priceId = getPriceIdForPlan("premium", interval);
+  const appUrl = getAppUrl();
 
   return getStripe().checkout.sessions.create({
     ui_mode: "embedded",
@@ -83,7 +90,7 @@ export async function createCheckoutSession(
         quantity: 1,
       },
     ],
-    return_url: `${process.env.NEXT_PUBLIC_APP_URL}/app/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
+    return_url: `${appUrl}/app/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
     metadata: { userId, plan: "pro" },
     subscription_data: {
       metadata: { userId, plan: "pro" },
@@ -95,6 +102,6 @@ export async function createCheckoutSession(
 export async function createPortalSession(stripeCustomerId: string) {
   return getStripe().billingPortal.sessions.create({
     customer: stripeCustomerId,
-    return_url: `${process.env.NEXT_PUBLIC_APP_URL}/app/settings`,
+    return_url: `${getAppUrl()}/app/settings`,
   });
 }

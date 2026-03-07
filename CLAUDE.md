@@ -23,7 +23,7 @@ npm run dev                    # http://localhost:3000
 
 Next.js 16 (App Router) · React 19 · TypeScript (strict) · Tailwind CSS v4 · Drizzle ORM · Neon PostgreSQL · NextAuth v4 (JWT + Google OAuth) · Stripe · Vitest
 
-**AI**: Anthropic SDK (primary LLM) + OpenAI (Whisper transcription) + ElevenLabs (TTS/choral)
+**AI**: Anthropic SDK (primary LLM) + Deepgram (speech-to-text) + ElevenLabs (TTS/choral)
 
 ## Architecture
 

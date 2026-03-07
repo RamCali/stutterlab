@@ -34,8 +34,11 @@ export function EmbeddedCheckoutDialog({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ interval }),
     });
-    const { clientSecret } = await res.json();
-    return clientSecret;
+    const data = await res.json();
+    if (!res.ok || !data.clientSecret) {
+      throw new Error(data.error || "Failed to create checkout session");
+    }
+    return data.clientSecret as string;
   }, [interval]);
 
   return (

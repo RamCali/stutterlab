@@ -192,7 +192,7 @@ export class SpeechCoach {
 
   // ==================== LIFECYCLE ====================
 
-  start(): boolean {
+  async start(): Promise<boolean> {
     if (this.isRunning) return false;
 
     // Create and start the underlying SpeechAnalyzer
@@ -202,7 +202,7 @@ export class SpeechCoach {
       onDisfluency: (disfluency) => this.handleDisfluency(disfluency),
     });
 
-    const started = this.analyzer.start();
+    const started = await this.analyzer.start();
     if (!started) return false;
 
     this.isRunning = true;

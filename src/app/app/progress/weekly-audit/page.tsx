@@ -27,6 +27,7 @@ import {
   getAuditHistory,
   saveWeeklyAudit,
 } from "@/lib/actions/weekly-audit";
+import { useDeepgramSTT } from "@/hooks/useDeepgramSTT";
 
 type AuditStep = "prompt" | "recording" | "processing" | "report";
 
@@ -75,7 +76,6 @@ export default function WeeklyAuditPage() {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   // Report state
   const [report, setReport] = useState<AuditReport | null>(null);
@@ -85,6 +85,17 @@ export default function WeeklyAuditPage() {
   const [history, setHistory] = useState<Awaited<ReturnType<typeof getAuditHistory>>>([]);
 
   const MAX_DURATION = 120; // 2 minutes
+
+  const deepgram = useDeepgramSTT({
+    config: { utteranceEndMs: 2000 },
+  });
+
+  // Sync deepgram transcript to local state
+  useEffect(() => {
+    if (isRecording) {
+      setTranscript(deepgram.transcript);
+    }
+  }, [deepgram.transcript, isRecording]);
 
   useEffect(() => {
     Promise.all([getWeeklyAuditStatus(), getAuditHistory(4)])
@@ -113,57 +124,21 @@ export default function WeeklyAuditPage() {
     }
   }, [elapsedSeconds, isRecording]);
 
-  function startRecording() {
+  async function startRecording() {
     setTranscript("");
     setElapsedSeconds(0);
-    setIsRecording(true);
     setStep("recording");
 
+    const success = await deepgram.start();
+    if (!success) {
+      setStep("prompt");
+      return;
+    }
+
+    setIsRecording(true);
     timerRef.current = setInterval(() => {
       setElapsedSeconds((s) => s + 1);
     }, 1000);
-
-    // Start Web Speech API
-    const SpeechRecognitionAPI =
-      (window as unknown as Record<string, unknown>).SpeechRecognition ||
-      (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
-
-    if (SpeechRecognitionAPI) {
-      const recognition = new (SpeechRecognitionAPI as new () => SpeechRecognition)();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = "en-US";
-
-      let finalTranscript = "";
-
-      recognition.onresult = (event: SpeechRecognitionEvent) => {
-        let interim = "";
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const text = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += text + " ";
-          } else {
-            interim = text;
-          }
-        }
-        setTranscript(finalTranscript + interim);
-      };
-
-      recognition.onerror = (event) => {
-        if (event.error === "no-speech") {
-          try { recognition.start(); } catch {}
-        }
-      };
-
-      recognition.onend = () => {
-        if (isRecording) {
-          try { recognition.start(); } catch {}
-        }
-      };
-
-      recognition.start();
-      recognitionRef.current = recognition;
-    }
   }
 
   function stopRecording() {
@@ -171,11 +146,7 @@ export default function WeeklyAuditPage() {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
-    if (recognitionRef.current) {
-      recognitionRef.current.onend = null;
-      recognitionRef.current.abort();
-      recognitionRef.current = null;
-    }
+    deepgram.stop();
     setIsRecording(false);
   }
 

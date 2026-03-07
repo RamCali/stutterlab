@@ -72,7 +72,7 @@
 ### What I Need From You
 | Item | Why | How to Get It |
 |------|-----|---------------|
-| **Cloudflare R2 credentials** | Store audio recordings | [Cloudflare Dashboard](https://dash.cloudflare.com) → R2 → Create bucket `stutterlab-recordings` |
+| **Cloudflare R2 credentials** | Store audio recordings | [Cloudflare Dashboard](https://dash.cloudflare.com) → R2 → Create bucket `stutterlab-uploads` |
 
 **Alternative:** UploadThing (simpler setup, free tier)
 

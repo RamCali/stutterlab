@@ -23,6 +23,7 @@ import { getExerciseById } from "@/lib/exercises/exercise-data";
 import { CoachingPanel } from "@/components/coaching/coaching-panel";
 import { completeExercise } from "@/lib/actions/exercises";
 import { useRouter } from "next/navigation";
+import { useDeepgramSTT } from "@/hooks/useDeepgramSTT";
 
 const READING_PASSAGES = [
   {
@@ -75,9 +76,12 @@ export default function ReadingToAIPage() {
   const [saving, setSaving] = useState(false);
   const [micError, setMicError] = useState<string | null>(null);
 
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sessionStartRef = useRef(Date.now());
+
+  const deepgram = useDeepgramSTT({
+    onError: (msg) => setMicError(msg),
+  });
 
   const passage = READING_PASSAGES[passageIndex];
   const currentSection = passage.sections[sectionIndex];
@@ -86,67 +90,29 @@ export default function ReadingToAIPage() {
   // Cleanup
   useEffect(() => {
     return () => {
-      if (recognitionRef.current) recognitionRef.current.abort();
       if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
     };
   }, []);
 
-  function startRecording() {
+  // Sync deepgram transcript to local state
+  useEffect(() => {
+    if (isRecording) {
+      setTranscript(deepgram.transcript);
+    }
+  }, [deepgram.transcript, isRecording]);
+
+  async function startRecording() {
     setMicError(null);
     setTranscript("");
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      setMicError("Speech recognition is not supported in this browser. Please use Chrome.");
-      return;
+    const success = await deepgram.start();
+    if (success) {
+      setIsRecording(true);
     }
-
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = "en-US";
-
-    let finalTranscript = "";
-
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let interim = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const result = event.results[i];
-        if (result.isFinal) {
-          finalTranscript += result[0].transcript + " ";
-        } else {
-          interim += result[0].transcript;
-        }
-      }
-      setTranscript(finalTranscript + interim);
-    };
-
-    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      if (event.error === "not-allowed") {
-        setMicError("Microphone access denied. Please allow microphone permission.");
-      } else if (event.error !== "aborted") {
-        // Auto-restart on non-critical errors
-        try { recognition.start(); } catch {}
-      }
-    };
-
-    recognition.onend = () => {
-      // Chrome auto-stops — restart if still recording
-      if (isRecording) {
-        try { recognition.start(); } catch {}
-      }
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
-    setIsRecording(true);
   }
 
   async function stopAndGetFeedback() {
-    if (recognitionRef.current) {
-      recognitionRef.current.abort();
-      recognitionRef.current = null;
-    }
+    deepgram.stop();
     setIsRecording(false);
     setIsFetchingFeedback(true);
 
@@ -156,7 +122,7 @@ export default function ReadingToAIPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           passage: currentSection,
-          transcript: transcript.trim() || "(no transcription captured)",
+          transcript: (deepgram.finalTranscript || transcript).trim() || "(no transcription captured)",
           sectionIndex,
         }),
       });

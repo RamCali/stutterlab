@@ -17,6 +17,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { READING_PASSAGES, type ReadingPassage } from "@/lib/assessment/reading-passages";
+import { useDeepgramSTT } from "@/hooks/useDeepgramSTT";
 
 interface ReadingAssessmentProps {
   onComplete: (result: {
@@ -32,17 +33,18 @@ export function ReadingAssessment({ onComplete }: ReadingAssessmentProps) {
   const [selectedPassage, setSelectedPassage] = useState<ReadingPassage | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const [transcript, setTranscript] = useState("");
   const [bars, setBars] = useState<number[]>(Array(40).fill(3));
 
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval>>(null);
-  const fullTranscriptRef = useRef("");
-  const isRecordingRef = useRef(false);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const animFrameRef = useRef<number | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+
+  const deepgram = useDeepgramSTT({
+    onError: (msg) => {
+      alert(msg);
+    },
+  });
 
   function updateBars() {
     if (!analyserRef.current) return;
@@ -59,10 +61,8 @@ export function ReadingAssessment({ onComplete }: ReadingAssessmentProps) {
     animFrameRef.current = requestAnimationFrame(updateBars);
   }
 
-  async function startAudioVisualizer() {
+  function setupAudioVisualizer(stream: MediaStream) {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
       const ctx = new AudioContext();
       audioCtxRef.current = ctx;
       const source = ctx.createMediaStreamSource(stream);
@@ -72,7 +72,7 @@ export function ReadingAssessment({ onComplete }: ReadingAssessmentProps) {
       analyserRef.current = analyser;
       animFrameRef.current = requestAnimationFrame(updateBars);
     } catch {
-      // Mic access denied — waveform won't show but recording still works via Speech API
+      // Waveform won't show but recording still works
     }
   }
 
@@ -84,10 +84,6 @@ export function ReadingAssessment({ onComplete }: ReadingAssessmentProps) {
       audioCtxRef.current.close();
       audioCtxRef.current = null;
     }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
-    }
     setBars(Array(40).fill(3));
   }
 
@@ -96,58 +92,20 @@ export function ReadingAssessment({ onComplete }: ReadingAssessmentProps) {
     setStep("record");
   }
 
-  function startRecording() {
-    const SpeechRecognitionAPI =
-      (window as unknown as Record<string, unknown>).SpeechRecognition ||
-      (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
-
-    if (!SpeechRecognitionAPI) {
-      alert("Speech recognition is not supported in this browser. Please use Chrome or Edge.");
-      return;
-    }
-
-    const recognition = new (SpeechRecognitionAPI as new () => SpeechRecognition)();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = "en-US";
-
-    fullTranscriptRef.current = "";
-
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let finalText = "";
-      let interimText = "";
-
-      for (let i = 0; i < event.results.length; i++) {
-        const result = event.results[i];
-        if (result.isFinal) {
-          finalText += result[0].transcript;
-        } else {
-          interimText += result[0].transcript;
-        }
-      }
-
-      fullTranscriptRef.current = finalText;
-      setTranscript(finalText + interimText);
-    };
-
-    recognition.onend = () => {
-      // Auto-restart if still recording (use ref to avoid stale closure)
-      if (isRecordingRef.current) {
-        try {
-          recognition.start();
-        } catch {
-          // Already started
-        }
-      }
-    };
-
-    recognition.start();
-    recognitionRef.current = recognition;
-    isRecordingRef.current = true;
+  async function startRecording() {
     setIsRecording(true);
     setElapsedSeconds(0);
 
-    startAudioVisualizer();
+    const success = await deepgram.start();
+    if (!success) {
+      setIsRecording(false);
+      return;
+    }
+
+    // Set up waveform visualizer using the Deepgram stream
+    if (deepgram.stream) {
+      setupAudioVisualizer(deepgram.stream);
+    }
 
     timerRef.current = setInterval(() => {
       setElapsedSeconds((s) => s + 1);
@@ -155,14 +113,8 @@ export function ReadingAssessment({ onComplete }: ReadingAssessmentProps) {
   }
 
   function stopRecording() {
-    isRecordingRef.current = false;
+    deepgram.stop();
     setIsRecording(false);
-
-    if (recognitionRef.current) {
-      recognitionRef.current.onend = null;
-      recognitionRef.current.stop();
-      recognitionRef.current = null;
-    }
 
     stopAudioVisualizer();
 
@@ -171,7 +123,7 @@ export function ReadingAssessment({ onComplete }: ReadingAssessmentProps) {
       timerRef.current = null;
     }
 
-    const finalTranscript = fullTranscriptRef.current || transcript;
+    const finalTranscript = deepgram.finalTranscript;
     if (finalTranscript.trim() && selectedPassage) {
       setStep("done");
       onComplete({
@@ -183,16 +135,18 @@ export function ReadingAssessment({ onComplete }: ReadingAssessmentProps) {
     }
   }
 
+  // Set up visualizer once stream is available
+  useEffect(() => {
+    if (isRecording && deepgram.stream && !analyserRef.current) {
+      setupAudioVisualizer(deepgram.stream);
+    }
+  }, [isRecording, deepgram.stream]);
+
   useEffect(() => {
     return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.onend = null;
-        recognitionRef.current.stop();
-      }
       if (timerRef.current) clearInterval(timerRef.current);
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       if (audioCtxRef.current) audioCtxRef.current.close();
-      if (streamRef.current) streamRef.current.getTracks().forEach((t) => t.stop());
     };
   }, []);
 
@@ -325,13 +279,13 @@ export function ReadingAssessment({ onComplete }: ReadingAssessmentProps) {
           </div>
 
           {/* Live transcript preview */}
-          {transcript && (
+          {deepgram.transcript && (
             <div>
               <p className="text-sm text-muted-foreground mb-1">
                 Live Transcript
               </p>
               <div className="p-3 rounded bg-muted/10 text-sm max-h-32 overflow-y-auto">
-                {transcript}
+                {deepgram.transcript}
               </div>
             </div>
           )}

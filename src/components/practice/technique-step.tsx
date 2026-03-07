@@ -36,6 +36,7 @@ export function TechniqueStep({
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [completedItems, setCompletedItems] = useState<Set<number>>(new Set());
   const [bars, setBars] = useState<number[]>(Array(40).fill(5));
+  const [micError, setMicError] = useState<string | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -86,7 +87,38 @@ export function TechniqueStep({
     return () => clearInterval(interval);
   }, [isRecording]);
 
+  // DAF: reactively connect/disconnect when toggled (even mid-recording)
+  useEffect(() => {
+    const ctx = audioCtxRef.current;
+    const source = sourceRef.current;
+    if (!isRecording || !ctx || !source) return;
+
+    if (dafEnabled) {
+      const delay = ctx.createDelay(0.5);
+      delay.delayTime.value = 0.07; // 70ms
+      const gain = ctx.createGain();
+      gain.gain.value = 0.85;
+      source.connect(delay);
+      delay.connect(gain);
+      gain.connect(ctx.destination);
+      delayNodeRef.current = delay;
+      dafGainRef.current = gain;
+    }
+
+    return () => {
+      if (delayNodeRef.current) {
+        delayNodeRef.current.disconnect();
+        delayNodeRef.current = null;
+      }
+      if (dafGainRef.current) {
+        dafGainRef.current.disconnect();
+        dafGainRef.current = null;
+      }
+    };
+  }, [dafEnabled, isRecording]);
+
   async function startRecording() {
+    setMicError(null);
     // Create AudioContext synchronously in the user-gesture context
     // (Chrome suspends it if created after an await)
     const ctx = new AudioContext();
@@ -106,23 +138,18 @@ export function TechniqueStep({
       analyser.fftSize = 2048;
       source.connect(analyser);
       analyserRef.current = analyser;
-
-      // DAF: route mic audio through a delay node to speakers
-      if (dafEnabled) {
-        const delay = ctx.createDelay(0.5);
-        delay.delayTime.value = 0.07; // 70ms
-        const gain = ctx.createGain();
-        gain.gain.value = 0.85;
-        source.connect(delay);
-        delay.connect(gain);
-        gain.connect(ctx.destination);
-        delayNodeRef.current = delay;
-        dafGainRef.current = gain;
-      }
-    } catch {
-      // Cleanup AudioContext if mic access failed
+    } catch (err) {
       ctx.close();
       audioCtxRef.current = null;
+      const name = err instanceof DOMException ? err.name : "";
+      if (name === "NotAllowedError") {
+        setMicError("Microphone access denied. Please allow microphone permission in your browser settings.");
+      } else if (name === "NotFoundError") {
+        setMicError("No microphone found. Please connect a microphone and try again.");
+      } else {
+        setMicError("Could not access microphone. Please check your browser settings.");
+      }
+      return;
     }
     setIsRecording(true);
     setElapsedSeconds(0);
@@ -319,6 +346,10 @@ export function TechniqueStep({
             )}
           </span>
         </div>
+
+        {micError && (
+          <p className="text-center text-sm text-red-400 mt-2">{micError}</p>
+        )}
 
         {dafEnabled && (
           <p className="text-center text-sm text-primary mt-2 flex items-center justify-center gap-1">

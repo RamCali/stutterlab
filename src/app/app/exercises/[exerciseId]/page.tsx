@@ -43,6 +43,7 @@ export default function ExerciseDetailPage() {
   const [completed, setCompleted] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [micError, setMicError] = useState<string | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -87,6 +88,36 @@ export default function ExerciseDetailPage() {
     return () => clearInterval(interval);
   }, [isRecording]);
 
+  // DAF: reactively connect/disconnect when toggled (even mid-recording)
+  useEffect(() => {
+    const ctx = audioCtxRef.current;
+    const source = sourceRef.current;
+    if (!isRecording || !ctx || !source) return;
+
+    if (dafEnabled) {
+      const delay = ctx.createDelay(0.5);
+      delay.delayTime.value = 0.07; // 70ms
+      const gain = ctx.createGain();
+      gain.gain.value = 0.85;
+      source.connect(delay);
+      delay.connect(gain);
+      gain.connect(ctx.destination);
+      delayNodeRef.current = delay;
+      dafGainRef.current = gain;
+    }
+
+    return () => {
+      if (delayNodeRef.current) {
+        delayNodeRef.current.disconnect();
+        delayNodeRef.current = null;
+      }
+      if (dafGainRef.current) {
+        dafGainRef.current.disconnect();
+        dafGainRef.current = null;
+      }
+    };
+  }, [dafEnabled, isRecording]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -126,6 +157,7 @@ export default function ExerciseDetailPage() {
     `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
 
   async function startRecording() {
+    setMicError(null);
     const ctx = new AudioContext();
     audioCtxRef.current = ctx;
     try {
@@ -142,21 +174,18 @@ export default function ExerciseDetailPage() {
       analyser.fftSize = 2048;
       source.connect(analyser);
       analyserRef.current = analyser;
-
-      if (dafEnabled) {
-        const delay = ctx.createDelay(0.5);
-        delay.delayTime.value = 0.07;
-        const gain = ctx.createGain();
-        gain.gain.value = 0.85;
-        source.connect(delay);
-        delay.connect(gain);
-        gain.connect(ctx.destination);
-        delayNodeRef.current = delay;
-        dafGainRef.current = gain;
-      }
-    } catch {
+    } catch (err) {
       ctx.close();
       audioCtxRef.current = null;
+      const name = err instanceof DOMException ? err.name : "";
+      if (name === "NotAllowedError") {
+        setMicError("Microphone access denied. Please allow microphone permission in your browser settings.");
+      } else if (name === "NotFoundError") {
+        setMicError("No microphone found. Please connect a microphone and try again.");
+      } else {
+        setMicError("Could not access microphone. Please check your browser settings.");
+      }
+      return;
     }
     setIsRecording(true);
     setElapsedSeconds(0);
@@ -474,6 +503,10 @@ export default function ExerciseDetailPage() {
               )}
             </span>
           </div>
+
+          {micError && (
+            <p className="text-center text-sm text-red-400 mt-2">{micError}</p>
+          )}
 
           {dafEnabled && (
             <p className="text-center text-xs text-primary mt-2 flex items-center justify-center gap-1">

@@ -53,7 +53,9 @@ export function useSpeechCoach(options: UseSpeechCoachOptions) {
     );
 
     coachRef.current = coach;
-    coach.start();
+    coach.start().catch(() => {
+      // Deepgram connection failed — coach will simply not run
+    });
 
     return () => {
       coach.stop();
