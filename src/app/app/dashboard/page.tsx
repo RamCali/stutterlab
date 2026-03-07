@@ -3,29 +3,74 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getDailyPlan, getPhaseInfo } from "@/lib/curriculum/daily-plans";
-import { isOnboardingComplete, getOnboardingData } from "@/lib/onboarding/feared-situations";
+import {
+  isOnboardingComplete,
+  getOnboardingData,
+  saveOnboardingData,
+} from "@/lib/onboarding/feared-situations";
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
 import { getCurrentDay } from "@/lib/actions/user-progress";
+import { checkOnboardingStatus } from "@/lib/actions/user";
 import { checkHasActiveSubscription } from "@/lib/auth/premium";
 import { PhaseTimeline } from "@/components/dashboard/phase-timeline";
 import { TodaysTasks } from "@/components/dashboard/todays-tasks";
 import { MilestoneCard } from "@/components/dashboard/milestone-card";
 import { WeekProgressStrip } from "@/components/dashboard/week-progress-strip";
 import { NorthStarCard } from "@/components/dashboard/north-star";
+import { WelcomeBackBanner } from "@/components/dashboard/welcome-back-banner";
 import { Badge } from "@/components/ui/badge";
 import { SLPAuthorityBadge } from "@/components/slp-authority-badge";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [onboarded, setOnboarded] = useState(() => isOnboardingComplete());
+  const localOnboarded = isOnboardingComplete();
+  const [onboarded, setOnboarded] = useState(localOnboarded);
+  const [checkingOnboarding, setCheckingOnboarding] = useState(!localOnboarded);
   const [currentDay, setCurrentDay] = useState(1);
 
   useEffect(() => {
     getCurrentDay().then(setCurrentDay).catch(() => {});
-    checkHasActiveSubscription().then((active) => {
-      if (!active) router.replace("/checkout/trial");
-    }).catch(() => {});
-  }, [router]);
+    checkHasActiveSubscription()
+      .then((active) => {
+        if (!active) router.replace("/checkout/trial");
+      })
+      .catch(() => {});
+
+    // Fix desync: if localStorage says not onboarded, check DB
+    if (!localOnboarded) {
+      checkOnboardingStatus()
+        .then((result) => {
+          if (result.onboardingCompleted && result.onboardingData) {
+            // Hydrate localStorage from DB
+            saveOnboardingData({
+              completed: true,
+              name: result.onboardingData.name,
+              fearedSituations: result.onboardingData.fearedSituations,
+              severity: result.onboardingData.severity,
+              speechChallenges: result.onboardingData.speechChallenges,
+              northStarGoal: result.onboardingData.northStarGoal,
+              confidenceRatings: result.onboardingData.confidenceRatings,
+              avoidanceBehaviors: result.onboardingData.avoidanceBehaviors,
+              stutteringTypes: result.onboardingData.stutteringTypes,
+              speakingFrequency:
+                result.onboardingData.speakingFrequency ?? undefined,
+              stutterFrequency:
+                result.onboardingData.stutterFrequency ?? undefined,
+              stutterDuration:
+                result.onboardingData.stutterDuration ?? undefined,
+              stutterImpact: result.onboardingData.stutterImpact ?? undefined,
+              severityScore: result.onboardingData.severityScore ?? undefined,
+              confidenceScore:
+                result.onboardingData.confidenceScore ?? undefined,
+            });
+            setOnboarded(true);
+          }
+        })
+        .catch(() => {})
+        .finally(() => setCheckingOnboarding(false));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const dailyPlan = getDailyPlan(currentDay)!;
   const phase = getPhaseInfo(currentDay);
@@ -40,6 +85,9 @@ export default function DashboardPage() {
     if (h < 17) return `Good afternoon${name}!`;
     return `Good evening${name}!`;
   })();
+
+  // Wait for DB check before showing onboarding flow (avoids flash)
+  if (checkingOnboarding) return null;
 
   if (!onboarded) {
     return <OnboardingFlow onComplete={() => setOnboarded(true)} />;
@@ -61,6 +109,9 @@ export default function DashboardPage() {
           </Badge>
         </div>
       </div>
+
+      {/* Welcome Back (shows only for returning users after 3+ day gap) */}
+      <WelcomeBackBanner />
 
       {/* Overall Progress */}
       <div>
