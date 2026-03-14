@@ -154,7 +154,6 @@ export default function AIPracticePage() {
   const prioritizedIds = useMemo(() => new Set(getPrioritizedScenarioIds()), []);
 
   const isLocked = usage !== null && !usage.canStart;
-  const needsUpgrade = usage !== null && (usage.plan === "free" || usage.plan === "core");
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
@@ -256,7 +255,7 @@ export default function AIPracticePage() {
           }
 
           return (
-            <Link key={scenario.id} href={`/ai-practice/${scenario.id}`}>
+            <Link key={scenario.id} href={`/app/ai-practice/${scenario.id}`}>
               {card}
             </Link>
           );

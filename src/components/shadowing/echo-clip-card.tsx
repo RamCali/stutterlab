@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,6 @@ import {
   Play,
   Pause,
   Mic,
-  RotateCcw,
   Users,
   Heart,
   Crown,
@@ -40,6 +39,12 @@ export function EchoClipCard({ clip, onShadow, completed }: EchoClipCardProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [hearted, setHearted] = useState(false);
   const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  // Pre-compute random waveform heights to avoid Math.random() during render
+  const waveformHeights = useMemo(
+    () => Array.from({ length: 40 }, (_, i) => Math.max(15, ((i * 17 + 7) % 100))),
+    []
+  );
 
   const authorColors: Record<string, string> = {
     slp: "text-blue-500 bg-blue-500/10",
@@ -119,18 +124,15 @@ export function EchoClipCard({ clip, onShadow, completed }: EchoClipCardProps) {
           </Button>
           {/* Fake waveform visualization */}
           <div className="flex-1 flex items-center gap-[2px] h-8">
-            {Array.from({ length: 40 }).map((_, i) => {
-              const height = Math.random() * 100;
-              return (
+            {waveformHeights.map((height, i) => (
                 <div
                   key={i}
                   className={`flex-1 rounded-full transition-colors ${
                     isPlaying ? "bg-primary" : "bg-muted-foreground/20"
                   }`}
-                  style={{ height: `${Math.max(15, height)}%` }}
+                  style={{ height: `${height}%` }}
                 />
-              );
-            })}
+            ))}
           </div>
           <span className="text-sm text-muted-foreground flex-shrink-0">
             {clip.durationSeconds}s

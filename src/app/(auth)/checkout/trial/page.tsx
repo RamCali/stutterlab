@@ -9,6 +9,7 @@ import {
   EmbeddedCheckout,
 } from "@stripe/react-stripe-js";
 import { Badge } from "@/components/ui/badge";
+import { BillingToggle } from "@/components/billing-toggle";
 import { Check, Loader2, Shield } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -94,30 +95,8 @@ export default function CheckoutTrialPage() {
       </div>
 
       {/* Billing toggle */}
-      <div className="flex items-center justify-center gap-2 mb-4">
-        <button
-          onClick={() => setInterval("month")}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-            interval === "month"
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Monthly
-        </button>
-        <button
-          onClick={() => setInterval("year")}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-            interval === "year"
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Yearly
-          <Badge variant="secondary" className="ml-2 text-xs bg-amber-500/10 text-amber-500 border-0">
-            Save $189
-          </Badge>
-        </button>
+      <div className="mb-4">
+        <BillingToggle interval={interval} onIntervalChange={setInterval} />
       </div>
 
       <Badge variant="secondary" className="w-full justify-center py-1.5 mb-6">

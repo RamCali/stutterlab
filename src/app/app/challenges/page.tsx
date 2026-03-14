@@ -12,31 +12,16 @@ import {
   CheckCircle2,
   Flame,
   Star,
-  Phone,
-  Coffee,
-  MapPin,
-  ShoppingBag,
-  Users,
-  Briefcase,
-  BookOpen,
   Loader2,
   Sparkles,
 } from "lucide-react";
-import { getUserGamificationStats, type LevelInfo } from "@/lib/gamification/engine";
+import { getUserGamificationStats } from "@/lib/gamification/engine";
 import { getAchievementStatus } from "@/lib/gamification/achievements";
 import {
   getTodayChallenge,
   completeDailyChallenge,
   type DailyChallenge,
 } from "@/lib/actions/challenges";
-
-const CATEGORY_ICONS: Record<string, typeof Phone> = {
-  phone: Phone,
-  social: Users,
-  ordering: Coffee,
-  work: Briefcase,
-  general: BookOpen,
-};
 
 const DIFFICULTY_COLORS: Record<string, string> = {
   easy: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
@@ -76,7 +61,7 @@ export default function ChallengesPage() {
     if (!todayData || todayData.completed || completing) return;
     setCompleting(true);
     try {
-      const result = await completeDailyChallenge(todayData.challenge.id);
+      await completeDailyChallenge(todayData.challenge.id);
       setTodayData((prev) => prev ? { ...prev, completed: true } : null);
       // Refresh stats
       const [newStats, newAch] = await Promise.all([
@@ -94,10 +79,6 @@ export default function ChallengesPage() {
 
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
   const level = stats?.level;
-  const CategoryIcon = todayData
-    ? CATEGORY_ICONS[todayData.challenge.category] || Target
-    : Target;
-
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div>

@@ -18,6 +18,7 @@ export default function ThinkingTrapsPage() {
 
   useEffect(() => {
     const stats = getThoughtRecordStats();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTrapCounts(stats.trapCounts);
     setTotalRecords(stats.total);
   }, []);

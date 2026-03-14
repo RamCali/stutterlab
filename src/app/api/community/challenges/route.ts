@@ -3,7 +3,6 @@ import { db } from "@/lib/db/client";
 import {
   communityChallenges,
   challengeParticipants,
-  userStats,
 } from "@/lib/db/schema";
 import { getUserId } from "@/lib/auth/helpers";
 import { eq, sql, and, gte } from "drizzle-orm";
@@ -19,7 +18,7 @@ export async function GET() {
 
     // Check user participation
     const userId = await getUserId();
-    let userParticipation: Record<string, number> = {};
+    const userParticipation: Record<string, number> = {};
 
     if (userId && challenges.length > 0) {
       const participations = await db

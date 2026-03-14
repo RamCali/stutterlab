@@ -167,7 +167,7 @@ export function PhonemeHeatmap({
             {showPractice && practicesSentences && practicesSentences.length > 0 && (
               <div className="space-y-1.5 p-3 rounded-lg bg-primary/5 border border-primary/10">
                 <p className="text-sm text-muted-foreground mb-2">
-                  Practice these sentences — they're loaded with your difficult sounds:
+                  Practice these sentences — they&apos;re loaded with your difficult sounds:
                 </p>
                 {practicesSentences.map((s, i) => (
                   <p key={i} className="text-sm leading-relaxed">

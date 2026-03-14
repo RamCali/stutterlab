@@ -155,6 +155,7 @@ export function VictoryNotificationToast() {
 /** Static feed of recent victory notifications — fetches from DB */
 export function VictoryFeed() {
   const [victories, setVictories] = useState<VictoryNotification[]>([]);
+  const [renderTime] = useState(() => Date.now());
 
   useEffect(() => {
     async function fetchVictories() {
@@ -192,7 +193,7 @@ export function VictoryFeed() {
       {victories.map((notif) => {
         const Icon = VICTORY_ICONS[notif.victoryType] || PartyPopper;
         const label = VICTORY_LABELS[notif.victoryType] || "had a victory";
-        const minutesAgo = Math.max(1, Math.round((Date.now() - new Date(notif.createdAt).getTime()) / 60000));
+        const minutesAgo = Math.max(1, Math.round((renderTime - new Date(notif.createdAt).getTime()) / 60000));
 
         return (
           <div key={notif.id} className="flex items-center gap-2 py-1">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,7 +14,6 @@ import {
   ChevronRight,
   Camera,
   CameraOff,
-  Play,
 } from "lucide-react";
 import { getExerciseById } from "@/lib/exercises/exercise-data";
 import { CoachingPanel } from "@/components/coaching/coaching-panel";
@@ -57,10 +56,14 @@ export default function MirrorPracticePage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const sessionStartRef = useRef(Date.now());
+  const sessionStartRef = useRef(0);
+
+  // Initialize session start time on mount
+  useEffect(() => {
+    sessionStartRef.current = Date.now();
+  }, []);
 
   const currentPrompt = MIRROR_PROMPTS[promptIndex];
-  const allDone = ratings.length >= promptsToComplete;
 
   // Cleanup on unmount
   useEffect(() => {

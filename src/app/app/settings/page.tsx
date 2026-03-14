@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,11 +21,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-interface SettingsPageProps {
-  searchParams: Promise<{ upgraded?: string }>;
-}
-
-export default function SettingsPage({ searchParams: _searchParams }: SettingsPageProps) {
+export default function SettingsPage() {
   const [displayName, setDisplayName] = useState("");
   const [email] = useState("");
   const [bio, setBio] = useState("");
@@ -33,9 +29,16 @@ export default function SettingsPage({ searchParams: _searchParams }: SettingsPa
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [subLoading, setSubLoading] = useState(false);
+  const [currentPlan, setCurrentPlan] = useState<"free" | "pro">("free");
 
-  // TODO: Fetch from server — hardcoded for now
-  const [currentPlan] = useState<"free" | "pro">("free");
+  useEffect(() => {
+    fetch("/api/user/stats")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.isPremium) setCurrentPlan("pro");
+      })
+      .catch(() => {});
+  }, []);
 
   const [notifications, setNotifications] = useState({
     dailyReminders: true,

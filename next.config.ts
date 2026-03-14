@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
         destination: "/speech-training-for-stuttering",
         permanent: true,
       },
+      {
+        source: "/dashboard",
+        destination: "/app/dashboard",
+        permanent: true,
+      },
     ];
   },
 };

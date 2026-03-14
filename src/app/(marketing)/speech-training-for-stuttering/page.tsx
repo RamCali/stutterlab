@@ -5,13 +5,11 @@ import {
   Baby,
   BookOpen,
   Brain,
-  CheckCircle2,
   GraduationCap,
   Heart,
   Mic,
   Sparkles,
   Stethoscope,
-  TrendingUp,
   User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";

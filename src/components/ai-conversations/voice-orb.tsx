@@ -87,7 +87,7 @@ export function VoiceOrb({ state }: VoiceOrbProps) {
                     key={i}
                     className="w-1.5 bg-white/80 rounded-full animate-pulse"
                     style={{
-                      height: `${12 + Math.random() * 24}px`,
+                      height: `${12 + (((i * 7 + 3) % 5) / 5) * 24}px`,
                       animationDelay: `${i * 0.1}s`,
                       animationDuration: "0.5s",
                     }}

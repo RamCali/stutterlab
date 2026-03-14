@@ -36,6 +36,7 @@ export default function FearedWordPracticePage() {
     const store = getFearedWordsStore();
     const entry = store?.words.find((w) => w.id === wordId);
     if (entry) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWordEntry(entry);
       const level = getCurrentTrainingLevel(entry);
       setCurrentLevel(level);

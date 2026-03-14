@@ -16,6 +16,7 @@ function CheckoutReturnContent() {
   useEffect(() => {
     const sessionId = searchParams.get("session_id");
     if (!sessionId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus("error");
       return;
     }

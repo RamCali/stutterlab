@@ -10,10 +10,6 @@
 
 import type { DailyPlan, DailyTask } from "./daily-plans";
 import type { TechniqueOutcomeSummary } from "@/lib/actions/user-progress";
-import {
-  FLUENCY_SHAPING_TECHNIQUES,
-  MODIFICATION_TECHNIQUES,
-} from "./technique-categories";
 import { getAdaptiveTechnique, getContentLevel } from "@/lib/practice/daily-session";
 
 /* ─── Affirmations (shared with daily-plans.ts, duplicated here to keep module pure) ─── */

@@ -39,6 +39,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { SuccessStoriesLanding } from "@/components/community/success-stories";
+import { PricingCard } from "@/components/pricing-card";
+import { EarlyAccessSignup } from "@/components/early-access-signup";
 
 const painPoints = [
   {
@@ -169,16 +171,6 @@ const testimonials = [
   },
 ];
 
-const pricingFeatures = [
-  "Full Audio Lab (DAF + FAF + Choral + Metronome)",
-  "90-day SLP-designed curriculum",
-  "Unlimited AI conversations & phone simulator",
-  "Feared Words Trainer",
-  "CBT & Mindfulness module",
-  "Real-world challenges with XP & streaks",
-  "Voice Journal with AI fluency scoring",
-  "Clinical progress reports",
-];
 
 const faqs = [
   {
@@ -233,19 +225,14 @@ export default function LandingPage() {
           <p className="text-sm text-muted-foreground mt-1.5">
             If any of these sound familiar — you&apos;re in the right place.
           </p>
-          <div className="mt-8">
-            <Button size="lg" className="px-10 text-lg h-13" asChild>
-              <Link href="/signup">
-                Start Your 7-Day Free Trial
-                <ArrowRight className="h-5 w-5 ml-2" />
-              </Link>
-            </Button>
+          <div className="mt-10 w-full">
+            <EarlyAccessSignup size="large" />
           </div>
-          <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-base text-muted-foreground">
+          <div className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-base text-muted-foreground">
             {[
               "Private 24/7 training",
               "Evidence-based",
-              "Full refund within 7 days",
+              "Launching soon",
             ].map((item) => (
               <div key={item} className="flex items-center gap-2">
                 <Check className="h-4 w-4 text-primary flex-shrink-0" />
@@ -753,44 +740,7 @@ export default function LandingPage() {
               StutterLab gives you SLP-designed practice every day.
             </p>
           </div>
-          <div className="max-w-md mx-auto">
-            <Card className="border-primary border-2 shadow-lg relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <Badge className="bg-primary text-primary-foreground shadow-sm">
-                  7-Day Free Trial
-                </Badge>
-              </div>
-              <CardContent className="pt-8 pb-6">
-                <h3 className="font-semibold text-xl">StutterLab</h3>
-                <div className="mt-2 flex items-baseline gap-1">
-                  <span className="text-5xl font-bold">$99</span>
-                  <span className="text-muted-foreground text-base">
-                    /month
-                  </span>
-                </div>
-                <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium mt-1">
-                  $999/year — save $189
-                </p>
-                <p className="text-base text-muted-foreground mt-2">
-                  Full access to everything. 7 days free.
-                </p>
-                <Button className="w-full mt-6" size="lg" asChild>
-                  <Link href="/signup">Start 7-Day Free Trial</Link>
-                </Button>
-                <ul className="mt-6 space-y-2.5">
-                  {pricingFeatures.map((feature) => (
-                    <li
-                      key={feature}
-                      className="flex items-start gap-2 text-base"
-                    >
-                      <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
+          <PricingCard />
         </div>
       </section>
 
@@ -834,7 +784,7 @@ export default function LandingPage() {
                 into their progress.
               </p>
               <Button size="lg" className="mt-6 px-8" asChild>
-                <Link href="/signup">
+                <Link href="#pricing">
                   Learn About SLP Plans
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Link>
@@ -890,17 +840,9 @@ export default function LandingPage() {
             That idea in the meeting. That joke on the date. That &ldquo;hi&rdquo;
             to the stranger. Your voice matters — and you can train it to show up when you need it.
           </p>
-          <div className="mt-10">
-            <Button size="lg" className="px-10 text-lg h-13" asChild>
-              <Link href="/signup">
-                Start 7-Day Free Trial
-                <ArrowRight className="h-5 w-5 ml-2" />
-              </Link>
-            </Button>
+          <div className="mt-10 w-full max-w-lg mx-auto">
+            <EarlyAccessSignup size="large" />
           </div>
-          <p className="text-sm text-muted-foreground mt-4">
-            7 days free. Cancel anytime.
-          </p>
         </div>
       </section>
     </>

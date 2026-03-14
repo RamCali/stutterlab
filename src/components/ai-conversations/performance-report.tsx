@@ -45,7 +45,6 @@ export function PerformanceReport({
   xpEarned,
   stressLevel,
   scorecard,
-  comparison,
 }: PerformanceReportProps) {
   const userTurns = turns.filter((t) => t.role === "user");
   const totalDisfluencies = userTurns.reduce(

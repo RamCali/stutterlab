@@ -63,7 +63,7 @@ export default function VoiceJournalPage() {
             Record daily voice entries and track your fluency over time
           </p>
         </div>
-        <Link href="/voice-journal/new">
+        <Link href="/app/voice-journal">
           <Button>
             <Plus className="h-4 w-4 mr-1" />
             New Entry

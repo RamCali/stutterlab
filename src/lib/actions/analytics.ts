@@ -10,13 +10,12 @@ import {
   monthlyReports,
   userStats,
 } from "@/lib/db/schema";
-import { eq, desc, sql, and, gte } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth/helpers";
 import {
   extractDisfluencyWords,
   mapDisfluenciesToPhonemes,
   computeDifficultyScore,
-  getPhonemeLabel,
 } from "@/lib/analysis/phoneme-mapper";
 import {
   computeTechniqueMastery,
@@ -25,7 +24,7 @@ import {
 } from "@/lib/analysis/technique-tracker";
 import { analyzePatterns } from "@/lib/analysis/predictive-coach";
 import { detectTransferGaps } from "@/lib/analysis/transfer-gap";
-import { scoreSession } from "@/lib/analysis/session-scorer";
+
 import { generatePhonemeTargetedPractice as genPractice } from "@/lib/analysis/phoneme-word-bank";
 import type {
   PhonemeHeatmapData,
@@ -286,56 +285,80 @@ export async function getPhonemeHeatmap(): Promise<PhonemeHeatmapData> {
       .limit(50),
   ]);
 
-  // Aggregate phoneme data from disfluency moments in conversations
-  const phonemeMap = new Map<
-    string,
-    { attempts: number; disfluencyCount: number; words: Set<string>; lastSeen: Date }
-  >();
+  // Split into recent (last 14 days) vs older for trend computation
+  const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+
+  interface PhonemeAgg {
+    attempts: number; disfluencyCount: number; words: Set<string>; lastSeen: Date;
+    recentAttempts: number; recentDisfluencies: number;
+    olderAttempts: number; olderDisfluencies: number;
+  }
+
+  const phonemeMap = new Map<string, PhonemeAgg>();
+
+  const getOrCreate = (phoneme: string, date: Date): PhonemeAgg => {
+    return phonemeMap.get(phoneme) || {
+      attempts: 0, disfluencyCount: 0, words: new Set<string>(), lastSeen: date,
+      recentAttempts: 0, recentDisfluencies: 0, olderAttempts: 0, olderDisfluencies: 0,
+    };
+  };
 
   for (const conv of conversations) {
+    const isRecent = conv.completedAt >= twoWeeksAgo;
     const events = extractDisfluencyWords(conv.disfluencyMoments);
     const phonemeAggs = mapDisfluenciesToPhonemes(events);
 
     for (const [phoneme, agg] of phonemeAggs) {
-      const existing = phonemeMap.get(phoneme) || {
-        attempts: 0,
-        disfluencyCount: 0,
-        words: new Set<string>(),
-        lastSeen: conv.completedAt,
-      };
+      const existing = getOrCreate(phoneme, conv.completedAt);
       existing.attempts += agg.attempts;
       existing.disfluencyCount += agg.disfluencyCount;
-      for (const w of agg.words) existing.words.add(w);
-      if (conv.completedAt > existing.lastSeen) {
-        existing.lastSeen = conv.completedAt;
+      if (isRecent) {
+        existing.recentAttempts += agg.attempts;
+        existing.recentDisfluencies += agg.disfluencyCount;
+      } else {
+        existing.olderAttempts += agg.attempts;
+        existing.olderDisfluencies += agg.disfluencyCount;
       }
+      for (const w of agg.words) existing.words.add(w);
+      if (conv.completedAt > existing.lastSeen) existing.lastSeen = conv.completedAt;
       phonemeMap.set(phoneme, existing);
     }
   }
 
   // Also merge data from speechAnalyses.triggerPhonemes
   for (const analysis of analyses) {
+    const isRecent = analysis.analyzedAt >= twoWeeksAgo;
     const raw = analysis.triggerPhonemes;
     if (Array.isArray(raw)) {
       for (const item of raw) {
-        // Handle both string[] and { phoneme, words, count }[] formats
         const phoneme = typeof item === "string" ? item : (item as Record<string, unknown>)?.phoneme;
         if (typeof phoneme !== "string") continue;
 
-        const existing = phonemeMap.get(phoneme) || {
-          attempts: 0,
-          disfluencyCount: 0,
-          words: new Set<string>(),
-          lastSeen: analysis.analyzedAt,
-        };
+        const existing = getOrCreate(phoneme, analysis.analyzedAt);
         existing.attempts += 1;
         existing.disfluencyCount += 1;
-        if (analysis.analyzedAt > existing.lastSeen) {
-          existing.lastSeen = analysis.analyzedAt;
+        if (isRecent) {
+          existing.recentAttempts += 1;
+          existing.recentDisfluencies += 1;
+        } else {
+          existing.olderAttempts += 1;
+          existing.olderDisfluencies += 1;
         }
+        if (analysis.analyzedAt > existing.lastSeen) existing.lastSeen = analysis.analyzedAt;
         phonemeMap.set(phoneme, existing);
       }
     }
+  }
+
+  // Compute trend by comparing recent vs older disfluency rates
+  function computeTrend(d: PhonemeAgg): "improving" | "stable" | "worsening" {
+    if (d.olderAttempts < 2 || d.recentAttempts < 2) return "stable";
+    const recentRate = d.recentDisfluencies / d.recentAttempts;
+    const olderRate = d.olderDisfluencies / d.olderAttempts;
+    const diff = olderRate - recentRate;
+    if (diff > 0.1) return "improving";
+    if (diff < -0.1) return "worsening";
+    return "stable";
   }
 
   // Build phoneme difficulty array
@@ -346,7 +369,7 @@ export async function getPhonemeHeatmap(): Promise<PhonemeHeatmapData> {
       totalAttempts: data.attempts,
       disfluencyCount: data.disfluencyCount,
       difficultyScore: computeDifficultyScore(data.disfluencyCount, data.attempts),
-      trend: "stable", // TODO: compute from time-window comparison
+      trend: computeTrend(data),
       lastSeen: data.lastSeen.toISOString(),
       triggerWords: [...data.words].slice(0, 10),
     });

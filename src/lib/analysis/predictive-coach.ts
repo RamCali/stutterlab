@@ -17,9 +17,9 @@ const DAY_NAMES = [
   "Saturday",
 ];
 
-const TIME_PERIODS = ["morning", "afternoon", "evening"] as const;
+type TimePeriod = "morning" | "afternoon" | "evening";
 
-function getTimePeriod(date: Date): (typeof TIME_PERIODS)[number] {
+function getTimePeriod(date: Date): TimePeriod {
   const hour = date.getHours();
   if (hour < 12) return "morning";
   if (hour < 17) return "afternoon";

@@ -38,7 +38,10 @@ export function useDeepgramSTT(
   const clientRef = useRef<DeepgramStreamingClient | null>(null);
   const finalRef = useRef("");
   const optionsRef = useRef(options);
-  optionsRef.current = options;
+
+  useEffect(() => {
+    optionsRef.current = options;
+  });
 
   const start = useCallback(async () => {
     // Reset state

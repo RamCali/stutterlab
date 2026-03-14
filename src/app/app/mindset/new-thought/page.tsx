@@ -19,7 +19,6 @@ import {
   type Emotion,
 } from "@/lib/cbt/store";
 import {
-  THINKING_TRAPS,
   getTrapById,
   type ThinkingTrapId,
 } from "@/lib/cbt/thinking-traps";

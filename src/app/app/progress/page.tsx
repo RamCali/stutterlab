@@ -14,7 +14,6 @@ import {
 } from "recharts";
 import {
   LineChart,
-  BarChart as BarChartIcon,
   Flame,
   Target,
   Calendar,
@@ -32,16 +31,6 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import Link from "next/link";
-import {
-  BarChart,
-  Bar,
-  XAxis as BarXAxis,
-  YAxis as BarYAxis,
-  CartesianGrid as BarGrid,
-  Tooltip as BarTooltip,
-  ResponsiveContainer as BarContainer,
-  Cell,
-} from "recharts";
 import { BeforeAfterPrompt } from "@/components/progress/before-after-card";
 import { getUserOutcomeSummary, type TechniqueOutcomeSummary } from "@/lib/actions/user-progress";
 import { getProgressData } from "@/lib/actions/progress";
@@ -241,6 +230,7 @@ export default function ProgressPage() {
   );
 
   // Build fluency trend chart data from real sessions
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const fluencyTrendData = useMemo(() => {
     if (!data?.fluencyTrend || data.fluencyTrend.length === 0) return [];
     return data.fluencyTrend.map((entry) => ({
@@ -257,8 +247,6 @@ export default function ProgressPage() {
   }, [fluencyTrendData]);
 
   const practiceMinutes = stats ? Math.round(stats.totalPracticeSeconds / 60) : 0;
-  const hasData = stats && stats.totalExercisesCompleted > 0;
-
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       <div>
@@ -293,12 +281,12 @@ export default function ProgressPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Link href="/progress/report">
+              <Link href="/app/progress/report">
                 <Badge variant="outline" className="cursor-pointer">
                   View Reports
                 </Badge>
               </Link>
-              <Link href="/progress/assess">
+              <Link href="/app/progress/assess">
                 <Badge className="cursor-pointer bg-primary text-primary-foreground">
                   Take Assessment
                 </Badge>
@@ -329,7 +317,7 @@ export default function ProgressPage() {
                 </p>
               </div>
             </div>
-            <Link href="/progress/weekly-audit">
+            <Link href="/app/progress/weekly-audit">
               <Badge className="cursor-pointer bg-amber-500 text-white hover:bg-amber-600">
                 Take Audit
               </Badge>
@@ -949,7 +937,7 @@ export default function ProgressPage() {
                   </Badge>
                 ))}
               </div>
-              <Link href="/ai-practice">
+              <Link href="/app/ai-practice">
                 <Badge className="cursor-pointer bg-primary text-primary-foreground mt-2">
                   Upgrade to Premium
                 </Badge>

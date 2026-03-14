@@ -149,9 +149,9 @@ export function getTrainingItems(wordId: string, level: TrainingLevel): string[]
   const word = store.words.find((w) => w.id === wordId);
   if (!word) return [];
 
-  // Word level: just the word itself
+  // Word level: repeat the feared word with warm-up words for desensitization
   if (level === "words") {
-    return [word.word];
+    return ["hello", "morning", word.word, "water", word.word];
   }
 
   // Other levels: pull from cached AI-generated content

@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db/client";
-import { sessions, userStats, exerciseCompletions } from "@/lib/db/schema";
+import { sessions, userStats } from "@/lib/db/schema";
 import { eq, desc, sql, and, gte } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth/helpers";
 

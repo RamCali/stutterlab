@@ -6,7 +6,6 @@ import { Progress } from "@/components/ui/progress";
 import {
   TrendingUp,
   TrendingDown,
-  Minus,
   Award,
 } from "lucide-react";
 import type { SessionScorecard as ScorecardType } from "@/lib/analysis/types";

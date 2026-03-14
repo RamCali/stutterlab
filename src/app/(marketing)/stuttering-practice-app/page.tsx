@@ -8,14 +8,10 @@ import {
   Check,
   Heart,
   LineChart,
-  Mic,
   Phone,
-  Shield,
   Sparkles,
   Star,
   Stethoscope,
-  Users,
-  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";

@@ -15,7 +15,6 @@ import {
   TrendingDown,
   TrendingUp,
   Minus,
-  Copy,
   Check,
 } from "lucide-react";
 import { useState } from "react";

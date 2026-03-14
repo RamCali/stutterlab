@@ -140,6 +140,7 @@ export function ReadingAssessment({ onComplete }: ReadingAssessmentProps) {
     if (isRecording && deepgram.stream && !analyserRef.current) {
       setupAudioVisualizer(deepgram.stream);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRecording, deepgram.stream]);
 
   useEffect(() => {

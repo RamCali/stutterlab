@@ -115,7 +115,6 @@ export default function AIConversationPage() {
       voiceConvRef.current?.stop();
       stressEngineRef.current?.stop();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function startVoiceConversation() {
@@ -279,7 +278,7 @@ export default function AIConversationPage() {
       {/* Header */}
       <div className="border-b px-4 py-3 flex items-center justify-between bg-background">
         <div className="flex items-center gap-3">
-          <Link href="/ai-practice">
+          <Link href="/app/ai-practice">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="h-4 w-4" />
             </Button>

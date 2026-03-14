@@ -7,12 +7,9 @@ import type { TechniqueOutcomeSummary } from "@/lib/actions/user-progress";
 
 /* ─── All 8 techniques ─── */
 
-const ALL_TECHNIQUE_IDS = [
-  ...FLUENCY_SHAPING_TECHNIQUES,
-  ...MODIFICATION_TECHNIQUES,
-] as const;
-
-export type Technique = (typeof ALL_TECHNIQUE_IDS)[number];
+export type Technique =
+  | (typeof FLUENCY_SHAPING_TECHNIQUES)[number]
+  | (typeof MODIFICATION_TECHNIQUES)[number];
 
 export interface TechniqueInfo {
   id: Technique;

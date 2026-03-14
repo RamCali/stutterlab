@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireAuth } from "@/lib/auth/helpers";
 
 export async function POST(req: NextRequest) {
   try {
+    await requireAuth();
     const { text, voiceId } = await req.json();
 
     if (!text) {

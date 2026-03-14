@@ -14,7 +14,7 @@ import {
   type Disfluency,
   type TranscriptSegment,
 } from "./SpeechAnalyzer";
-import { CoachAudioCues, type AudioCueConfig } from "./CoachAudioCues";
+import { CoachAudioCues } from "./CoachAudioCues";
 import { EmotionDetector } from "./EmotionDetector";
 import type { EmotionalState, EmotionSnapshot } from "@/lib/analysis/types";
 

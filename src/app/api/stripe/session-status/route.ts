@@ -3,6 +3,7 @@ import { getStripe, getPlanForPriceId } from "@/lib/stripe";
 import { db } from "@/lib/db/client";
 import { subscriptions } from "@/lib/db/schema";
 import type { PlanTier } from "@/lib/auth/premium";
+import { requireAuth } from "@/lib/auth/helpers";
 
 export async function GET(req: NextRequest) {
   const sessionId = req.nextUrl.searchParams.get("session_id");
@@ -10,6 +11,8 @@ export async function GET(req: NextRequest) {
   if (!sessionId) {
     return NextResponse.json({ error: "Missing session_id" }, { status: 400 });
   }
+
+  await requireAuth();
 
   try {
     const session = await getStripe().checkout.sessions.retrieve(sessionId);

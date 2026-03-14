@@ -537,3 +537,11 @@ export const audioLabPresets = pgTable("audio_lab_presets", {
   isDefault: boolean("is_default").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// ==================== EARLY ACCESS SIGNUPS ====================
+
+export const earlyAccessSignups = pgTable("early_access_signups", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: text("email").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

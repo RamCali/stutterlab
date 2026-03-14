@@ -7,7 +7,6 @@ import {
   FileText,
   Download,
   Share2,
-  Copy,
   Check,
   TrendingDown,
   TrendingUp,

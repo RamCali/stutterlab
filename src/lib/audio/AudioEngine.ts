@@ -113,7 +113,7 @@ export class AudioEngine {
           : { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
       };
       this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-    } catch (e) {
+    } catch {
       this.updateState({ error: "Microphone access denied. Please allow microphone access and try again." });
       await this.audioContext.close();
       this.audioContext = null;

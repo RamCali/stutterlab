@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { requireAuth } from "@/lib/auth/helpers";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -39,6 +40,7 @@ const FALLBACK_RESPONSE: ChallengeResponse = {
 
 export async function POST(req: NextRequest) {
   try {
+    await requireAuth();
     const { situation, automaticThought, emotions } =
       (await req.json()) as ChallengeRequest;
 

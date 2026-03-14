@@ -53,7 +53,7 @@ export default function ExerciseDetailPage() {
   const delayNodeRef = useRef<DelayNode | null>(null);
   const dafGainRef = useRef<GainNode | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
-  const sessionStartRef = useRef(Date.now());
+  const [sessionStart] = useState(() => Date.now());
 
   // Set default content level once exercise is known
   useEffect(() => {
@@ -134,7 +134,7 @@ export default function ExerciseDetailPage() {
     return (
       <div className="p-6 max-w-2xl mx-auto text-center space-y-4">
         <p className="text-muted-foreground">Exercise not found.</p>
-        <Link href="/exercises">
+        <Link href="/app/exercises">
           <Button variant="ghost">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Exercises
@@ -225,7 +225,9 @@ export default function ExerciseDetailPage() {
   async function handleComplete() {
     if (saving || !exercise) return;
     setSaving(true);
-    const durationSeconds = Math.round((Date.now() - sessionStartRef.current) / 1000);
+    // eslint-disable-next-line react-hooks/purity
+    const elapsed = Date.now() - sessionStart;
+    const durationSeconds = Math.round(elapsed / 1000);
     try {
       const result = await completeExercise({
         exerciseId: exercise.id,
@@ -269,7 +271,7 @@ export default function ExerciseDetailPage() {
       {/* Header */}
       <div className="border-b px-4 py-3 bg-background">
         <div className="flex items-center justify-between">
-          <Link href="/exercises">
+          <Link href="/app/exercises">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back

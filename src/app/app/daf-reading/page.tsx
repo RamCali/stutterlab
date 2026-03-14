@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -55,7 +55,7 @@ export default function DafReadingPage() {
   const [xpEarned, setXpEarned] = useState(0);
   const [saving, setSaving] = useState(false);
 
-  const sessionStartRef = useRef(Date.now());
+  const [sessionStart] = useState(() => Date.now());
   const audio = useDafAudio({ delayMs: dafDelay });
 
   const passage = PASSAGES[passageIndex];
@@ -86,7 +86,7 @@ export default function DafReadingPage() {
   async function handleComplete() {
     if (saving) return;
     setSaving(true);
-    const durationSeconds = Math.round((Date.now() - sessionStartRef.current) / 1000);
+    const durationSeconds = Math.round((Date.now() - sessionStart) / 1000);
     try {
       const result = await completeExercise({
         exerciseId: "daf-reading",

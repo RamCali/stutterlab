@@ -26,6 +26,7 @@ export default function AudioLabPage() {
   const [running, setRunning] = useState(false);
   const [inputLevel, setInputLevel] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [analyserNode, setAnalyserNode] = useState<AnalyserNode | null>(null);
 
   // DAF
   const [dafEnabled, setDafEnabled] = useState(false);
@@ -55,6 +56,7 @@ export default function AudioLabPage() {
       setRunning(false);
       setInputLevel(0);
       setError(null);
+      setAnalyserNode(null);
       return;
     }
 
@@ -91,6 +93,7 @@ export default function AudioLabPage() {
       // Check if engine actually started (it may have set an error instead)
       if (engine.getState().isActive) {
         setRunning(true);
+        setAnalyserNode(engine.getAnalyserNode() ?? null);
       }
     } catch (e) {
       setError(`Failed to start audio: ${e instanceof Error ? e.message : e}`);
@@ -400,7 +403,7 @@ export default function AudioLabPage() {
 
       {/* Live Coach Overlay */}
       <LiveCoachOverlay
-        analyserNode={engineRef.current?.getAnalyserNode() ?? null}
+        analyserNode={analyserNode}
         enabled={running}
       />
     </div>

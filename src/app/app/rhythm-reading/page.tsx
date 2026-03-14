@@ -15,8 +15,6 @@ import {
   CheckCircle2,
   Lightbulb,
   Sparkles,
-  Play,
-  Pause,
 } from "lucide-react";
 import { useMetronome } from "@/hooks/useMetronome";
 import { useDafAudio } from "@/hooks/useDafAudio";
@@ -45,7 +43,12 @@ export default function RhythmReadingPage() {
   const [xpEarned, setXpEarned] = useState(0);
   const [saving, setSaving] = useState(false);
 
-  const sessionStartRef = useRef(Date.now());
+  const sessionStartRef = useRef(0);
+
+  // Initialize session start time on mount
+  useEffect(() => {
+    sessionStartRef.current = Date.now();
+  }, []);
   const metronome = useMetronome({ initialBpm: 60 });
   const audio = useDafAudio();
 

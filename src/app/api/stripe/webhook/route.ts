@@ -8,14 +8,18 @@ import type { PlanTier } from "@/lib/auth/premium";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
-  const sig = req.headers.get("stripe-signature")!;
+  const sig = req.headers.get("stripe-signature");
+
+  if (!sig || !process.env.STRIPE_WEBHOOK_SECRET) {
+    return NextResponse.json({ error: "Missing signature or webhook secret" }, { status: 400 });
+  }
 
   let event: Stripe.Event;
   try {
     event = getStripe().webhooks.constructEvent(
       body,
       sig,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });

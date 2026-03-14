@@ -36,12 +36,6 @@ const SILENT_INITIAL: Record<string, string> = {
   phase: "f", phenomenon: "f", philosophy: "f", phantom: "f",
 };
 
-// Digraph phoneme mappings for display
-const DIGRAPH_PHONEMES: Record<string, string> = {
-  ch: "/tʃ/", sh: "/ʃ/", th: "/θ/", ph: "/f/", wh: "/w/",
-  kn: "/n/", wr: "/r/", qu: "/kw/",
-};
-
 /**
  * Get the initial phoneme/cluster of an English word.
  * Returns a simplified phoneme representation.

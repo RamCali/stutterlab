@@ -31,7 +31,12 @@ export default function PracticePage() {
   const [outcomes, setOutcomes] = useState<TechniqueOutcomeSummary | null>(null);
   const [confidenceBefore, setConfidenceBefore] = useState(5);
   const [saving, setSaving] = useState(false);
-  const sessionStartRef = useRef(Date.now());
+  const sessionStartRef = useRef(0);
+
+  // Initialize session start time on mount
+  useEffect(() => {
+    sessionStartRef.current = Date.now();
+  }, []);
 
   // Fetch real currentDay and outcomes on mount
   useEffect(() => {
@@ -92,7 +97,7 @@ export default function PracticePage() {
       {/* Header */}
       <div className="border-b px-4 py-3 bg-background">
         <div className="flex items-center justify-between mb-3">
-          <Link href="/dashboard">
+          <Link href="/app/dashboard">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="h-4 w-4 mr-1" />
               Exit

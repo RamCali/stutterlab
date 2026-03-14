@@ -54,7 +54,7 @@ export default function ReportHistoryPage() {
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/progress">
+          <Link href="/app/progress">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="h-4 w-4" />
             </Button>
@@ -69,7 +69,7 @@ export default function ReportHistoryPage() {
             </p>
           </div>
         </div>
-        <Link href="/progress/assess">
+        <Link href="/app/progress/assess">
           <Button>New Assessment</Button>
         </Link>
       </div>
@@ -81,7 +81,7 @@ export default function ReportHistoryPage() {
           <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
             Complete your first monthly assessment to start tracking your progress.
           </p>
-          <Link href="/progress/assess">
+          <Link href="/app/progress/assess">
             <Button className="mt-4">Start Assessment</Button>
           </Link>
         </div>

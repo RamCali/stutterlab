@@ -95,60 +95,72 @@ export function BreathingExercise({
   const [progress, setProgress] = useState(0);
 
   const animRef = useRef<number | null>(null);
-  const phaseStartRef = useRef(Date.now());
-  const phaseDurRef = useRef(pattern.inhale * 1000);
+  // eslint-disable-next-line react-hooks/purity
+  const cycleStartRef = useRef(Date.now());
+  const pausedElapsedRef = useRef(0);
 
   const isBox = pattern.hold > 0 || pattern.holdAfter > 0;
 
-  function getPhaseDur(p: Phase) {
-    const map = { inhale: pattern.inhale, hold: pattern.hold, exhale: pattern.exhale, holdAfter: pattern.holdAfter };
-    return map[p];
-  }
-
-  function advancePhase(p: Phase): { next: Phase; dur: number; incCycle: boolean } {
-    if (p === "inhale" && pattern.hold > 0) return { next: "hold", dur: pattern.hold, incCycle: false };
-    if (p === "inhale") return { next: "exhale", dur: pattern.exhale, incCycle: false };
-    if (p === "hold") return { next: "exhale", dur: pattern.exhale, incCycle: false };
-    if (p === "exhale" && pattern.holdAfter > 0) return { next: "holdAfter", dur: pattern.holdAfter, incCycle: false };
-    if (p === "exhale") return { next: "inhale", dur: pattern.inhale, incCycle: true };
-    return { next: "inhale", dur: pattern.inhale, incCycle: true };
-  }
-
-  // Smooth animation for dot
+  // Single rAF loop — one time source, no jitter between timers
   useEffect(() => {
-    if (!running || !isBox) return;
+    if (!running) {
+      pausedElapsedRef.current = Date.now() - cycleStartRef.current;
+      return;
+    }
+
+    cycleStartRef.current = Date.now() - pausedElapsedRef.current;
+
+    const phaseDurations = [
+      pattern.inhale * 1000,
+      pattern.hold * 1000,
+      pattern.exhale * 1000,
+      pattern.holdAfter * 1000,
+    ];
+    const phaseOrder: Phase[] = ["inhale", "hold", "exhale", "holdAfter"];
+    const cycleDuration = phaseDurations.reduce((a, b) => a + b, 0);
+
     function animate() {
-      const elapsed = Date.now() - phaseStartRef.current;
-      setProgress(Math.min(elapsed / phaseDurRef.current, 1));
+      const totalElapsed = Date.now() - cycleStartRef.current;
+      const completedCycles = Math.floor(totalElapsed / cycleDuration);
+
+      if (completedCycles >= totalCycles) {
+        setCycles(totalCycles);
+        setRunning(false);
+        return;
+      }
+
+      const cycleElapsed = totalElapsed - completedCycles * cycleDuration;
+
+      let acc = 0;
+      let currentPhase: Phase = "inhale";
+      let phaseProgress = 0;
+      let phaseTimeLeft = pattern.inhale;
+
+      for (let i = 0; i < 4; i++) {
+        if (phaseDurations[i] === 0) continue;
+        if (cycleElapsed < acc + phaseDurations[i]) {
+          currentPhase = phaseOrder[i];
+          const phaseElapsed = cycleElapsed - acc;
+          phaseProgress = phaseElapsed / phaseDurations[i];
+          phaseTimeLeft = Math.ceil((phaseDurations[i] - phaseElapsed) / 1000);
+          break;
+        }
+        acc += phaseDurations[i];
+      }
+
+      setCycles(completedCycles);
+      setPhase(currentPhase);
+      setProgress(phaseProgress);
+      setTimeLeft(Math.max(phaseTimeLeft, 1));
+
       animRef.current = requestAnimationFrame(animate);
     }
+
     animRef.current = requestAnimationFrame(animate);
-    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
-  }, [running, phase, isBox]);
-
-  // Phase timer (1s ticks)
-  useEffect(() => {
-    if (!running) return;
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          const { next, dur, incCycle } = advancePhase(phase);
-          if (incCycle) setCycles((c) => c + 1);
-          setPhase(next);
-          phaseStartRef.current = Date.now();
-          phaseDurRef.current = dur * 1000;
-          setProgress(0);
-          return dur;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [phase, running, pattern]);
-
-  useEffect(() => {
-    if (cycles >= totalCycles) setRunning(false);
-  }, [cycles, totalCycles]);
+    return () => {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+    };
+  }, [running, pattern, totalCycles]);
 
   const phaseLabels: Record<Phase, string> = {
     inhale: "Breathe In",

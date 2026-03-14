@@ -114,6 +114,7 @@ export default function WeeklyAuditPage() {
       if (timerRef.current) clearInterval(timerRef.current);
       stopRecording();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Auto-stop at 2 minutes
@@ -122,6 +123,7 @@ export default function WeeklyAuditPage() {
       stopRecording();
       analyzeAudit();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [elapsedSeconds, isRecording]);
 
   async function startRecording() {
@@ -235,7 +237,7 @@ export default function WeeklyAuditPage() {
     >
       <div className="p-6 max-w-3xl mx-auto space-y-6">
         <div className="flex items-center gap-3">
-          <Link href="/progress">
+          <Link href="/app/progress">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="h-4 w-4" />
             </Button>
@@ -619,7 +621,7 @@ export default function WeeklyAuditPage() {
             </Card>
 
             <div className="flex gap-3">
-              <Link href="/progress" className="flex-1">
+              <Link href="/app/progress" className="flex-1">
                 <Button variant="outline" className="w-full">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Progress

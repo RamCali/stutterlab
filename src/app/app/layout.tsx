@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import {
   Flame,
   LineChart,
@@ -23,6 +24,7 @@ function ThemeToggle() {
 
   useEffect(() => {
     const isDark = document.documentElement.classList.contains("dark");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDark(isDark);
   }, []);
 
@@ -46,6 +48,8 @@ function ThemeToggle() {
 
 function AppShell({ children }: { children: React.ReactNode }) {
   const { currentDay, loading } = useProgram();
+  const { data: session } = useSession();
+  const firstName = session?.user?.name?.split(" ")[0];
   const [streak, setStreak] = useState(0);
   const [xp, setXp] = useState(0);
 
@@ -63,9 +67,14 @@ function AppShell({ children }: { children: React.ReactNode }) {
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 flex-col border-r border-border/60 bg-sidebar">
         {/* Logo */}
-        <div className="flex items-center px-5 py-4 border-b border-border/60">
-          <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={240} height={48} className="h-12 w-auto dark:hidden" />
-          <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={240} height={48} className="h-12 w-auto hidden dark:block" />
+        <div className="px-5 py-4 border-b border-border/60">
+          <Link href="/app/dashboard">
+            <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={240} height={48} className="h-12 w-auto dark:hidden" />
+            <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={240} height={48} className="h-12 w-auto hidden dark:block" />
+          </Link>
+          {firstName && (
+            <p className="text-sm text-muted-foreground mt-1">Welcome, {firstName}</p>
+          )}
         </div>
 
         {/* Streak indicator */}
@@ -128,10 +137,10 @@ function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex flex-1 flex-col">
         {/* Mobile top bar */}
         <header className="flex md:hidden items-center justify-between border-b border-border/60 px-4 py-3 bg-card">
-          <div className="flex items-center">
+          <Link href="/app/dashboard" className="flex items-center">
             <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={200} height={40} className="h-10 w-auto dark:hidden" />
             <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={200} height={40} className="h-10 w-auto hidden dark:block" />
-          </div>
+          </Link>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 bg-primary/5 dark:bg-primary/10 rounded-lg px-2 py-1">
               <Flame className="h-3.5 w-3.5 text-orange-500" />

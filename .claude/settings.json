@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.reddit.com)",
+      "Read(//Users/RamG/Downloads/Projects \\(DND\\)/StutterLab/**)",
+      "Bash(npm run lint)",
+      "Read(//tmp/**)",
+      "Read(//private/tmp/**)",
+      "Bash(npx eslint --no-eslintrc --rule '{\"\"@typescript-eslint/no-unused-vars\"\": \"\"warn\"\", \"\"no-unused-vars\"\": \"\"warn\"\"}' --parser @typescript-eslint/parser src/app/app/community/page.tsx src/app/app/daf-reading/page.tsx src/app/app/exercises/[exerciseId]/page.tsx src/app/app/exposure-ladder/page.tsx src/app/app/feared-words/page.tsx src/app/app/feared-words/practice/[wordId]/page.tsx)",
+      "Bash(npx eslint --no-warn-ignored src/hooks/useDafAudio.ts src/hooks/useDeepgramSTT.ts src/app/app/checkout/return/page.tsx src/app/app/layout.tsx src/app/app/practice/page.tsx)",
+      "Bash(npx eslint src/app/app/community/page.tsx src/app/app/daf-reading/page.tsx \"src/app/app/exercises/[exerciseId]/page.tsx\" src/app/app/exposure-ladder/page.tsx src/app/app/feared-words/page.tsx \"src/app/app/feared-words/practice/[wordId]/page.tsx\" src/app/app/challenges/page.tsx src/app/api/community/buddy/route.ts src/app/api/community/challenges/route.ts src/app/api/community/pulse/route.ts src/app/api/shadowing/scores/route.ts \"src/app/\\(marketing\\)/ai-speech-training/page.tsx\" \"src/app/\\(marketing\\)/blog/page.tsx\" \"src/app/\\(marketing\\)/speech-training-for-stuttering/page.tsx\" \"src/app/\\(marketing\\)/stuttering-practice-app/page.tsx\")",
+      "Bash(npx eslint --no-warn-ignored src/lib/actions/analytics.ts src/lib/actions/progress.ts src/lib/analysis/phoneme-mapper.ts src/lib/analysis/predictive-coach.ts src/lib/analysis/technique-tracker.ts src/lib/audio/AudioEngine.ts src/lib/audio/SpeechCoach.ts src/lib/curriculum/adaptive-engine.ts src/lib/gamification/engine.ts src/lib/practice/daily-session.ts)",
+      "Bash(npx eslint src/app/app/feared-words/page.tsx \"src/app/app/feared-words/practice/[wordId]/page.tsx\")",
+      "Bash(npx eslint --no-warn-ignored src/lib/gamification/engine.ts)",
+      "Bash(python3 -c \":*)",
+      "Bash(npx eslint src/app/app/community/page.tsx src/app/app/challenges/page.tsx src/app/app/exposure-ladder/page.tsx src/app/api/community/buddy/route.ts src/app/api/community/challenges/route.ts src/app/api/community/pulse/route.ts src/app/api/shadowing/scores/route.ts \"src/app/\\(marketing\\)/ai-speech-training/page.tsx\" \"src/app/\\(marketing\\)/blog/page.tsx\" \"src/app/\\(marketing\\)/speech-training-for-stuttering/page.tsx\" \"src/app/\\(marketing\\)/stuttering-practice-app/page.tsx\")",
+      "Bash(npx eslint src/app/app/ai-practice/[scenario]/page.tsx --no-error-on-unmatched-pattern)",
+      "Bash(npx eslint --no-eslintrc --plugin react-compiler --rule '{\"\"react-compiler/react-compiler\"\": \"\"error\"\"}' src/app/app/audio-lab/page.tsx src/app/app/checkout/return/page.tsx src/app/app/daf-reading/page.tsx \"src/app/app/exercises/[exerciseId]/page.tsx\" src/app/app/exposure-ladder/page.tsx src/app/app/feared-words/page.tsx \"src/app/app/feared-words/practice/[wordId]/page.tsx\" src/app/app/layout.tsx src/app/app/mindset/page.tsx \"src/app/app/mindset/predictions/[id]/page.tsx\" src/app/app/mindset/traps/page.tsx)",
+      "Bash(npx eslint --no-eslintrc --plugin react-compiler --rule '{\"\"react-compiler/react-compiler\"\": \"\"error\"\"}' src/app/app/mirror-practice/page.tsx src/app/app/practice/page.tsx src/app/app/presentation-mode/page.tsx src/app/app/progress/page.tsx src/app/app/rhythm-reading/page.tsx src/app/not-found.tsx src/components/ai-conversations/voice-orb.tsx src/components/breathing-exercise.tsx src/components/community/i-did-it-wall.tsx src/components/community/victory-notifications.tsx src/components/dashboard/north-star.tsx src/components/insights/CohortInsightBadge.tsx src/components/shadowing/echo-clip-card.tsx src/hooks/useDafAudio.ts src/hooks/useDeepgramSTT.ts src/components/practice/speak-step.tsx src/components/practice/technique-step.tsx)",
+      "Bash(npx eslint src/app/app/audio-lab/page.tsx src/app/app/checkout/return/page.tsx src/app/app/daf-reading/page.tsx \"src/app/app/exercises/[exerciseId]/page.tsx\" src/app/app/exposure-ladder/page.tsx src/app/app/feared-words/page.tsx \"src/app/app/feared-words/practice/[wordId]/page.tsx\" src/app/app/layout.tsx src/app/app/mindset/page.tsx \"src/app/app/mindset/predictions/[id]/page.tsx\" src/app/app/mindset/traps/page.tsx)",
+      "Bash(npx eslint src/app/app/mirror-practice/page.tsx src/app/app/practice/page.tsx src/app/app/presentation-mode/page.tsx src/app/app/progress/page.tsx src/app/app/rhythm-reading/page.tsx src/app/not-found.tsx src/components/ai-conversations/voice-orb.tsx src/components/breathing-exercise.tsx src/components/community/i-did-it-wall.tsx src/components/community/victory-notifications.tsx src/components/dashboard/north-star.tsx src/components/insights/CohortInsightBadge.tsx src/components/shadowing/echo-clip-card.tsx src/hooks/useDafAudio.ts src/hooks/useDeepgramSTT.ts src/components/practice/speak-step.tsx src/components/practice/technique-step.tsx)",
+      "Bash(npx eslint src/app/app/progress/weekly-audit/page.tsx src/components/ai-conversations/performance-report.tsx src/components/premium-gate.tsx src/components/progress/reading-assessment.tsx)",
+      "Bash(npx eslint src/app/api/shadowing/scores/route.ts src/app/app/progress/weekly-audit/page.tsx \"src/app/app/ai-practice/[scenario]/page.tsx\" src/components/ai-conversations/performance-report.tsx src/components/premium-gate.tsx src/components/progress/reading-assessment.tsx)",
+      "Bash(for f in src/app/app/presentation-mode/page.tsx src/app/app/exposure-ladder/page.tsx src/app/app/checkout/return/page.tsx src/app/app/mindset/traps/page.tsx src/app/app/mindset/page.tsx \"src/app/app/mindset/predictions/[id]/page.tsx\" src/app/app/layout.tsx \"src/app/app/feared-words/practice/[wordId]/page.tsx\" src/app/app/feared-words/page.tsx src/app/not-found.tsx src/components/insights/CohortInsightBadge.tsx src/components/dashboard/north-star.tsx src/components/community/i-did-it-wall.tsx)",
+      "Bash(do sed -i '' 's|eslint-disable-next-line react-compiler/react-compiler|eslint-disable-next-line react-hooks/set-state-in-effect|g' \"$f\")",
+      "Bash(npx eslint --fix)"
+    ],
+    "additionalDirectories": [
+      "/Users/RamG/Downloads/Projects (DND)/StutterLab/src/app/api/klaviyo"
+    ]
+  }
+}

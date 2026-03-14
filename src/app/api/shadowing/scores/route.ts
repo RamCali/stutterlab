@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { shadowingScores, userStats } from "@/lib/db/schema";
 import { getUserId } from "@/lib/auth/helpers";
-import { eq, sql, desc, and } from "drizzle-orm";
+import { eq, sql, desc } from "drizzle-orm";
 
 /** GET — fetch user's shadowing scores */
 export async function GET() {

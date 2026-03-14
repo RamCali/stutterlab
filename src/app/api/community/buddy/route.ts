@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { buddyPairings, userStats } from "@/lib/db/schema";
 import { getUserId } from "@/lib/auth/helpers";

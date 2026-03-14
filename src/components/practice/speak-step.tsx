@@ -2,7 +2,6 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Mic,
   Square,
@@ -54,7 +53,10 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
   const coachAudioCtxRef = useRef<AudioContext | null>(null);
   const [bars, setBars] = useState<number[]>(Array(40).fill(3));
   const messagesRef = useRef<Message[]>([]);
-  messagesRef.current = messages;
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  });
 
   const scenarioInfo = SCENARIO_LABELS[scenario] || {
     title: "Conversation",
@@ -249,6 +251,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
   // Sync deepgram transcript to liveTranscript for display
   useEffect(() => {
     if (listening) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLiveTranscript(deepgram.transcript);
     }
   }, [deepgram.transcript, listening]);
@@ -297,6 +300,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
   /* ─── Waveform visualization ─── */
   useEffect(() => {
     if (!listening || !coachAnalyser) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setBars(Array(40).fill(3));
       return;
     }

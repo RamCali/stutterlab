@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -46,10 +46,10 @@ export function MarketingHeader() {
         {/* Desktop auth buttons */}
         <div className="hidden md:flex items-center gap-3">
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/login">Log in</Link>
+            <Link href="/access">Have a passcode?</Link>
           </Button>
           <Button size="sm" asChild>
-            <Link href="/signup">Get Started</Link>
+            <Link href="#pricing">Join Waitlist</Link>
           </Button>
         </div>
 
@@ -78,10 +78,10 @@ export function MarketingHeader() {
               <hr className="border-border" />
               <div className="flex flex-col gap-4">
                 <Button variant="outline" size="lg" asChild>
-                  <Link href="/login" onClick={() => setOpen(false)}>Log in</Link>
+                  <Link href="/access" onClick={() => setOpen(false)}>Have a passcode?</Link>
                 </Button>
                 <Button size="lg" asChild>
-                  <Link href="/signup" onClick={() => setOpen(false)}>Start Free Trial</Link>
+                  <Link href="/#pricing" onClick={() => setOpen(false)}>Join Waitlist</Link>
                 </Button>
               </div>
             </div>

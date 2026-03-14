@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>StutterLab Color Palette</title>
+<style>
+  body { font-family: 'Inter', system-ui, sans-serif; background: #1a1a2e; color: #e4e7eb; padding: 40px; max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 28px; margin-bottom: 8px; }
+  h2 { font-size: 18px; margin-top: 36px; margin-bottom: 12px; color: #48C6B3; border-bottom: 1px solid #2D3440; padding-bottom: 6px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+  .swatch {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 12px; border-radius: 8px;
+    background: rgba(255,255,255,0.04); cursor: pointer;
+    transition: background 0.15s;
+  }
+  .swatch:hover { background: rgba(255,255,255,0.1); }
+  .swatch:active { transform: scale(0.98); }
+  .color-box {
+    width: 36px; height: 36px; border-radius: 6px; flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .hex { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 14px; font-weight: 600; }
+  .label { font-size: 12px; color: #8B949E; }
+  .copied { position: fixed; top: 20px; right: 20px; background: #48C6B3; color: #0B0E14; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 14px; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+  .copied.show { opacity: 1; }
+  .subtitle { color: #8B949E; margin-bottom: 32px; }
+</style>
+</head>
+<body>
+
+<h1>StutterLab Color Palette</h1>
+<p class="subtitle">Click any swatch to copy the hex code</p>
+<div id="toast" class="copied">Copied!</div>
+
+<h2>Primary / Brand</h2>
+<div class="grid">
+  <div class="swatch" onclick="copy('#3BA89A')"><div class="color-box" style="background:#3BA89A"></div><div><div class="hex">#3BA89A</div><div class="label">Clarity Teal (light)</div></div></div>
+  <div class="swatch" onclick="copy('#48C6B3')"><div class="color-box" style="background:#48C6B3"></div><div><div class="hex">#48C6B3</div><div class="label">Clarity Teal (dark)</div></div></div>
+  <div class="swatch" onclick="copy('#FFB347')"><div class="color-box" style="background:#FFB347"></div><div><div class="hex">#FFB347</div><div class="label">Brand Amber</div></div></div>
+  <div class="swatch" onclick="copy('#00E676')"><div class="color-box" style="background:#00E676"></div><div><div class="hex">#00E676</div><div class="label">Fluency Green</div></div></div>
+</div>
+
+<h2>Light Mode</h2>
+<div class="grid">
+  <div class="swatch" onclick="copy('#F8F9FA')"><div class="color-box" style="background:#F8F9FA"></div><div><div class="hex">#F8F9FA</div><div class="label">Background</div></div></div>
+  <div class="swatch" onclick="copy('#FFFFFF')"><div class="color-box" style="background:#FFFFFF"></div><div><div class="hex">#FFFFFF</div><div class="label">Card / Popover</div></div></div>
+  <div class="swatch" onclick="copy('#1A1F26')"><div class="color-box" style="background:#1A1F26"></div><div><div class="hex">#1A1F26</div><div class="label">Foreground</div></div></div>
+  <div class="swatch" onclick="copy('#F0F1F3')"><div class="color-box" style="background:#F0F1F3"></div><div><div class="hex">#F0F1F3</div><div class="label">Secondary</div></div></div>
+  <div class="swatch" onclick="copy('#EDEEF0')"><div class="color-box" style="background:#EDEEF0"></div><div><div class="hex">#EDEEF0</div><div class="label">Muted</div></div></div>
+  <div class="swatch" onclick="copy('#6B7280')"><div class="color-box" style="background:#6B7280"></div><div><div class="hex">#6B7280</div><div class="label">Muted Foreground</div></div></div>
+  <div class="swatch" onclick="copy('#E8F5F2')"><div class="color-box" style="background:#E8F5F2"></div><div><div class="hex">#E8F5F2</div><div class="label">Accent</div></div></div>
+  <div class="swatch" onclick="copy('#E2E4E8')"><div class="color-box" style="background:#E2E4E8"></div><div><div class="hex">#E2E4E8</div><div class="label">Border / Input</div></div></div>
+  <div class="swatch" onclick="copy('#EF4444')"><div class="color-box" style="background:#EF4444"></div><div><div class="hex">#EF4444</div><div class="label">Destructive</div></div></div>
+</div>
+
+<h2>Dark Mode</h2>
+<div class="grid">
+  <div class="swatch" onclick="copy('#0B0E14')"><div class="color-box" style="background:#0B0E14"></div><div><div class="hex">#0B0E14</div><div class="label">Background</div></div></div>
+  <div class="swatch" onclick="copy('#141820')"><div class="color-box" style="background:#141820"></div><div><div class="hex">#141820</div><div class="label">Card</div></div></div>
+  <div class="swatch" onclick="copy('#1A1F26')"><div class="color-box" style="background:#1A1F26"></div><div><div class="hex">#1A1F26</div><div class="label">Popover</div></div></div>
+  <div class="swatch" onclick="copy('#E4E7EB')"><div class="color-box" style="background:#E4E7EB"></div><div><div class="hex">#E4E7EB</div><div class="label">Foreground</div></div></div>
+  <div class="swatch" onclick="copy('#242A33')"><div class="color-box" style="background:#242A33"></div><div><div class="hex">#242A33</div><div class="label">Secondary / Muted / Accent</div></div></div>
+  <div class="swatch" onclick="copy('#8B949E')"><div class="color-box" style="background:#8B949E"></div><div><div class="hex">#8B949E</div><div class="label">Muted Foreground</div></div></div>
+  <div class="swatch" onclick="copy('#2D3440')"><div class="color-box" style="background:#2D3440"></div><div><div class="hex">#2D3440</div><div class="label">Border / Input</div></div></div>
+  <div class="swatch" onclick="copy('#F87171')"><div class="color-box" style="background:#F87171"></div><div><div class="hex">#F87171</div><div class="label">Destructive</div></div></div>
+</div>
+
+<h2>Sidebar (Light)</h2>
+<div class="grid">
+  <div class="swatch" onclick="copy('#F0F1F3')"><div class="color-box" style="background:#F0F1F3"></div><div><div class="hex">#F0F1F3</div><div class="label">Sidebar BG</div></div></div>
+  <div class="swatch" onclick="copy('#1A1F26')"><div class="color-box" style="background:#1A1F26"></div><div><div class="hex">#1A1F26</div><div class="label">Sidebar Foreground</div></div></div>
+  <div class="swatch" onclick="copy('#3BA89A')"><div class="color-box" style="background:#3BA89A"></div><div><div class="hex">#3BA89A</div><div class="label">Sidebar Primary</div></div></div>
+  <div class="swatch" onclick="copy('#E8F5F2')"><div class="color-box" style="background:#E8F5F2"></div><div><div class="hex">#E8F5F2</div><div class="label">Sidebar Accent</div></div></div>
+  <div class="swatch" onclick="copy('#E2E4E8')"><div class="color-box" style="background:#E2E4E8"></div><div><div class="hex">#E2E4E8</div><div class="label">Sidebar Border</div></div></div>
+</div>
+
+<h2>Sidebar (Dark)</h2>
+<div class="grid">
+  <div class="swatch" onclick="copy('#0F1218')"><div class="color-box" style="background:#0F1218"></div><div><div class="hex">#0F1218</div><div class="label">Sidebar BG</div></div></div>
+  <div class="swatch" onclick="copy('#E4E7EB')"><div class="color-box" style="background:#E4E7EB"></div><div><div class="hex">#E4E7EB</div><div class="label">Sidebar Foreground</div></div></div>
+  <div class="swatch" onclick="copy('#48C6B3')"><div class="color-box" style="background:#48C6B3"></div><div><div class="hex">#48C6B3</div><div class="label">Sidebar Primary</div></div></div>
+  <div class="swatch" onclick="copy('#242A33')"><div class="color-box" style="background:#242A33"></div><div><div class="hex">#242A33</div><div class="label">Sidebar Accent</div></div></div>
+  <div class="swatch" onclick="copy('#2D3440')"><div class="color-box" style="background:#2D3440"></div><div><div class="hex">#2D3440</div><div class="label">Sidebar Border</div></div></div>
+</div>
+
+<h2>Chart Palette (Light)</h2>
+<div class="grid">
+  <div class="swatch" onclick="copy('#48C6B3')"><div class="color-box" style="background:#48C6B3"></div><div><div class="hex">#48C6B3</div><div class="label">Chart 1 — Teal</div></div></div>
+  <div class="swatch" onclick="copy('#FFB347')"><div class="color-box" style="background:#FFB347"></div><div><div class="hex">#FFB347</div><div class="label">Chart 2 — Amber</div></div></div>
+  <div class="swatch" onclick="copy('#00E676')"><div class="color-box" style="background:#00E676"></div><div><div class="hex">#00E676</div><div class="label">Chart 3 — Green</div></div></div>
+  <div class="swatch" onclick="copy('#7C3AED')"><div class="color-box" style="background:#7C3AED"></div><div><div class="hex">#7C3AED</div><div class="label">Chart 4 — Purple</div></div></div>
+  <div class="swatch" onclick="copy('#F59E0B')"><div class="color-box" style="background:#F59E0B"></div><div><div class="hex">#F59E0B</div><div class="label">Chart 5 — Yellow</div></div></div>
+</div>
+
+<h2>Chart Palette (Dark)</h2>
+<div class="grid">
+  <div class="swatch" onclick="copy('#48C6B3')"><div class="color-box" style="background:#48C6B3"></div><div><div class="hex">#48C6B3</div><div class="label">Chart 1 — Teal</div></div></div>
+  <div class="swatch" onclick="copy('#FFB347')"><div class="color-box" style="background:#FFB347"></div><div><div class="hex">#FFB347</div><div class="label">Chart 2 — Amber</div></div></div>
+  <div class="swatch" onclick="copy('#00E676')"><div class="color-box" style="background:#00E676"></div><div><div class="hex">#00E676</div><div class="label">Chart 3 — Green</div></div></div>
+  <div class="swatch" onclick="copy('#A78BFA')"><div class="color-box" style="background:#A78BFA"></div><div><div class="hex">#A78BFA</div><div class="label">Chart 4 — Purple</div></div></div>
+  <div class="swatch" onclick="copy('#FBBF24')"><div class="color-box" style="background:#FBBF24"></div><div><div class="hex">#FBBF24</div><div class="label">Chart 5 — Yellow</div></div></div>
+</div>
+
+<h2>Elevation Overlays (Dark Mode)</h2>
+<div class="grid">
+  <div class="swatch" onclick="copy('rgba(255,255,255,0.05)')"><div class="color-box" style="background:rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15)"></div><div><div class="hex">rgba(255,255,255,0.05)</div><div class="label">Elevation 1</div></div></div>
+  <div class="swatch" onclick="copy('rgba(255,255,255,0.07)')"><div class="color-box" style="background:rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15)"></div><div><div class="hex">rgba(255,255,255,0.07)</div><div class="label">Elevation 2</div></div></div>
+  <div class="swatch" onclick="copy('rgba(255,255,255,0.08)')"><div class="color-box" style="background:rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15)"></div><div><div class="hex">rgba(255,255,255,0.08)</div><div class="label">Elevation 3</div></div></div>
+  <div class="swatch" onclick="copy('rgba(255,255,255,0.09)')"><div class="color-box" style="background:rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.15)"></div><div><div class="hex">rgba(255,255,255,0.09)</div><div class="label">Elevation 4</div></div></div>
+  <div class="swatch" onclick="copy('rgba(255,255,255,0.11)')"><div class="color-box" style="background:rgba(255,255,255,0.11); border: 1px solid rgba(255,255,255,0.15)"></div><div><div class="hex">rgba(255,255,255,0.11)</div><div class="label">Elevation 6</div></div></div>
+  <div class="swatch" onclick="copy('rgba(255,255,255,0.12)')"><div class="color-box" style="background:rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.15)"></div><div><div class="hex">rgba(255,255,255,0.12)</div><div class="label">Elevation 8</div></div></div>
+  <div class="swatch" onclick="copy('rgba(255,255,255,0.14)')"><div class="color-box" style="background:rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.15)"></div><div><div class="hex">rgba(255,255,255,0.14)</div><div class="label">Elevation 12</div></div></div>
+  <div class="swatch" onclick="copy('rgba(255,255,255,0.15)')"><div class="color-box" style="background:rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2)"></div><div><div class="hex">rgba(255,255,255,0.15)</div><div class="label">Elevation 16</div></div></div>
+  <div class="swatch" onclick="copy('rgba(255,255,255,0.16)')"><div class="color-box" style="background:rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.2)"></div><div><div class="hex">rgba(255,255,255,0.16)</div><div class="label">Elevation 24</div></div></div>
+</div>
+
+<script>
+function copy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  const toast = document.getElementById('toast');
+  toast.textContent = 'Copied ' + text;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1200);
+}
+</script>
+
+</body>
+</html>

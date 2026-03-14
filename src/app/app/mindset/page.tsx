@@ -27,7 +27,7 @@ import {
   type Prediction,
   type CBTStore,
 } from "@/lib/cbt/store";
-import { getTrapById, type ThinkingTrapId } from "@/lib/cbt/thinking-traps";
+import { getTrapById } from "@/lib/cbt/thinking-traps";
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
@@ -53,6 +53,7 @@ export default function MindsetPage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshStore();
   }, [refreshStore]);
 
@@ -136,7 +137,7 @@ export default function MindsetPage() {
       {/* ── Thought Journal Tab ── */}
       {tab === "journal" && (
         <div className="space-y-3">
-          <Link href="/mindset/new-thought">
+          <Link href="/app/mindset/new-thought">
             <Button className="w-full">
               <Plus className="h-4 w-4 mr-1" />
               New Thought Record
@@ -216,7 +217,7 @@ export default function MindsetPage() {
       {/* ── Predictions Tab ── */}
       {tab === "predictions" && (
         <div className="space-y-4">
-          <Link href="/mindset/new-thought?mode=prediction">
+          <Link href="/app/mindset/new-thought?mode=prediction">
             <Button className="w-full">
               <Plus className="h-4 w-4 mr-1" />
               New Prediction
@@ -272,7 +273,7 @@ export default function MindsetPage() {
       )}
 
       {/* Thinking Traps Education */}
-      <Link href="/mindset/traps">
+      <Link href="/app/mindset/traps">
         <Card className="hover:border-primary/50 transition-colors cursor-pointer">
           <CardContent className="pt-5 pb-4">
             <div className="flex items-center gap-3">

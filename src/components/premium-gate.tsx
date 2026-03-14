@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Crown, Sparkles, Clock } from "lucide-react";
 import { EmbeddedCheckoutDialog } from "@/components/embedded-checkout";
+import { BillingToggle } from "@/components/billing-toggle";
 import type { PlanTier } from "@/lib/auth/premium";
 
 interface PremiumGateProps {
@@ -18,7 +19,6 @@ interface PremiumGateProps {
 }
 
 export function PremiumGate({
-  requiredPlan,
   currentPlan = "free",
   featureName,
   description,
@@ -69,29 +69,7 @@ export function PremiumGate({
           </div>
 
           {/* Billing interval toggle */}
-          <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-muted">
-            <button
-              onClick={() => setInterval("month")}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                interval === "month"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              $99/mo
-            </button>
-            <button
-              onClick={() => setInterval("year")}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                interval === "year"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              $999/yr
-              <span className="ml-1 text-sm text-emerald-500">Save $189</span>
-            </button>
-          </div>
+          <BillingToggle interval={interval} onIntervalChange={setInterval} />
 
           <Button onClick={() => setCheckoutOpen(true)} className="w-full">
             <Crown className="h-4 w-4 mr-2" />

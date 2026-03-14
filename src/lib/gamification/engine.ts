@@ -51,8 +51,7 @@ export async function calculateXpForAction(
 
 export async function awardXp(
   userId: string,
-  amount: number,
-  source: string
+  amount: number
 ): Promise<{ newTotal: number; leveledUp: boolean; newLevel: number }> {
   await ensureUserStats(userId);
 

@@ -171,10 +171,21 @@ export function useDafAudio(options: UseDafAudioOptions = {}): UseDafAudioReturn
     if (timerRef.current) clearInterval(timerRef.current);
   }, []);
 
+  const [analyserNode, setAnalyserNode] = useState<AnalyserNode | null>(null);
+
+  // Sync analyser ref to state for consumers
+  useEffect(() => {
+    if (isActive) {
+      setAnalyserNode(analyserRef.current);
+    } else {
+      setAnalyserNode(null);
+    }
+  }, [isActive]);
+
   return {
     start,
     stop,
-    analyserNode: analyserRef.current,
+    analyserNode,
     isActive,
     bars,
     elapsedSeconds,

@@ -1,0 +1,63 @@
+{
+  "Brand": {
+    "Clarity Teal Light": { "value": "#3BA89A", "type": "color" },
+    "Clarity Teal Dark": { "value": "#48C6B3", "type": "color" },
+    "Amber": { "value": "#FFB347", "type": "color" },
+    "Fluency Green": { "value": "#00E676", "type": "color" }
+  },
+  "Light Mode": {
+    "Background": { "value": "#F8F9FA", "type": "color" },
+    "Card": { "value": "#FFFFFF", "type": "color" },
+    "Foreground": { "value": "#1A1F26", "type": "color" },
+    "Secondary": { "value": "#F0F1F3", "type": "color" },
+    "Muted": { "value": "#EDEEF0", "type": "color" },
+    "Muted Foreground": { "value": "#6B7280", "type": "color" },
+    "Accent": { "value": "#E8F5F2", "type": "color" },
+    "Border": { "value": "#E2E4E8", "type": "color" },
+    "Destructive": { "value": "#EF4444", "type": "color" },
+    "Primary": { "value": "#3BA89A", "type": "color" },
+    "Primary Foreground": { "value": "#FFFFFF", "type": "color" },
+    "Ring": { "value": "#3BA89A", "type": "color" }
+  },
+  "Dark Mode": {
+    "Background": { "value": "#0B0E14", "type": "color" },
+    "Card": { "value": "#141820", "type": "color" },
+    "Popover": { "value": "#1A1F26", "type": "color" },
+    "Foreground": { "value": "#E4E7EB", "type": "color" },
+    "Secondary": { "value": "#242A33", "type": "color" },
+    "Muted Foreground": { "value": "#8B949E", "type": "color" },
+    "Border": { "value": "#2D3440", "type": "color" },
+    "Destructive": { "value": "#F87171", "type": "color" },
+    "Primary": { "value": "#48C6B3", "type": "color" },
+    "Primary Foreground": { "value": "#0B0E14", "type": "color" },
+    "Ring": { "value": "#48C6B3", "type": "color" }
+  },
+  "Sidebar Light": {
+    "Background": { "value": "#F0F1F3", "type": "color" },
+    "Foreground": { "value": "#1A1F26", "type": "color" },
+    "Primary": { "value": "#3BA89A", "type": "color" },
+    "Accent": { "value": "#E8F5F2", "type": "color" },
+    "Border": { "value": "#E2E4E8", "type": "color" }
+  },
+  "Sidebar Dark": {
+    "Background": { "value": "#0F1218", "type": "color" },
+    "Foreground": { "value": "#E4E7EB", "type": "color" },
+    "Primary": { "value": "#48C6B3", "type": "color" },
+    "Accent": { "value": "#242A33", "type": "color" },
+    "Border": { "value": "#2D3440", "type": "color" }
+  },
+  "Chart Light": {
+    "1 Teal": { "value": "#48C6B3", "type": "color" },
+    "2 Amber": { "value": "#FFB347", "type": "color" },
+    "3 Green": { "value": "#00E676", "type": "color" },
+    "4 Purple": { "value": "#7C3AED", "type": "color" },
+    "5 Yellow": { "value": "#F59E0B", "type": "color" }
+  },
+  "Chart Dark": {
+    "1 Teal": { "value": "#48C6B3", "type": "color" },
+    "2 Amber": { "value": "#FFB347", "type": "color" },
+    "3 Green": { "value": "#00E676", "type": "color" },
+    "4 Purple": { "value": "#A78BFA", "type": "color" },
+    "5 Yellow": { "value": "#FBBF24", "type": "color" }
+  }
+}

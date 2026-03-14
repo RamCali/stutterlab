@@ -15,6 +15,7 @@ export function NorthStarCard() {
     // Read from localStorage first (instant)
     const data = getOnboardingData();
     if (data?.northStarGoal) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setGoal(data.northStarGoal);
     }
     if (data?.speechChallenges?.length) {

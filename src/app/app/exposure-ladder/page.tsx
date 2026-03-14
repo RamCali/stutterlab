@@ -51,6 +51,7 @@ export default function ExposureLadderPage() {
   const [outcome, setOutcome] = useState<"completed" | "partial" | "skipped">("completed");
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setState(getExposureLadderState());
   }, []);
 
@@ -89,10 +90,6 @@ export default function ExposureLadderPage() {
       .filter((a) => a.outcome === "completed")
       .map((a) => a.rungId)
   );
-
-  const highestCompleted = EXPOSURE_LADDER.reduce((max, rung) => {
-    return completedRungs.has(rung.id) && rung.level > max ? rung.level : max;
-  }, 0);
 
   return (
     <div className="p-6 max-w-2xl mx-auto space-y-6">

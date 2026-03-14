@@ -53,6 +53,7 @@ export default function FearedWordsPage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshStore();
   }, [refreshStore]);
 

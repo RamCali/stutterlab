@@ -15,10 +15,6 @@ import {
   Check,
 } from "lucide-react";
 
-interface UserStatsData {
-  streakFreezeTokens: number;
-}
-
 interface ShieldRequest {
   id: string;
   anonymousName: string;

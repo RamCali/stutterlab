@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { Users, ExternalLink } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Users } from "lucide-react";
 import { getCohortInsight } from "@/lib/analysis/cohort-insights";
 import type { CohortContext, CohortInsight } from "@/lib/analysis/types";
 
@@ -43,6 +43,7 @@ export function CohortInsightBadge({ context }: CohortInsightBadgeProps) {
       setInsight(result);
       markSeen(result.id);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [context.page, context.scenario, context.day, context.streak]);
 
   if (!insight) return null;

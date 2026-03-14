@@ -8,7 +8,6 @@
 import type {
   TechniqueType,
   TechniqueMasteryData,
-  TechniqueHistory,
   TechniqueDetectionRecord,
 } from "./types";
 

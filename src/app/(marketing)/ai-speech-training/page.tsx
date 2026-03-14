@@ -1,13 +1,11 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  AudioWaveform,
   Bot,
   Brain,
   Check,
   Fingerprint,
   MessageSquare,
-  Mic,
   Phone,
   Sparkles,
   Target,

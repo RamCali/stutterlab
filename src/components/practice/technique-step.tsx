@@ -37,6 +37,7 @@ export function TechniqueStep({
   const [completedItems, setCompletedItems] = useState<Set<number>>(new Set());
   const [bars, setBars] = useState<number[]>(Array(40).fill(5));
   const [micError, setMicError] = useState<string | null>(null);
+  const [analyserNode, setAnalyserNode] = useState<AnalyserNode | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -49,8 +50,6 @@ export function TechniqueStep({
 
   const items = propItems ?? readingContent[contentLevel];
   const currentItem = items[currentIndex];
-  const progress = Math.round((completedItems.size / items.length) * 100);
-
   // Map technique to coaching config
   const coachConfig: Partial<CoachingConfig> | undefined = technique.id === "easy_onset"
     ? { activeTechniques: ["gentle_onset", "rate_compliance"], targetSPM: { min: 100, max: 160 } }
@@ -152,6 +151,7 @@ export function TechniqueStep({
       return;
     }
     setIsRecording(true);
+    setAnalyserNode(analyserRef.current);
     setElapsedSeconds(0);
     timerRef.current = setInterval(() => {
       setElapsedSeconds((s) => s + 1);
@@ -160,6 +160,7 @@ export function TechniqueStep({
 
   function stopRecording() {
     analyserRef.current = null;
+    setAnalyserNode(null);
     if (delayNodeRef.current) {
       delayNodeRef.current.disconnect();
       delayNodeRef.current = null;
@@ -360,7 +361,7 @@ export function TechniqueStep({
 
         {/* Live Coach Overlay */}
         <LiveCoachOverlay
-          analyserNode={analyserRef.current}
+          analyserNode={analyserNode}
           enabled={isRecording}
           config={coachConfig}
         />

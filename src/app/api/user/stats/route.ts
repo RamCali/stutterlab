@@ -3,6 +3,7 @@ import { db } from "@/lib/db/client";
 import { userStats } from "@/lib/db/schema";
 import { getUserId } from "@/lib/auth/helpers";
 import { eq, sql } from "drizzle-orm";
+import { isPremium } from "@/lib/auth/premium";
 
 /** GET — fetch current user's stats */
 export async function GET() {
@@ -26,9 +27,10 @@ export async function GET() {
         .returning();
     }
 
-    return NextResponse.json({ stats });
+    const premium = await isPremium(userId);
+    return NextResponse.json({ stats, isPremium: premium });
   } catch {
-    return NextResponse.json({ stats: null });
+    return NextResponse.json({ stats: null, isPremium: false });
   }
 }
 
