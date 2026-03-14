@@ -41,6 +41,7 @@ import {
 import { SuccessStoriesLanding } from "@/components/community/success-stories";
 import { PricingCard } from "@/components/pricing-card";
 import { EarlyAccessSignup } from "@/components/early-access-signup";
+import { KlaviyoInlineSignup } from "@/components/klaviyo-inline-signup";
 
 const painPoints = [
   {
@@ -762,6 +763,18 @@ export default function LandingPage() {
               </AccordionItem>
             ))}
           </Accordion>
+        </div>
+      </section>
+
+      {/* ═══ Newsletter Inline Signup ═══ */}
+      <section className="py-16 px-6">
+        <div className="max-w-2xl mx-auto">
+          <KlaviyoInlineSignup
+            heading="Get speech training tips & early access"
+            subtext="Join our newsletter for stuttering techniques, app updates, and community stories. Unsubscribe anytime."
+            buttonText="Subscribe"
+            source="landing-inline"
+          />
         </div>
       </section>
 
