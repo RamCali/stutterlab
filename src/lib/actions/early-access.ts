@@ -4,15 +4,69 @@ import { db } from "@/lib/db/client";
 import { earlyAccessSignups } from "@/lib/db/schema";
 
 async function syncToKlaviyo(email: string, source: string) {
+  const apiKey = process.env.KLAVIYO_API_KEY;
+  const listId = process.env.KLAVIYO_LIST_ID;
+
+  if (!apiKey || !listId) return;
+
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    await fetch(`${baseUrl}/api/klaviyo/subscribe`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, source }),
-    });
-  } catch {
-    // Don't block signup if Klaviyo sync fails
+    // Klaviyo Server API — Subscribe profiles to a list in one call
+    // Creates the profile if needed + subscribes to the list + sets consent
+    const res = await fetch(
+      "https://a.klaviyo.com/api/profile-subscription-bulk-create-jobs/",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Klaviyo-API-Key ${apiKey}`,
+          "Content-Type": "application/json",
+          revision: "2024-10-15",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          data: {
+            type: "profile-subscription-bulk-create-job",
+            attributes: {
+              custom_source: source,
+              profiles: {
+                data: [
+                  {
+                    type: "profile",
+                    attributes: {
+                      email,
+                      subscriptions: {
+                        email: {
+                          marketing: {
+                            consent: "SUBSCRIBED",
+                          },
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+            relationships: {
+              list: {
+                data: {
+                  type: "list",
+                  id: listId,
+                },
+              },
+            },
+          },
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      console.error(
+        "Klaviyo subscribe failed:",
+        res.status,
+        await res.text()
+      );
+    }
+  } catch (err) {
+    console.error("Klaviyo sync error:", err);
   }
 }
 
@@ -29,8 +83,7 @@ export async function joinEarlyAccess(email: string, source = "early-access") {
       .values({ email: trimmed })
       .onConflictDoNothing();
 
-    // Sync to Klaviyo in background
-    syncToKlaviyo(trimmed, source);
+    await syncToKlaviyo(trimmed, source);
 
     return { success: true };
   } catch {
