@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, useCallback } from "react";
 import { X, Mail, ArrowRight, Check, Loader2, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { joinEarlyAccess } from "@/lib/actions/early-access";
 
 const DISMISS_KEY = "klaviyo-popup-dismissed";
-const POPUP_DELAY_MS = 8000; // Show after 8 seconds
+const MOBILE_DELAY_MS = 15000; // Mobile fallback: show after 15s
+const MIN_TIME_ON_PAGE_MS = 5000; // Don't trigger exit intent in first 5s
 
 export function KlaviyoPopup() {
   const [visible, setVisible] = useState(false);
@@ -16,14 +17,46 @@ export function KlaviyoPopup() {
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
 
+  const show = useCallback(() => {
+    setVisible(true);
+  }, []);
+
   useEffect(() => {
-    // Don't show if already dismissed or submitted
     const dismissed = localStorage.getItem(DISMISS_KEY);
     if (dismissed) return;
 
-    const timer = setTimeout(() => setVisible(true), POPUP_DELAY_MS);
-    return () => clearTimeout(timer);
-  }, []);
+    const pageLoadTime = Date.now();
+    let triggered = false;
+
+    // Exit intent: mouse leaves viewport at the top (desktop only)
+    function handleMouseLeave(e: MouseEvent) {
+      if (triggered) return;
+      if (e.clientY > 0) return; // Only trigger when cursor goes above viewport
+      if (Date.now() - pageLoadTime < MIN_TIME_ON_PAGE_MS) return;
+      triggered = true;
+      show();
+    }
+
+    // Mobile fallback: show after delay since there's no mouse exit intent
+    const isMobile = window.matchMedia("(pointer: coarse)").matches;
+    let mobileTimer: ReturnType<typeof setTimeout> | undefined;
+
+    if (isMobile) {
+      mobileTimer = setTimeout(() => {
+        if (!triggered) {
+          triggered = true;
+          show();
+        }
+      }, MOBILE_DELAY_MS);
+    } else {
+      document.addEventListener("mouseleave", handleMouseLeave);
+    }
+
+    return () => {
+      document.removeEventListener("mouseleave", handleMouseLeave);
+      if (mobileTimer) clearTimeout(mobileTimer);
+    };
+  }, [show]);
 
   function dismiss() {
     setVisible(false);
@@ -35,7 +68,7 @@ export function KlaviyoPopup() {
     setError("");
 
     startTransition(async () => {
-      const result = await joinEarlyAccess(email, "popup");
+      const result = await joinEarlyAccess(email, "exit-intent-popup");
       if (result.success) {
         setSubmitted(true);
         localStorage.setItem(DISMISS_KEY, Date.now().toString());
@@ -89,10 +122,11 @@ export function KlaviyoPopup() {
 
                 {/* Copy */}
                 <h3 className="text-2xl font-bold text-center">
-                  Train your speech.
-                  <br />
-                  <span className="text-primary">10 minutes a day.</span>
+                  Wait — before you go.
                 </h3>
+                <p className="text-lg text-primary font-semibold text-center mt-1">
+                  Get free speech training tips in your inbox.
+                </p>
                 <p className="text-muted-foreground text-center mt-3">
                   Join the waitlist for StutterLab — AI-powered speech training
                   designed by an SLP for people who stutter.
