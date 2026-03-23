@@ -16,6 +16,7 @@
  */
 
 import { getAdaptiveDailyPlan as getAdaptiveDailyPlanImport } from "./adaptive-engine";
+import { getHarrisonReflection, HARRISON_AFFIRMATIONS } from "./harrison-observations";
 
 export type TaskType =
   | "warmup"
@@ -90,6 +91,8 @@ const affirmations = [
   "I speak not because it's easy, but because what I have to say matters.",
   "Singing and reading aloud use different neural pathways. I'm building those alternative circuits right now.",
   "The fear of stuttering is a mile wide and an inch deep. The anticipation is always worse than the moment itself.",
+  // Harrison-inspired affirmations (deeper psychological patterns)
+  ...HARRISON_AFFIRMATIONS,
 ];
 
 function getAffirmation(day: number): string {
@@ -773,9 +776,19 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         type: "feared-words",
         href: "/app/feared-words",
       });
+      // Harrison-themed journal prompts cycle through observations
+      const harrisonJournalPrompts = [
+        "What thoughts come up before speaking?",
+        "Were you communicating today — or performing?",
+        "Did you hold back from saying something? What stopped you?",
+        "Name three things about yourself beyond your speech.",
+        "Was there a moment you spoke with energy? How did it feel?",
+        "Compare what you feared would happen to what actually happened.",
+        "Did you make a decision today without overthinking your speech?",
+      ];
       tasks.push({
         title: "Voice Journal",
-        subtitle: "What thoughts come up before speaking?",
+        subtitle: harrisonJournalPrompts[(dayInPhase - 1) % harrisonJournalPrompts.length],
         duration: "2 min",
         type: "journal",
         href: "/app/voice-journal/new",
@@ -792,9 +805,14 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         href: "/app/ai-practice",
         premium: true,
       });
+      const techniqueReflectionPrompts = [
+        "Which technique did you reach for? How did it go?",
+        "Were you focused on your message or on sounding fluent?",
+        "Did the conversation feel like a test — or just a conversation?",
+      ];
       tasks.push({
         title: "Technique Reflection",
-        subtitle: "Which technique did you reach for? How did it go?",
+        subtitle: techniqueReflectionPrompts[(dayInPhase - 1) % techniqueReflectionPrompts.length],
         duration: "2 min",
         type: "journal",
         href: "/app/voice-journal/new",
@@ -1078,9 +1096,16 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         href: "/app/exercises",
         premium: true,
       });
+      const phase5JournalPrompts = [
+        "What did you choose and why? Track your instincts.",
+        "Are you speaking to communicate — or still performing? Notice the difference.",
+        "If your stutter disappeared tomorrow, what problems would remain?",
+        "Recall a positive speaking moment this week. Hold onto that proof.",
+        "Are you shrinking to stay invisible — or letting yourself be seen?",
+      ];
       tasks.push({
         title: "Voice Journal",
-        subtitle: "What did you choose and why? Track your instincts",
+        subtitle: phase5JournalPrompts[(dayInPhase - 1) % phase5JournalPrompts.length],
         duration: "2 min",
         type: "journal",
         href: "/app/voice-journal/new",
@@ -1146,9 +1171,15 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         type: "feared-words",
         href: "/app/feared-words",
       });
+      const phase5LateJournalPrompts = [
+        "What would you tell Day 1 you?",
+        "You've been speaking for weeks now. Are you the same person who started?",
+        "Think of someone you admire. Their challenges don't make them less — yours don't either.",
+        "What decision did you make today without worrying about your speech?",
+      ];
       tasks.push({
         title: "Voice Journal",
-        subtitle: "What would you tell Day 1 you?",
+        subtitle: phase5LateJournalPrompts[(dayInPhase - 1) % phase5LateJournalPrompts.length],
         duration: "2 min",
         type: "journal",
         href: "/app/voice-journal/new",
@@ -1212,9 +1243,9 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
 function getTaskReason(type: TaskType, day: number, phase: number): string {
   // Warmup — always relevant
   if (type === "warmup") {
-    if (day <= 7) return "Diaphragmatic breathing lowers vocal tension before practice — building your foundation.";
-    if (phase <= 3) return "Starting with controlled breathing reduces muscle tension, which directly impacts fluency.";
-    return "Even advanced speakers benefit from a breathing reset — it primes your speech muscles for smooth onset.";
+    if (day <= 7) return "Diaphragmatic breathing lowers vocal tension before practice. Try the wave technique: imagine your breath as a wave, and your words are surfers riding on it.";
+    if (phase <= 3) return "Controlled breathing reduces the muscle tension that triggers blocks. Big inhale, slow exhale — let words fall out on the airflow, not pushed through tension.";
+    return "Even advanced speakers benefit from a breathing reset. Focus on chest vibration like singing — your speech system works best with continuous, relaxed airflow.";
   }
 
   // Exercise — varies by phase
@@ -1248,18 +1279,30 @@ function getTaskReason(type: TaskType, day: number, phase: number): string {
     return "Advanced conversations build endurance and confidence for the situations that matter most to you.";
   }
 
-  // Journal
+  // Journal — enriched with Harrison reflection prompts in phases 3-5
   if (type === "journal") {
     if (day <= 3) return "Voice journaling creates your baseline — comparing future entries shows progress you can't see day-to-day.";
     if (phase <= 2) return "Reflection strengthens learning — articulating what worked helps your brain consolidate new speech patterns.";
-    if (phase === 3) return "Tracking thoughts and feelings about speech is a core CBT practice — awareness reduces anxiety spirals.";
+    if (phase >= 3) {
+      const harrison = getHarrisonReflection(day, phase);
+      if (harrison) {
+        return `${harrison.reflectionPrompt} (Research shows stuttering is a whole-person pattern — reflection on the bigger picture accelerates change.)`;
+      }
+      return "Tracking thoughts and feelings about speech is a core CBT practice — awareness reduces anxiety spirals.";
+    }
     return "Self-reflection builds metacognition about your speech — the ability to coach yourself long-term.";
   }
 
-  // Mindfulness
+  // Mindfulness — enriched with Harrison awareness themes
   if (type === "mindfulness") {
     if (phase <= 2) return "Anxiety increases muscle tension, which directly worsens stuttering — mindfulness breaks that cycle.";
-    if (phase === 3) return "CBT-based mindfulness restructures the anxiety-stuttering loop — changing how you think about speaking.";
+    if (phase === 3) {
+      const harrison = getHarrisonReflection(day, phase);
+      if (harrison) {
+        return `CBT-based mindfulness restructures the anxiety-stuttering loop. Today's focus: ${harrison.label.toLowerCase()} — noticing patterns beyond speech.`;
+      }
+      return "CBT-based mindfulness restructures the anxiety-stuttering loop — changing how you think about speaking.";
+    }
     return "Maintaining a mindfulness practice is the #1 predictor of long-term fluency maintenance after program completion.";
   }
 

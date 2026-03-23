@@ -13,6 +13,9 @@ import {
   Sparkles,
   Volume2,
   Crown,
+  Lightbulb,
+  Music,
+  Waves,
 } from "lucide-react";
 import { BreathingExercise } from "@/components/breathing-exercise";
 
@@ -193,6 +196,40 @@ export default function MindfulnessPage() {
               >
                 Start 2-Min Routine
               </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Community Breathing Tips */}
+        <Card className="border-amber-500/30 bg-amber-500/5">
+          <CardContent className="pt-5 pb-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Lightbulb className="h-4 w-4 text-amber-500" />
+              <h3 className="font-semibold text-sm">Community Breathing Tips</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="flex gap-3 p-3 rounded-lg bg-background/60">
+                <Waves className="h-5 w-5 text-cyan-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-medium mb-1">The Wave Technique</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Imagine your breath as a wave, and your words are surfers riding on it.
+                    Big inhale, slow controlled exhale, and let the words fall out on the airflow.
+                    This reframes speech from something you push out to something you let flow.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3 p-3 rounded-lg bg-background/60">
+                <Music className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-medium mb-1">Singing as Practice</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Sing in the car, in the shower — anywhere. Focus on the vibration in your chest
+                    and how your mouth shapes words. Then try to recreate that feeling when speaking.
+                    Your speech system works perfectly with continuous airflow.
+                  </p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -62,6 +62,7 @@ export const EXPOSURE_LADDER: ExposureRung[] = [
       "Read a news article aloud in your room",
       "Read a recipe while cooking alone",
       "Read song lyrics out loud",
+      "Notice your anxiety level before and after — the gap is your proof that anxiety is temporary",
     ],
   },
   {
@@ -88,6 +89,7 @@ export const EXPOSURE_LADDER: ExposureRung[] = [
       "Complete an easy AI scenario (ordering food)",
       "Try the small talk scenario",
       "Ask the AI for directions",
+      "Intentionally stutter during an AI conversation and notice the world doesn't end",
     ],
   },
   {
@@ -140,6 +142,7 @@ export const EXPOSURE_LADDER: ExposureRung[] = [
       "Call to make a restaurant reservation",
       "Call a store to check if an item is in stock",
       "Schedule a haircut appointment by phone",
+      "Make a call you've been avoiding — rate your anxiety before and after to see the gap",
     ],
     inspirationalStory: {
       quote:
@@ -172,6 +175,7 @@ export const EXPOSURE_LADDER: ExposureRung[] = [
       "Ask your boss a question in person",
       "Speak up in a meeting or class",
       "Describe symptoms to a doctor without simplifying",
+      "Maintain eye contact during a block with an authority figure — you survived, and that's the win",
     ],
   },
   {
@@ -191,6 +195,7 @@ export const EXPOSURE_LADDER: ExposureRung[] = [
       "Give a 2-minute presentation at work or school",
       "Tell a story at a social gathering",
       "Lead a meeting discussion",
+      "Openly stutter during a presentation and keep going — notice the relief that follows",
     ],
   },
 ];

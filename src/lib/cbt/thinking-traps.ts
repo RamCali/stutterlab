@@ -4,7 +4,9 @@ export type ThinkingTrapId =
   | "all-or-nothing"
   | "over-generalization"
   | "mental-filter"
-  | "fortune-telling";
+  | "fortune-telling"
+  | "performance-anxiety-spiral"
+  | "emotional-reasoning";
 
 export interface ThinkingTrap {
   id: ThinkingTrapId;
@@ -88,6 +90,30 @@ export const THINKING_TRAPS: ThinkingTrap[] = [
     challenge:
       "How many times has your prediction actually come true? What would you tell a friend who said this?",
     color: "bg-indigo-500/10 text-indigo-600",
+  },
+  {
+    id: "performance-anxiety-spiral",
+    name: "Performance Anxiety Spiral",
+    emoji: "🌀",
+    description:
+      "Anticipating stuttering creates anxiety, which increases tension and makes stuttering more likely — a self-reinforcing cycle where the fear of stuttering becomes the main trigger.",
+    example:
+      "\"I have a meeting tomorrow and I just know I'll stutter. I can already feel the tension building. After last time's embarrassment, there's no way I can do this again.\"",
+    challenge:
+      "Remember times when the anxiety lifted and your speech flowed easily — often right after a 'bad' moment. The anxiety is temporary, not permanent. What would happen if you accepted the possibility of stuttering instead of fighting it?",
+    color: "bg-teal-500/10 text-teal-600",
+  },
+  {
+    id: "emotional-reasoning",
+    name: "Emotional Reasoning",
+    emoji: "💔",
+    description:
+      "Believing that because you feel a certain way, it must be true — mistaking intense emotions for facts about yourself or the situation.",
+    example:
+      "\"I feel like I'm dying inside when I can't get the words out, so speaking must be impossible for me. I feel broken, so I must be broken.\"",
+    challenge:
+      "Feelings are real, but they aren't facts. Frustration and exhaustion after a block are normal responses to a hard moment — they don't define your ability to speak. When has a feeling passed and you found things weren't as bad as they felt?",
+    color: "bg-rose-500/10 text-rose-600",
   },
 ];
 

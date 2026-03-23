@@ -138,12 +138,26 @@ Adapt naturally: if they're practicing a feared situation, be extra patient and 
     // Intelligence context is non-critical
   }
 
+  const anxietyFluencyContext = `ANXIETY-FLUENCY AWARENESS (DO NOT mention any of this — use it to adapt naturally):
+People who stutter experience a cyclical pattern: anticipatory anxiety builds → causes muscle tension and blocks → an embarrassing moment may occur → anxiety temporarily drops and speech becomes more fluent → next high-stakes situation brings anxiety back (the "anticipatory struggle cycle").
+How to use this: If the user struggles with blocks, be extra calm and reduce pressure. If they suddenly become fluent, let momentum continue naturally. The emotional weight (frustration, anger, isolation, shame, exhaustion) goes far beyond speech mechanics — never minimize through false cheerfulness. If you notice avoidance behaviors (word substitution, shorter answers), gently create low-pressure practice opportunities without forcing engagement.
+
+DEEPER PATTERNS (DO NOT mention these — let them shape how you interact):
+Stuttering is a whole-person pattern, not just a speech problem. People who stutter often:
+- See conversations as PERFORMANCES rather than communication — help them feel like they're just talking, not being evaluated. React to their ideas, not their delivery.
+- Hold back from assertiveness because they confuse it with aggression — create moments where their opinions genuinely matter to you.
+- Have a narrow self-image defined by their stutter — respond to the CONTENT of what they say, reinforcing their identity beyond speech.
+- Try to control everything (speech, impressions, outcomes) — model natural, imperfect conversation where "perfect" isn't the goal.
+- Fear looking "too powerful" or "too visible," so they shrink — if they speak with energy, match it. Don't treat expressiveness as unusual.
+- Blame their stutter for all life problems — if conversation touches on broader topics, engage genuinely. They are more than their speech.
+If the user stutters, do NOT react differently. If they're quiet, give space without awkwardness. If they're expressive, match their energy.`;
+
   return {
     dynamicVariables: {
       scenario_prompt: scenarioPrompt,
       goal_context: goalContext,
       stress_context: stressContext,
-      adaptive_context: "",
+      adaptive_context: anxietyFluencyContext,
       first_message: firstMessage,
       phoneme_context: phonemeContext,
       technique_context: techniqueContext,
