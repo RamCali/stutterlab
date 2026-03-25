@@ -204,8 +204,10 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
   }
 
   /* ─── Deepgram STT hook ─── */
+  const deepgramErrorRef = useRef<string | null>(null);
   const deepgram = useDeepgramSTT({
     onError: (msg) => {
+      deepgramErrorRef.current = msg;
       setStatusText(msg);
       setListening(false);
     },
@@ -222,6 +224,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
       speechSynthesis.cancel();
     }
     setSpeaking(false);
+    deepgramErrorRef.current = null;
 
     setListening(true);
     setLiveTranscript("");
@@ -230,7 +233,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
     const success = await deepgram.start();
     if (!success) {
       setListening(false);
-      setStatusText("Failed to start listening — check mic permissions");
+      setStatusText(deepgramErrorRef.current || "Failed to start listening — check mic permissions");
     }
   }
 
