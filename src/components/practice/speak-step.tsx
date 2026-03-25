@@ -203,6 +203,40 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
     }
   }
 
+  /* ─── Auto-silence detection state ─── */
+  const SILENCE_TIMEOUT_MS = 3000; // 3 seconds of silence before auto-submit
+  const [autoSendCountdown, setAutoSendCountdown] = useState<number | null>(null);
+  const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastTranscriptRef = useRef("");
+  const hasSpokenRef = useRef(false);
+
+  function clearSilenceTimer() {
+    if (silenceTimerRef.current) {
+      clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
+    }
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
+    setAutoSendCountdown(null);
+  }
+
+  function startSilenceTimer() {
+    clearSilenceTimer();
+    // Start countdown display
+    setAutoSendCountdown(3);
+    countdownIntervalRef.current = setInterval(() => {
+      setAutoSendCountdown((prev) => (prev !== null && prev > 1 ? prev - 1 : prev));
+    }, 1000);
+    // Auto-submit after timeout
+    silenceTimerRef.current = setTimeout(() => {
+      clearSilenceTimer();
+      stopListeningRef.current();
+    }, SILENCE_TIMEOUT_MS);
+  }
+
   /* ─── Deepgram STT hook ─── */
   const deepgramErrorRef = useRef<string | null>(null);
   const deepgram = useDeepgramSTT({
@@ -210,6 +244,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
       deepgramErrorRef.current = msg;
       setStatusText(msg);
       setListening(false);
+      clearSilenceTimer();
     },
   });
 
@@ -225,6 +260,8 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
     }
     setSpeaking(false);
     deepgramErrorRef.current = null;
+    hasSpokenRef.current = false;
+    lastTranscriptRef.current = "";
 
     setListening(true);
     setLiveTranscript("");
@@ -238,6 +275,7 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
   }
 
   function stopListening() {
+    clearSilenceTimer();
     deepgram.stop();
     setListening(false);
 
@@ -251,13 +289,48 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
     }
   }
 
-  // Sync deepgram transcript to liveTranscript for display
+  // Keep a stable ref for stopListening so the silence timer can call it
+  const stopListeningRef = useRef(stopListening);
+  stopListeningRef.current = stopListening;
+
+  function cancelAutoSend() {
+    clearSilenceTimer();
+    setStatusText("Listening — keep speaking...");
+  }
+
+  // Sync deepgram transcript to liveTranscript + manage silence detection
   useEffect(() => {
     if (listening) {
+      const current = deepgram.transcript;
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLiveTranscript(deepgram.transcript);
+      setLiveTranscript(current);
+
+      // If transcript changed, user is speaking — reset silence timer
+      if (current !== lastTranscriptRef.current) {
+        lastTranscriptRef.current = current;
+        if (current.trim()) {
+          hasSpokenRef.current = true;
+          clearSilenceTimer();
+          // eslint-disable-next-line react-hooks/set-state-in-effect
+          setStatusText("Listening — speak now...");
+        }
+      }
     }
   }, [deepgram.transcript, listening]);
+
+  // Watch for silence after user has spoken (via finalTranscript changes)
+  useEffect(() => {
+    if (listening && hasSpokenRef.current && deepgram.finalTranscript.trim()) {
+      // User finished a phrase — start silence countdown
+      startSilenceTimer();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deepgram.finalTranscript, listening]);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => clearSilenceTimer();
+  }, []);
 
   /* ─── Start conversation (AI speaks first) ─── */
   async function startConversation() {
@@ -463,7 +536,22 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
           )}
         </div>
 
-        {listening && (
+        {listening && autoSendCountdown !== null && (
+          <div className="flex items-center justify-center gap-2 mt-2">
+            <p className="text-center text-sm text-amber-400 animate-pulse flex items-center gap-1">
+              Sending in {autoSendCountdown}s...
+            </p>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs border-primary/30 text-primary hover:bg-primary/10"
+              onClick={cancelAutoSend}
+            >
+              Keep talking
+            </Button>
+          </div>
+        )}
+        {listening && autoSendCountdown === null && (
           <p className="text-center text-sm text-red-500 animate-pulse mt-2 flex items-center justify-center gap-1">
             <span className="h-2 w-2 rounded-full bg-red-500" />
             Listening...
