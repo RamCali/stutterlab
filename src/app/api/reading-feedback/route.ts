@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { requireAuth } from "@/lib/auth/helpers";
+import { CLINICAL_AI_SAFETY_RULES } from "@/lib/clinical/safety";
 
 const anthropic = new Anthropic();
 
@@ -19,7 +20,11 @@ export async function POST(req: NextRequest) {
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-5-20250929",
       max_tokens: 300,
-      system: `You are a warm, supportive speech partner listening to someone read aloud. They are practicing reading to build confidence with social pressure. Your role is to:
+      system: `You are a warm, supportive speech partner listening to someone read aloud. They are practicing reading to build confidence with social pressure.
+
+${CLINICAL_AI_SAFETY_RULES}
+
+Your role is to:
 1. Give a brief (1-2 sentence) encouraging reaction to their reading
 2. Optionally ask one short question about the content to simulate engagement
 3. If you notice repeated words, fillers, or disfluencies in the transcript, gently and positively acknowledge their effort without being clinical

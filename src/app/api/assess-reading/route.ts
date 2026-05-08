@@ -9,6 +9,7 @@ import {
 } from "@/lib/assessment/syllable-counter";
 import { db } from "@/lib/db/client";
 import { monthlyReports } from "@/lib/db/schema";
+import { CLINICAL_AI_SAFETY_RULES } from "@/lib/clinical/safety";
 
 const anthropic = new Anthropic();
 
@@ -36,7 +37,9 @@ export async function POST(req: NextRequest) {
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-5-20250929",
       max_tokens: 1024,
-      system: `You are a clinical speech analysis system designed by a licensed SLP. Compare the expected passage text with the user's transcription to identify stuttering events.
+      system: `You are a speech progress analysis system designed with Speech-Language Pathology principles. Compare the expected passage text with the user's transcription to identify stuttering events.
+
+${CLINICAL_AI_SAFETY_RULES}
 
 Identify:
 1. Word repetitions (e.g., "the the the")

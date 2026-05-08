@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+import { z } from "zod";
+import { requireAuth } from "@/lib/auth/helpers";
+import { isPremium } from "@/lib/auth/premium";
+import { checkRateLimit } from "@/lib/security/rate-limit";
 
 const TECHNIQUE_RUBRICS: Record<string, string> = {
   "Gentle Onset":
@@ -18,76 +17,46 @@ const TECHNIQUE_RUBRICS: Record<string, string> = {
     "Cancellation means stopping after a block, pausing, then restarting the word with easy onset. Score higher if the restart is smooth and relaxed.",
 };
 
+const scoreShadowingSchema = z.object({
+  technique: z.string().min(1).max(80),
+  transcript: z.string().min(1).max(1000),
+  durationSeconds: z.number().min(1).max(300),
+});
+
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
-    const technique = formData.get("technique") as string;
-    const transcript = formData.get("transcript") as string;
-    const durationSeconds = Number(formData.get("durationSeconds"));
+    const user = await requireAuth();
 
-    if (!process.env.ANTHROPIC_API_KEY) {
+    const hasPremium = await isPremium(user.id);
+    if (!hasPremium) {
       return NextResponse.json(
-        { error: "AI service not configured" },
-        { status: 503 }
+        { error: "Premium subscription required for AI scoring" },
+        { status: 403 }
       );
     }
 
-    const rubric = TECHNIQUE_RUBRICS[technique] || "Evaluate overall speech fluency and clarity.";
+    const rate = checkRateLimit(`score-shadowing:${user.id}`, 20, 60 * 60 * 1000);
+    if (!rate.ok) {
+      return NextResponse.json(
+        { error: "Too many scoring requests. Please try again later." },
+        { status: 429 }
+      );
+    }
 
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-5-20250929",
-      max_tokens: 400,
-      system: `You are a speech-language pathology AI assistant that scores "shadowing" exercises for people who stutter.
-The user listened to a model clip and recorded themselves repeating it.
-
-Scoring rubric for the technique "${technique}":
-${rubric}
-
-Target clip transcript: "${transcript}"
-Target duration: ${durationSeconds} seconds
-
-Return ONLY valid JSON with this exact structure (no markdown, no explanation):
-{
-  "overallScore": <number 0-100>,
-  "rhythmMatch": <number 0-100>,
-  "techniqueAccuracy": <number 0-100>,
-  "paceMatch": <number 0-100>,
-  "stars": <1|2|3>,
-  "feedback": "<1-2 sentence coach feedback>",
-  "techniqueNotes": "<1-2 sentence technique-specific tip>",
-  "xpEarned": <number>
-}
-
-Scoring guidelines:
-- rhythmMatch: How well the speaker's rhythm matches the model clip's pacing pattern
-- techniqueAccuracy: How well the speaker applied the specific technique
-- paceMatch: How close the speaking rate was to the model
-- stars: 3 = score >= 85, 2 = score >= 65, 1 = below 65
-- xpEarned: stars * 15
-- Be encouraging but honest. This is for adults who stutter.
-- NEVER mention stuttering negatively. Focus on technique usage.`,
-      messages: [
-        {
-          role: "user",
-          content:
-            "The user has submitted their shadowing recording. Since we cannot process the audio directly in this demo, please generate a realistic score based on the technique difficulty and a typical intermediate-level performance. Vary the sub-scores naturally — don't make them all the same.",
-        },
-      ],
+    const formData = await req.formData();
+    const parsed = scoreShadowingSchema.safeParse({
+      technique: formData.get("technique"),
+      transcript: formData.get("transcript"),
+      durationSeconds: Number(formData.get("durationSeconds")),
     });
 
-    const text =
-      response.content[0].type === "text" ? response.content[0].text : "";
-
-    // Parse the JSON response
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      return NextResponse.json(
-        { error: "Failed to parse AI response" },
-        { status: 500 }
-      );
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     }
 
-    const score = JSON.parse(jsonMatch[0]);
+    const { technique, transcript, durationSeconds } = parsed.data;
+
+    const score = buildPracticeEstimate(technique, transcript, durationSeconds);
 
     return NextResponse.json({ score });
   } catch (error) {
@@ -97,4 +66,32 @@ Scoring guidelines:
       { status: 500 }
     );
   }
+}
+
+function buildPracticeEstimate(
+  technique: string,
+  transcript: string,
+  durationSeconds: number
+) {
+  const wordCount = transcript.trim().split(/\s+/).filter(Boolean).length;
+  const targetWordsPerMinute = Math.round((wordCount / durationSeconds) * 60);
+  const base = targetWordsPerMinute > 0 && targetWordsPerMinute < 150 ? 72 : 66;
+  const techniqueBonus = TECHNIQUE_RUBRICS[technique] ? 6 : 0;
+  const overallScore = Math.min(82, base + techniqueBonus);
+  const stars = overallScore >= 85 ? 3 : overallScore >= 65 ? 2 : 1;
+
+  return {
+    overallScore,
+    rhythmMatch: Math.max(0, overallScore - 3),
+    techniqueAccuracy: overallScore,
+    paceMatch: Math.min(100, overallScore + 4),
+    stars,
+    feedback:
+      "Practice estimate saved. Full acoustic scoring is coming soon; for now, use this as a completion marker, not a clinical score.",
+    techniqueNotes:
+      TECHNIQUE_RUBRICS[technique] ||
+      "Keep practicing with steady pacing and low physical effort.",
+    xpEarned: stars * 15,
+    scoringMode: "practice_estimate",
+  };
 }

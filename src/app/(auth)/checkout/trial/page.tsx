@@ -14,6 +14,7 @@ import { Check, Loader2, Shield } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { BillingInterval } from "@/lib/stripe";
+import { trackProductEvent } from "@/lib/analytics/client";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -39,6 +40,7 @@ export default function CheckoutTrialPage() {
   }, [status, router]);
 
   const fetchClientSecret = useCallback(async () => {
+    trackProductEvent("checkout_session_requested", { interval });
     const res = await fetch("/api/stripe/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -46,8 +48,10 @@ export default function CheckoutTrialPage() {
     });
     const data = await res.json();
     if (!res.ok || !data.clientSecret) {
+      trackProductEvent("checkout_session_failed", { interval });
       throw new Error(data.error || "Failed to create checkout session");
     }
+    trackProductEvent("checkout_session_created", { interval });
     return data.clientSecret as string;
   }, [interval]);
 
@@ -102,6 +106,12 @@ export default function CheckoutTrialPage() {
       <Badge variant="secondary" className="w-full justify-center py-1.5 mb-6">
         7 days free, then {interval === "month" ? "$99/month" : "$999/year"}
       </Badge>
+
+      <div className="mb-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 text-sm text-muted-foreground">
+        Secure checkout is processed by Stripe for StutterLab only. We do not
+        use third-party billing sites, and your card is not charged during the
+        7-day trial.
+      </div>
 
       {/* Stripe Embedded Checkout */}
       <div className="rounded-lg overflow-hidden border border-border">

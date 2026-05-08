@@ -1,21 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { shadowingScores, userStats } from "@/lib/db/schema";
-import { getUserId } from "@/lib/auth/helpers";
+import { requireAuth } from "@/lib/auth/helpers";
 import { eq, sql, desc } from "drizzle-orm";
+import { z } from "zod";
+
+const shadowingScoreSchema = z.object({
+  clipId: z.string().min(1).max(120),
+  technique: z.string().min(1).max(80),
+  overallScore: z.number().int().min(0).max(100),
+  rhythmMatch: z.number().int().min(0).max(100),
+  techniqueAccuracy: z.number().int().min(0).max(100),
+  paceMatch: z.number().int().min(0).max(100),
+  stars: z.number().int().min(1).max(3),
+  feedback: z.string().max(500).optional(),
+  techniqueNotes: z.string().max(500).optional(),
+});
 
 /** GET — fetch user's shadowing scores */
 export async function GET() {
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ scores: [] });
-    }
+    const user = await requireAuth();
 
     const scores = await db
       .select()
       .from(shadowingScores)
-      .where(eq(shadowingScores.userId, userId))
+      .where(eq(shadowingScores.userId, user.id))
       .orderBy(desc(shadowingScores.createdAt))
       .limit(50);
 
@@ -28,9 +38,11 @@ export async function GET() {
 /** POST — save a shadowing score */
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const user = await requireAuth();
+
+    const parsed = shadowingScoreSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid score" }, { status: 400 });
     }
 
     const {
@@ -43,13 +55,13 @@ export async function POST(req: NextRequest) {
       stars,
       feedback,
       techniqueNotes,
-      xpEarned,
-    } = await req.json();
+    } = parsed.data;
+    const xpEarned = stars * 15;
 
     const [score] = await db
       .insert(shadowingScores)
       .values({
-        userId,
+        userId: user.id,
         clipId,
         technique,
         overallScore,
@@ -59,19 +71,17 @@ export async function POST(req: NextRequest) {
         stars,
         feedback,
         techniqueNotes,
-        xpEarned: xpEarned || 0,
+        xpEarned,
       })
       .returning();
 
     // Award XP
-    if (xpEarned > 0) {
-      await db
-        .update(userStats)
-        .set({
-          totalXp: sql`${userStats.totalXp} + ${xpEarned}`,
-        })
-        .where(eq(userStats.userId, userId));
-    }
+    await db
+      .update(userStats)
+      .set({
+        totalXp: sql`${userStats.totalXp} + ${xpEarned}`,
+      })
+      .where(eq(userStats.userId, user.id));
 
     return NextResponse.json({ score });
   } catch (error) {

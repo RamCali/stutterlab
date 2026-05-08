@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,8 @@ import {
   Shield,
   Hand,
   MicOff,
+  CheckCircle2,
+  Keyboard,
 } from "lucide-react";
 import Link from "next/link";
 import { VoiceConversation, type VoiceState, type TurnMetrics, type TurnMode } from "@/lib/audio/VoiceConversation";
@@ -31,6 +33,11 @@ import { scoreSession } from "@/lib/analysis/session-scorer";
 import { getSessionComparison } from "@/lib/actions/analytics";
 import type { SessionScorecard, SessionComparison } from "@/lib/analysis/types";
 import { CohortInsightBadge } from "@/components/insights/CohortInsightBadge";
+import { trackProductEvent } from "@/lib/analytics/client";
+import {
+  getCompletedScenarioSteps,
+  getScenarioTask,
+} from "@/lib/ai-practice/scenarios";
 
 type Message = {
   role: "user" | "assistant";
@@ -49,11 +56,15 @@ const scenarioTitles: Record<string, string> = {
   "meeting-intro": "Meeting Introduction",
 };
 
+const GOODBYE_PATTERN =
+  /\b(goodbye|bye|see you|thank you|thanks|that'?s all|have a good|take care)\b/i;
+
 export default function AIConversationPage() {
   const params = useParams();
   const router = useRouter();
   const scenario = params.scenario as string;
   const title = scenarioTitles[scenario] || "AI Conversation";
+  const scenarioTask = getScenarioTask(scenario);
 
   // Conversation state
   const [messages, setMessages] = useState<Message[]>([]);
@@ -72,6 +83,20 @@ export default function AIConversationPage() {
   const voiceConvRef = useRef<VoiceConversation | null>(null);
   const [voiceAnalyserNode, setVoiceAnalyserNode] = useState<AnalyserNode | null>(null);
   const [usingElevenLabs, setUsingElevenLabs] = useState(false);
+  const [completionHint, setCompletionHint] = useState(false);
+  const [manualTranscript, setManualTranscript] = useState("");
+  const completedStepIds = useMemo(() => {
+    if (!scenarioTask) return new Set<string>();
+    const userTexts = messages
+      .filter((message) => message.role === "user")
+      .map((message) => message.content);
+    if (voiceTranscript) userTexts.push(voiceTranscript);
+    return getCompletedScenarioSteps(scenarioTask, userTexts);
+  }, [messages, scenarioTask, voiceTranscript]);
+  const taskProgress =
+    scenarioTask && scenarioTask.steps.length > 0
+      ? Math.round((completedStepIds.size / scenarioTask.steps.length) * 100)
+      : 0;
 
   // Stress mode state
   const [stressMode, setStressMode] = useState(false);
@@ -91,11 +116,13 @@ export default function AIConversationPage() {
     onUserTranscript: (text) => setVoiceTranscript(text),
     onAssistantMessage: (text) => {
       setMessages((prev) => [...prev, { role: "assistant", content: text }]);
+      if (GOODBYE_PATTERN.test(text)) setCompletionHint(true);
     },
     onTurnComplete: (turn) => {
       setVoiceTurns((prev) => [...prev, turn]);
       if (turn.role === "user") {
         setMessages((prev) => [...prev, { role: "user", content: turn.text }]);
+        if (GOODBYE_PATTERN.test(turn.text)) setCompletionHint(true);
         setVoiceTranscript("");
       }
     },
@@ -122,6 +149,14 @@ export default function AIConversationPage() {
     setVoiceTurns([]);
     setVoiceTranscript("");
     setShowReport(false);
+    setCompletionHint(false);
+    setManualTranscript("");
+    trackProductEvent("voice_session_started", {
+      scenario,
+      stressMode,
+      blockAwareMode,
+      turnMode,
+    });
 
     timerRef.current = setInterval(() => {
       setElapsedSeconds((s) => s + 1);
@@ -144,11 +179,20 @@ export default function AIConversationPage() {
     const elevenLabsSuccess = await elevenLabs.start();
     if (elevenLabsSuccess) {
       setUsingElevenLabs(true);
+      trackProductEvent("voice_provider_started", {
+        scenario,
+        provider: "elevenlabs",
+      });
       return;
     }
 
     // Fallback to legacy pipeline (Web Speech API → Claude → ElevenLabs TTS)
     setUsingElevenLabs(false);
+    trackProductEvent("voice_provider_fallback", {
+      scenario,
+      from: "elevenlabs",
+      to: "legacy_deepgram_anthropic_tts",
+    });
 
     // Set up mic AnalyserNode for LiveCoachOverlay
     try {
@@ -168,11 +212,13 @@ export default function AIConversationPage() {
       onUserTranscript: (text) => setVoiceTranscript(text),
       onAssistantMessage: (text) => {
         setMessages((prev) => [...prev, { role: "assistant", content: text }]);
+        if (GOODBYE_PATTERN.test(text)) setCompletionHint(true);
       },
       onTurnComplete: (turn) => {
         setVoiceTurns((prev) => [...prev, turn]);
         if (turn.role === "user") {
           setMessages((prev) => [...prev, { role: "user", content: turn.text }]);
+          if (GOODBYE_PATTERN.test(turn.text)) setCompletionHint(true);
           setVoiceTranscript("");
         }
       },
@@ -183,10 +229,16 @@ export default function AIConversationPage() {
     });
 
     voiceConvRef.current = voiceConv;
-    await voiceConv.start();
+    const legacyStarted = await voiceConv.start();
+    if (!legacyStarted) {
+      trackProductEvent("voice_session_failed", {
+        scenario,
+        provider: "legacy_deepgram_anthropic_tts",
+      });
+    }
   }
 
-  async function endConversation() {
+  async function completeConversation(fallbackUserText?: string) {
     if (timerRef.current) clearInterval(timerRef.current);
 
     // Stop the active voice engine (ElevenLabs or legacy)
@@ -200,12 +252,33 @@ export default function AIConversationPage() {
       turns = [];
     }
 
+    if (turns.filter((t) => t.role === "user").length === 0 && fallbackUserText?.trim()) {
+      trackProductEvent("voice_manual_summary_used", { scenario });
+      turns = [
+        {
+          turnIndex: 0,
+          role: "user",
+          text: fallbackUserText.trim(),
+          disfluencyCount: 0,
+          speakingRate: 0,
+          timestamp: Date.now(),
+        },
+      ];
+    }
+
     setVoiceTurns(turns);
     stressEngineRef.current?.stop();
     stressEngineRef.current = null;
     setCountdownSeconds(null);
 
     if (turns.filter((t) => t.role === "user").length > 0) {
+      trackProductEvent("ai_task_completed", {
+        scenario,
+        durationSeconds: elapsedSeconds,
+        turnCount: turns.length,
+        usedManualSummary: Boolean(fallbackUserText?.trim()),
+        taskProgress,
+      });
       // Compute session scorecard (client-side, no DB needed)
       const scoringTurns = turns.map((t) => ({
         role: t.role as "user" | "assistant",
@@ -307,7 +380,13 @@ export default function AIConversationPage() {
             </Badge>
           )}
           {started && (
-            <Button variant="destructive" size="sm" onClick={endConversation}>
+            <Button variant="outline" size="sm" onClick={() => completeConversation()}>
+              <CheckCircle2 className="h-4 w-4 mr-1" />
+              Complete Task
+            </Button>
+          )}
+          {started && (
+            <Button variant="destructive" size="sm" onClick={() => completeConversation()}>
               {isPhoneSim ? (
                 <PhoneOff className="h-4 w-4 mr-1" />
               ) : (
@@ -335,6 +414,19 @@ export default function AIConversationPage() {
             <p className="text-sm text-muted-foreground mt-2 max-w-md">
               Speak naturally with the AI using your voice. Real-time fluency tracking included.
             </p>
+            {scenarioTask && (
+              <div className="mt-4 w-full max-w-md rounded-xl border border-border bg-card/60 p-4 text-left">
+                <p className="text-sm font-semibold">{scenarioTask.goal}</p>
+                <div className="mt-3 space-y-2">
+                  {scenarioTask.steps.map((step) => (
+                    <div key={step.id} className="flex items-center gap-2 text-sm">
+                      <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+                      <span>{step.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="flex items-center gap-2 mt-4">
               <Badge variant="outline" className="text-xs">
                 <Sparkles className="h-3 w-3 mr-1" />
@@ -495,6 +587,43 @@ export default function AIConversationPage() {
               </Badge>
             )}
 
+            {scenarioTask && (
+              <Card className="w-full max-w-sm border-primary/20 bg-primary/5">
+                <CardContent className="py-3 px-4 space-y-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium">Task progress</span>
+                    <span className="text-muted-foreground">{taskProgress}%</span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-primary transition-all"
+                      style={{ width: `${taskProgress}%` }}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    {scenarioTask.steps.map((step) => {
+                      const done = completedStepIds.has(step.id);
+                      return (
+                        <div
+                          key={step.id}
+                          className="flex items-center gap-2 text-xs text-muted-foreground"
+                        >
+                          <CheckCircle2
+                            className={`h-3.5 w-3.5 ${
+                              done ? "text-emerald-500" : "text-muted-foreground/40"
+                            }`}
+                          />
+                          <span className={done ? "text-foreground" : ""}>
+                            {step.label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Live Coach Overlay (legacy mode only — ElevenLabs manages its own audio) */}
             {!usingElevenLabs && (
               <LiveCoachOverlay
@@ -567,6 +696,42 @@ export default function AIConversationPage() {
                 {turnMode === "push-to-talk" ? "Push-to-Talk" : "Block-Aware (5s)"}
               </Badge>
             )}
+
+            {(completionHint || taskProgress === 100) && (
+              <Card className="border-emerald-500/20 bg-emerald-500/5 max-w-sm">
+                <CardContent className="py-3 px-4 text-center space-y-2">
+                  <p className="text-sm font-medium">Sounds like the task is done.</p>
+                  <Button size="sm" onClick={() => completeConversation()} className="w-full">
+                    <CheckCircle2 className="h-4 w-4 mr-1" />
+                    Complete and Continue
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            <Card className="border-amber-500/20 bg-amber-500/5 max-w-sm w-full">
+              <CardContent className="py-3 px-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Keyboard className="h-4 w-4 text-amber-500" />
+                  <p className="text-sm font-medium">AI misheard you?</p>
+                </div>
+                <textarea
+                  value={manualTranscript}
+                  onChange={(event) => setManualTranscript(event.target.value)}
+                  placeholder="Type a quick summary of what you said, then complete."
+                  className="min-h-16 w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+                />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => completeConversation(manualTranscript)}
+                  disabled={!manualTranscript.trim()}
+                >
+                  Complete With Typed Summary
+                </Button>
+              </CardContent>
+            </Card>
 
             {/* Technique reminder */}
             <Card className="border-0 bg-primary/5 max-w-sm">

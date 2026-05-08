@@ -15,6 +15,20 @@
       "when": 1772778873316,
       "tag": "0001_fresh_krista_starr",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1775520000000,
+      "tag": "0002_production_readiness_indexes",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1775523600000,
+      "tag": "0003_product_events",
+      "breakpoints": true
     }
   ]
 }

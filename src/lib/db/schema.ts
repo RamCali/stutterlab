@@ -9,6 +9,7 @@ import {
   uuid,
   pgEnum,
   primaryKey,
+  index,
 } from "drizzle-orm/pg-core";
 type AdapterAccountType = "oauth" | "oidc" | "email" | "credentials";
 
@@ -169,22 +170,26 @@ export const exercises = pgTable("exercises", {
 
 // ==================== SESSIONS & TRACKING ====================
 
-export const sessions = pgTable("sessions", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").notNull(),
-  startedAt: timestamp("started_at").defaultNow().notNull(),
-  endedAt: timestamp("ended_at"),
-  durationSeconds: integer("duration_seconds"),
-  exerciseType: text("exercise_type"),
-  toolsUsed: jsonb("tools_used"), // ["daf", "faf", "metronome", "choral"]
-  selfRatedFluency: integer("self_rated_fluency"), // 1-10
-  aiFluencyScore: real("ai_fluency_score"), // 0-100
-  techniqueCategory: techniqueCategoryEnum("technique_category"),
-  confidenceBefore: integer("confidence_before"), // 1-10
-  confidenceAfter: integer("confidence_after"), // 1-10
-  notes: text("notes"),
-  recordingUrl: text("recording_url"),
-});
+export const sessions = pgTable(
+  "sessions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    startedAt: timestamp("started_at").defaultNow().notNull(),
+    endedAt: timestamp("ended_at"),
+    durationSeconds: integer("duration_seconds"),
+    exerciseType: text("exercise_type"),
+    toolsUsed: jsonb("tools_used"), // ["daf", "faf", "metronome", "choral"]
+    selfRatedFluency: integer("self_rated_fluency"), // 1-10
+    aiFluencyScore: real("ai_fluency_score"), // 0-100
+    techniqueCategory: techniqueCategoryEnum("technique_category"),
+    confidenceBefore: integer("confidence_before"), // 1-10
+    confidenceAfter: integer("confidence_after"), // 1-10
+    notes: text("notes"),
+    recordingUrl: text("recording_url"),
+  },
+  (table) => [index("sessions_user_started_idx").on(table.userId, table.startedAt)]
+);
 
 export const exerciseCompletions = pgTable("exercise_completions", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -244,20 +249,29 @@ export const speechAnalyses = pgTable("speech_analyses", {
   analyzedAt: timestamp("analyzed_at").defaultNow().notNull(),
 });
 
-export const aiConversations = pgTable("ai_conversations", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").notNull(),
-  scenarioType: text("scenario_type").notNull(),
-  messages: jsonb("messages").notNull(), // [{role, content, timestamp}]
-  fluencyScore: real("fluency_score"),
-  disfluencyMoments: jsonb("disfluency_moments"),
-  techniquesUsed: jsonb("techniques_used"),
-  durationSeconds: integer("duration_seconds"),
-  stressLevel: integer("stress_level"), // null = calm, 1-3 = stress levels
-  sessionScorecard: jsonb("session_scorecard"), // SessionScorecard from session-scorer
-  emotionalJourney: jsonb("emotional_journey"), // EmotionSnapshot[] timeline
-  completedAt: timestamp("completed_at").defaultNow().notNull(),
-});
+export const aiConversations = pgTable(
+  "ai_conversations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    scenarioType: text("scenario_type").notNull(),
+    messages: jsonb("messages").notNull(), // [{role, content, timestamp}]
+    fluencyScore: real("fluency_score"),
+    disfluencyMoments: jsonb("disfluency_moments"),
+    techniquesUsed: jsonb("techniques_used"),
+    durationSeconds: integer("duration_seconds"),
+    stressLevel: integer("stress_level"), // null = calm, 1-3 = stress levels
+    sessionScorecard: jsonb("session_scorecard"), // SessionScorecard from session-scorer
+    emotionalJourney: jsonb("emotional_journey"), // EmotionSnapshot[] timeline
+    completedAt: timestamp("completed_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("ai_conversations_user_completed_idx").on(
+      table.userId,
+      table.completedAt
+    ),
+  ]
+);
 
 // ==================== COHORT AGGREGATES ====================
 
@@ -392,65 +406,77 @@ export const severityRatingEnum = pgEnum("severity_rating", [
   "severe",
 ]);
 
-export const monthlyReports = pgTable("monthly_reports", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").notNull(),
-  month: timestamp("month").notNull(), // first day of the month
-  passageId: text("passage_id").notNull(),
-  audioUrl: text("audio_url"),
-  transcription: text("transcription"),
-  totalSyllables: integer("total_syllables"),
-  stutteredSyllables: integer("stuttered_syllables"),
-  percentSS: real("percent_ss"),
-  severityRating: severityRatingEnum("severity_rating"),
-  speakingRate: real("speaking_rate"),
-  fluencyScore: integer("fluency_score"),
-  analysisJson: jsonb("analysis_json"), // detailed disfluency breakdown
-  recommendationsJson: jsonb("recommendations_json"), // AI-generated clinical recommendations
-  shareToken: text("share_token").unique(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+export const monthlyReports = pgTable(
+  "monthly_reports",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    month: timestamp("month").notNull(), // first day of the month
+    passageId: text("passage_id").notNull(),
+    audioUrl: text("audio_url"),
+    transcription: text("transcription"),
+    totalSyllables: integer("total_syllables"),
+    stutteredSyllables: integer("stuttered_syllables"),
+    percentSS: real("percent_ss"),
+    severityRating: severityRatingEnum("severity_rating"),
+    speakingRate: real("speaking_rate"),
+    fluencyScore: integer("fluency_score"),
+    analysisJson: jsonb("analysis_json"), // detailed disfluency breakdown
+    recommendationsJson: jsonb("recommendations_json"), // AI-generated clinical recommendations
+    shareToken: text("share_token").unique(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [index("monthly_reports_user_month_idx").on(table.userId, table.month)]
+);
 
 // ==================== WEEKLY CLINICAL AUDITS ====================
 
-export const weeklyAudits = pgTable("weekly_audits", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").notNull(),
-  weekNumber: text("week_number").notNull(), // ISO week: "2026-W07"
-  prompt: text("prompt").notNull(),
-  transcription: text("transcription").notNull(),
-  durationSeconds: integer("duration_seconds"),
-  // Core clinical metrics
-  percentSS: real("percent_ss"),
-  severityRating: severityRatingEnum("severity_rating"),
-  fluencyScore: integer("fluency_score"),
-  speakingRate: real("speaking_rate"),
-  totalSyllables: integer("total_syllables"),
-  stutteredSyllables: integer("stuttered_syllables"),
-  // Structured analysis (JSONB)
-  disfluencyBreakdown: jsonb("disfluency_breakdown"),
-  techniqueAnalysis: jsonb("technique_analysis"),
-  rateAnalysis: jsonb("rate_analysis"),
-  weekOverWeekChange: jsonb("week_over_week_change"),
-  insights: jsonb("insights"),
-  phonemeHeatmap: jsonb("phoneme_heatmap"),
-  // Sharing
-  shareToken: text("share_token").unique(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const weeklyAudits = pgTable(
+  "weekly_audits",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    weekNumber: text("week_number").notNull(), // ISO week: "2026-W07"
+    prompt: text("prompt").notNull(),
+    transcription: text("transcription").notNull(),
+    durationSeconds: integer("duration_seconds"),
+    // Core clinical metrics
+    percentSS: real("percent_ss"),
+    severityRating: severityRatingEnum("severity_rating"),
+    fluencyScore: integer("fluency_score"),
+    speakingRate: real("speaking_rate"),
+    totalSyllables: integer("total_syllables"),
+    stutteredSyllables: integer("stuttered_syllables"),
+    // Structured analysis (JSONB)
+    disfluencyBreakdown: jsonb("disfluency_breakdown"),
+    techniqueAnalysis: jsonb("technique_analysis"),
+    rateAnalysis: jsonb("rate_analysis"),
+    weekOverWeekChange: jsonb("week_over_week_change"),
+    insights: jsonb("insights"),
+    phonemeHeatmap: jsonb("phoneme_heatmap"),
+    // Sharing
+    shareToken: text("share_token").unique(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("weekly_audits_user_created_idx").on(table.userId, table.createdAt)]
+);
 
 // ==================== COMMUNITY VICTORIES (I DID IT) ====================
 
-export const communityVictories = pgTable("community_victories", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").notNull(),
-  anonymousName: text("anonymous_name").notNull(),
-  victoryType: text("victory_type").notNull(), // phone_call, meeting, order, presentation, conversation, asked_help
-  description: text("description"),
-  celebrateCount: integer("celebrate_count").default(0).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const communityVictories = pgTable(
+  "community_victories",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    anonymousName: text("anonymous_name").notNull(),
+    victoryType: text("victory_type").notNull(), // phone_call, meeting, order, presentation, conversation, asked_help
+    description: text("description"),
+    celebrateCount: integer("celebrate_count").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("community_victories_created_idx").on(table.createdAt)]
+);
 
 // ==================== ACCOUNTABILITY BUDDIES ====================
 
@@ -493,21 +519,25 @@ export const challengeParticipants = pgTable("challenge_participants", {
 
 // ==================== SHADOWING SCORES ====================
 
-export const shadowingScores = pgTable("shadowing_scores", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").notNull(),
-  clipId: text("clip_id").notNull(),
-  technique: text("technique").notNull(),
-  overallScore: integer("overall_score").notNull(),
-  rhythmMatch: integer("rhythm_match").notNull(),
-  techniqueAccuracy: integer("technique_accuracy").notNull(),
-  paceMatch: integer("pace_match").notNull(),
-  stars: integer("stars").notNull(),
-  feedback: text("feedback"),
-  techniqueNotes: text("technique_notes"),
-  xpEarned: integer("xp_earned").default(0).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const shadowingScores = pgTable(
+  "shadowing_scores",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    clipId: text("clip_id").notNull(),
+    technique: text("technique").notNull(),
+    overallScore: integer("overall_score").notNull(),
+    rhythmMatch: integer("rhythm_match").notNull(),
+    techniqueAccuracy: integer("technique_accuracy").notNull(),
+    paceMatch: integer("pace_match").notNull(),
+    stars: integer("stars").notNull(),
+    feedback: text("feedback"),
+    techniqueNotes: text("technique_notes"),
+    xpEarned: integer("xp_earned").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("shadowing_scores_user_created_idx").on(table.userId, table.createdAt)]
+);
 
 // ==================== MICRO-CHALLENGE COMPLETIONS ====================
 
@@ -545,3 +575,20 @@ export const earlyAccessSignups = pgTable("early_access_signups", {
   email: text("email").notNull().unique(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// ==================== PRODUCT EVENTS ====================
+
+export const productEvents = pgTable(
+  "product_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id"),
+    eventName: text("event_name").notNull(),
+    context: jsonb("context").default({}).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("product_events_user_created_idx").on(table.userId, table.createdAt),
+    index("product_events_name_created_idx").on(table.eventName, table.createdAt),
+  ]
+);

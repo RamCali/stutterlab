@@ -13,13 +13,13 @@ import {
 // ─── CBT Thinking Traps ───
 
 describe("THINKING_TRAPS", () => {
-  it("has exactly 6 thinking traps", () => {
-    expect(THINKING_TRAPS.length).toBe(6);
+  it("has exactly 8 thinking traps", () => {
+    expect(THINKING_TRAPS.length).toBe(8);
   });
 
   it("all traps have unique IDs", () => {
     const ids = THINKING_TRAPS.map((t) => t.id);
-    expect(new Set(ids).size).toBe(6);
+    expect(new Set(ids).size).toBe(THINKING_TRAPS.length);
   });
 
   it("all traps have required fields", () => {
@@ -42,6 +42,8 @@ describe("THINKING_TRAPS", () => {
     expect(ids).toContain("over-generalization");
     expect(ids).toContain("mental-filter");
     expect(ids).toContain("fortune-telling");
+    expect(ids).toContain("performance-anxiety-spiral");
+    expect(ids).toContain("emotional-reasoning");
   });
 });
 

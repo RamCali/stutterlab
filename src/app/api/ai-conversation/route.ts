@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { getUserId } from "@/lib/auth/helpers";
+import { z } from "zod";
+import { requireAuth } from "@/lib/auth/helpers";
+import { isPremium } from "@/lib/auth/premium";
 import { db } from "@/lib/db/client";
 import { profiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { checkRateLimit } from "@/lib/security/rate-limit";
+import { measureAsync } from "@/lib/observability/logger";
+import { withTimeout } from "@/lib/observability/timeout";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -30,9 +35,61 @@ const SCENARIO_PROMPTS: Record<string, string> = {
     "You are at a professional meeting. The user is introducing themselves. React naturally, ask a follow-up question about their role or background.",
 };
 
+const aiConversationSchema = z.object({
+  scenario: z.string().max(80).optional(),
+  messages: z
+    .array(
+      z.object({
+        role: z.enum(["user", "assistant"]),
+        content: z.string().max(2000),
+      })
+    )
+    .max(30)
+    .optional(),
+  userMessage: z.string().max(2000).optional(),
+  voiceMode: z.boolean().optional(),
+  speechMetrics: z
+    .object({
+      currentSPM: z.number().optional(),
+      vocalEffort: z.number().optional(),
+      recentDisfluencies: z.number().optional(),
+      detectedTechniques: z.array(z.string()).optional(),
+      emotionalState: z.string().optional(),
+      difficultPhonemes: z.array(z.string()).optional(),
+      techniqueContext: z.string().max(2000).optional(),
+      transferContext: z.string().max(2000).optional(),
+    })
+    .passthrough()
+    .optional(),
+  stressLevel: z.number().int().min(0).max(3).optional(),
+});
+
 export async function POST(req: NextRequest) {
   try {
-    const { scenario, messages, userMessage, voiceMode, speechMetrics, stressLevel } = await req.json();
+    const user = await requireAuth();
+
+    const hasPremium = await isPremium(user.id);
+    if (!hasPremium) {
+      return NextResponse.json(
+        { error: "Premium subscription required for AI conversations" },
+        { status: 403 }
+      );
+    }
+
+    const rate = checkRateLimit(`ai-conversation:${user.id}`, 30, 60 * 60 * 1000);
+    if (!rate.ok) {
+      return NextResponse.json(
+        { error: "Too many AI conversations. Please try again later." },
+        { status: 429 }
+      );
+    }
+
+    const parsed = aiConversationSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    }
+
+    const { scenario, messages, userMessage, voiceMode, speechMetrics, stressLevel } = parsed.data;
 
     if (!process.env.ANTHROPIC_API_KEY) {
       return NextResponse.json(
@@ -44,27 +101,24 @@ export async function POST(req: NextRequest) {
     // Fetch user goal context from DB
     let goalContext = "";
     try {
-      const userId = await getUserId();
-      if (userId) {
-        const result = await db
-          .select({ treatmentPath: profiles.treatmentPath })
-          .from(profiles)
-          .where(eq(profiles.userId, userId))
-          .limit(1);
+      const result = await db
+        .select({ treatmentPath: profiles.treatmentPath })
+        .from(profiles)
+        .where(eq(profiles.userId, user.id))
+        .limit(1);
 
-        if (result.length > 0 && result[0].treatmentPath) {
-          const tp = result[0].treatmentPath as Record<string, unknown>;
-          const challenges = (tp.speechChallenges as string[]) || [];
-          const northStar = (tp.northStarGoal as string) || "";
-          if (challenges.length > 0 || northStar) {
-            goalContext = `
+      if (result.length > 0 && result[0].treatmentPath) {
+        const tp = result[0].treatmentPath as Record<string, unknown>;
+        const challenges = (tp.speechChallenges as string[]) || [];
+        const northStar = (tp.northStarGoal as string) || "";
+        if (challenges.length > 0 || northStar) {
+          goalContext = `
 
 GOAL CONTEXT (DO NOT mention any of this to the user — use it to adapt naturally):
 ${challenges.length > 0 ? `- Main challenges: ${challenges.join(", ")}` : ""}
 ${northStar ? `- Personal goal: "${northStar}"` : ""}
 
 Adapt naturally: if they're practicing a feared situation, be extra patient and supportive. Never mention their goals or challenges explicitly — stay fully in character.`;
-          }
         }
       }
     } catch {
@@ -139,8 +193,9 @@ STRESS SIMULATION (Level 3 — High):
 Frequently interrupt mid-sentence. Express urgency. Change topics suddenly. Ask rapid-fire questions. Show impatience with pauses. CRITICAL: NEVER mock stuttering. You are a realistic but safe practice partner.`;
     }
 
+    const scenarioKey = scenario ?? "";
     const systemPrompt = `You are helping someone who stutters practice real-world speaking scenarios. ${
-      SCENARIO_PROMPTS[scenario] ||
+      SCENARIO_PROMPTS[scenarioKey] ||
       "You are a friendly conversation partner. Have a natural conversation with the user."
     }
 
@@ -173,23 +228,31 @@ People who stutter often see conversations as performances, not communication. T
         : ""
     }${adaptiveContext}${goalContext}${stressContext}`;
 
-    const conversationHistory = (messages || []).map(
-      (msg: { role: string; content: string }) => ({
-        role: msg.role as "user" | "assistant",
-        content: msg.content,
-      })
-    );
+    const conversationHistory = messages || [];
 
     if (userMessage) {
       conversationHistory.push({ role: "user", content: userMessage });
     }
 
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-5-20250929",
-      max_tokens: 256,
-      system: systemPrompt,
-      messages: conversationHistory,
-    });
+    const response = await measureAsync(
+      "provider.anthropic.ai_conversation",
+      {
+        provider: "anthropic",
+        model: "claude-sonnet-4-5-20250929",
+        endpoint: "ai_conversation",
+      },
+      () =>
+        withTimeout(
+          anthropic.messages.create({
+            model: "claude-sonnet-4-5-20250929",
+            max_tokens: 256,
+            system: systemPrompt,
+            messages: conversationHistory,
+          }),
+          15000,
+          "Anthropic AI conversation"
+        )
+    );
 
     const assistantMessage =
       response.content[0].type === "text" ? response.content[0].text : "";

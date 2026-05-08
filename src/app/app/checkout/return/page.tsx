@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
+import { trackProductEvent } from "@/lib/analytics/client";
 
 type SessionStatus = "loading" | "complete" | "open" | "error";
 
@@ -25,8 +26,15 @@ function CheckoutReturnContent() {
       .then((res) => res.json())
       .then((data) => {
         setStatus(data.status === "complete" ? "complete" : "open");
+        trackProductEvent(
+          data.status === "complete" ? "checkout_completed" : "checkout_incomplete",
+          { status: data.status }
+        );
       })
-      .catch(() => setStatus("error"));
+      .catch(() => {
+        trackProductEvent("checkout_status_error");
+        setStatus("error");
+      });
   }, [searchParams]);
 
   if (status === "loading") {

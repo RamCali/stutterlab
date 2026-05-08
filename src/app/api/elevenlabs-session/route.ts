@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/helpers";
 import { isPremium } from "@/lib/auth/premium";
+import { checkRateLimit } from "@/lib/security/rate-limit";
+import { fetchWithTimeout } from "@/lib/observability/timeout";
+import { logError, measureAsync } from "@/lib/observability/logger";
 
 export async function POST() {
   try {
@@ -14,6 +17,14 @@ export async function POST() {
       );
     }
 
+    const rate = checkRateLimit(`elevenlabs-session:${user.id}`, 20, 60 * 60 * 1000);
+    if (!rate.ok) {
+      return NextResponse.json(
+        { error: "Too many voice sessions. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const agentId = process.env.ELEVENLABS_AGENT_ID;
     const apiKey = process.env.ELEVENLABS_API_KEY;
 
@@ -24,17 +35,26 @@ export async function POST() {
       );
     }
 
-    const response = await fetch(
-      `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${agentId}`,
-      {
-        headers: {
-          "xi-api-key": apiKey,
-        },
-      }
+    const response = await measureAsync(
+      "provider.elevenlabs.signed_url",
+      { provider: "elevenlabs", endpoint: "signed_url" },
+      () =>
+        fetchWithTimeout(
+          `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${agentId}`,
+          {
+            headers: {
+              "xi-api-key": apiKey,
+            },
+          },
+          8000,
+          "ElevenLabs signed URL"
+        )
     );
 
     if (!response.ok) {
-      console.error("ElevenLabs signed URL error:", await response.text());
+      logError("provider.elevenlabs.signed_url.bad_status", undefined, {
+        status: response.status,
+      });
       return NextResponse.json(
         { error: "Failed to initialize voice session" },
         { status: 502 }

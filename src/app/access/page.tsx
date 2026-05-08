@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { Lock, Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -93,9 +94,9 @@ export default function AccessPage() {
 
         <p className="text-sm text-muted-foreground mt-8">
           Don&apos;t have a passcode?{" "}
-          <a href="/" className="text-primary underline underline-offset-2 hover:text-primary/80">
+          <Link href="/" className="text-primary underline underline-offset-2 hover:text-primary/80">
             Join the waitlist
-          </a>
+          </Link>
         </p>
       </div>
     </div>

@@ -77,7 +77,8 @@ export default function SignupPage() {
           </Button>
 
           <p className="text-sm text-muted-foreground text-center">
-            Credit card required — you won&apos;t be charged for 7 days
+            Credit card required. Secure checkout is processed by Stripe for
+            StutterLab only, and you won&apos;t be charged for 7 days.
           </p>
         </CardContent>
       </Card>

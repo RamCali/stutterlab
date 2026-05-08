@@ -4,6 +4,17 @@ import { sessions, userStats } from "@/lib/db/schema";
 import { eq, sql, desc } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth/helpers";
 import { ensureUserStats } from "@/lib/actions/user-progress";
+import { z } from "zod";
+
+const mobileSessionSchema = z.object({
+  exerciseType: z.string().max(80).optional(),
+  durationSeconds: z.number().int().min(0).max(3 * 60 * 60).optional(),
+  fluencyScore: z.number().int().min(1).max(10).optional(),
+  confidenceBefore: z.number().int().min(1).max(10).optional(),
+  confidenceAfter: z.number().int().min(1).max(10).optional(),
+  notes: z.string().max(2000).optional(),
+  exercisesCompleted: z.number().int().min(1).max(25).optional(),
+});
 
 /**
  * POST /api/mobile/sessions
@@ -12,7 +23,11 @@ import { ensureUserStats } from "@/lib/actions/user-progress";
 export async function POST(req: NextRequest) {
   try {
     const user = await requireAuth();
-    const body = await req.json();
+    const parsed = mobileSessionSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid session" }, { status: 400 });
+    }
+    const body = parsed.data;
 
     await ensureUserStats(user.id);
 

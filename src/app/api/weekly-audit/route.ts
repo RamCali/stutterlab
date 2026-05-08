@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { requireAuth } from "@/lib/auth/helpers";
 import { isPremium } from "@/lib/auth/premium";
+import { CLINICAL_AI_SAFETY_RULES } from "@/lib/clinical/safety";
 
 const anthropic = new Anthropic();
 
@@ -67,7 +68,9 @@ export async function POST(req: NextRequest) {
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-5-20250929",
       max_tokens: 2048,
-      system: `You are StutterLab's Weekly Clinical Audit system, designed by a licensed Speech-Language Pathologist. You provide rigorous, SSI-4-grade analysis of a 2-minute diagnostic narrative.
+      system: `You are StutterLab's Weekly Clinical Audit system, designed with Speech-Language Pathology principles. You provide rigorous analysis of a 2-minute diagnostic narrative.
+
+${CLINICAL_AI_SAFETY_RULES}
 
 Analyze the user's speech transcript and detected disfluencies to produce a comprehensive clinical assessment. Be precise with syllable counts and percentages. Provide actionable, encouraging insights grounded in evidence-based practice.
 

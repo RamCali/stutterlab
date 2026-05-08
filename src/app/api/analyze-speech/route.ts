@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { requireAuth } from "@/lib/auth/helpers";
+import { CLINICAL_AI_SAFETY_RULES } from "@/lib/clinical/safety";
 
 const anthropic = new Anthropic();
 
@@ -21,7 +22,9 @@ export async function POST(req: NextRequest) {
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-5-20250929",
       max_tokens: 512,
-      system: `You are StutterLab's AI speech analyst, designed by a licensed Speech-Language Pathologist. Analyze the speech session data and provide a concise clinical assessment.
+      system: `You are StutterLab's AI speech analyst, designed with Speech-Language Pathology principles. Analyze the speech session data and provide a concise progress assessment.
+
+${CLINICAL_AI_SAFETY_RULES}
 
 Return a JSON object with:
 - stutterFingerprint: { primaryType: string, triggers: string[], patterns: string[] }
@@ -30,7 +33,7 @@ Return a JSON object with:
 - severityEstimate: "normal" | "mild" | "moderate" | "severe"
 
 Base severity on %SS: <3% normal, 3-5% mild, 5-8% moderate, >8% severe.
-Keep it clinical but warm. No disclaimers about not being a replacement for SLP — the app already states this.`,
+Keep it clinical but warm.`,
       messages: [
         {
           role: "user",

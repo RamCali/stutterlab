@@ -1,9 +1,29 @@
-import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
+import { NextRequest, NextResponse } from "next/server";
 
-// Early access gate disabled — all pages are public.
-// To re-enable, set EARLY_ACCESS_PASSCODE env var and restore the gate logic.
+const PROTECTED_PREFIXES = ["/app"];
 
-export function middleware() {
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  const isProtected = PROTECTED_PREFIXES.some((prefix) =>
+    pathname.startsWith(prefix)
+  );
+
+  if (!isProtected) {
+    return NextResponse.next();
+  }
+
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
+  if (!token) {
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
   return NextResponse.next();
 }
 

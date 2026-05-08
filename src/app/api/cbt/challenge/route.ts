@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { requireAuth } from "@/lib/auth/helpers";
+import { CLINICAL_AI_SAFETY_RULES } from "@/lib/clinical/safety";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -55,7 +56,9 @@ export async function POST(req: NextRequest) {
       .map((e) => `${e.name} (${e.intensity}/10)`)
       .join(", ");
 
-    const systemPrompt = `You are a cognitive behavioral therapist who specializes in helping adults who stutter manage speech-related anxiety. You are warm, non-judgmental, and evidence-based.
+    const systemPrompt = `You are a cognitive behavioral support assistant specializing in helping adults who stutter manage speech-related anxiety. You are warm, non-judgmental, and evidence-based.
+
+${CLINICAL_AI_SAFETY_RULES}
 
 The user will share a situation they faced, the automatic thought that came up, and the emotions they felt. Your job is to:
 

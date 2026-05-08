@@ -5,7 +5,7 @@
  * cross-browser, higher-accuracy transcription tuned for stuttering.
  *
  * Flow:
- * 1. Fetch temp API key from /api/deepgram-session
+ * 1. Fetch short-lived access token from /api/deepgram-session
  * 2. Open WebSocket to wss://api.deepgram.com/v1/listen
  * 3. Capture mic → ScriptProcessorNode → PCM Int16 → WebSocket
  * 4. Receive JSON transcript results → fire callbacks
@@ -77,7 +77,7 @@ export class DeepgramStreamingClient {
     if (this.active) return true;
 
     try {
-      // 1. Get temp API key
+      // 1. Get short-lived access token
       const keyRes = await fetch("/api/deepgram-session", { method: "POST" });
       if (!keyRes.ok) {
         const data = await keyRes.json().catch(() => ({}));
@@ -86,7 +86,11 @@ export class DeepgramStreamingClient {
         );
         return false;
       }
-      const { apiKey } = await keyRes.json();
+      const { accessToken } = await keyRes.json();
+      if (!accessToken) {
+        this.callbacks.onError?.("Speech service returned an invalid session");
+        return false;
+      }
 
       // 2. Get mic stream
       this.mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -113,7 +117,7 @@ export class DeepgramStreamingClient {
 
       this.ws = new WebSocket(
         `wss://api.deepgram.com/v1/listen?${params.toString()}`,
-        ["token", apiKey]
+        ["token", accessToken]
       );
 
       await this.waitForOpen();
@@ -280,7 +284,8 @@ export class DeepgramStreamingClient {
             method: "POST",
           });
           if (!keyRes.ok) throw new Error("Key fetch failed");
-          const { apiKey } = await keyRes.json();
+          const { accessToken } = await keyRes.json();
+          if (!accessToken) throw new Error("Invalid speech session");
 
           const params = new URLSearchParams({
             model: this.config.model,
@@ -297,7 +302,7 @@ export class DeepgramStreamingClient {
 
           this.ws = new WebSocket(
             `wss://api.deepgram.com/v1/listen?${params.toString()}`,
-            ["token", apiKey]
+            ["token", accessToken]
           );
 
           await this.waitForOpen();

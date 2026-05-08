@@ -23,6 +23,7 @@ export interface ShadowingScore {
   feedback: string;
   techniqueNotes: string;
   xpEarned: number;
+  scoringMode?: "practice_estimate" | "acoustic";
 }
 
 interface ShadowingScoreCardProps {
@@ -106,6 +107,18 @@ export function ShadowingScoreCard({ clip, score, onRetry, onShare, onNext }: Sh
         </div>
 
         <div className="px-6 py-5 space-y-4">
+          {score.scoringMode === "practice_estimate" && (
+            <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3">
+              <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
+                Practice estimate
+              </p>
+              <p className="text-sm text-muted-foreground">
+                This score marks completion and technique focus. It is not a
+                full acoustic analysis yet.
+              </p>
+            </div>
+          )}
+
           {/* Score breakdown */}
           <div className="flex justify-around">
             <ScoreRing value={score.rhythmMatch} label="Rhythm" color="hsl(var(--primary))" />

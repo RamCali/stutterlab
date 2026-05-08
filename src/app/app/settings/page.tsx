@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { EmbeddedCheckoutDialog } from "@/components/embedded-checkout";
 import {
   Settings,
   User,
@@ -19,6 +21,8 @@ import {
   Loader2,
   Crown,
   ExternalLink,
+  LifeBuoy,
+  Send,
 } from "lucide-react";
 
 export default function SettingsPage() {
@@ -30,6 +34,15 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [subLoading, setSubLoading] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<"free" | "pro">("free");
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [supportReason, setSupportReason] = useState<
+    "billing_question" | "refund_request" | "suspicious_charge"
+  >("refund_request");
+  const [supportMessage, setSupportMessage] = useState("");
+  const [supportStatus, setSupportStatus] = useState<"idle" | "sending" | "sent" | "error">(
+    "idle"
+  );
+  const [supportError, setSupportError] = useState("");
 
   useEffect(() => {
     fetch("/api/user/stats")
@@ -46,15 +59,8 @@ export default function SettingsPage() {
     newExercises: true,
   });
 
-  async function handleUpgrade() {
-    setSubLoading(true);
-    try {
-      const res = await fetch("/api/stripe/checkout", { method: "POST" });
-      const { url } = await res.json();
-      if (url) window.location.href = url;
-    } finally {
-      setSubLoading(false);
-    }
+  function handleUpgrade() {
+    setCheckoutOpen(true);
   }
 
   async function handleManageSubscription() {
@@ -75,6 +81,32 @@ export default function SettingsPage() {
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+  }
+
+  async function handleBillingSupport() {
+    setSupportStatus("sending");
+    setSupportError("");
+    try {
+      const res = await fetch("/api/billing/support", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reason: supportReason,
+          message: supportMessage,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not send request");
+      setSupportStatus("sent");
+      setSupportMessage("");
+    } catch (err) {
+      setSupportStatus("error");
+      setSupportError(
+        err instanceof Error
+          ? err.message
+          : "Please email support@stutterlab.com and we will review it."
+      );
+    }
   }
 
   return (
@@ -195,7 +227,7 @@ export default function SettingsPage() {
             Subscription
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Current Plan</p>
@@ -232,6 +264,72 @@ export default function SettingsPage() {
               ? "You have full access to all StutterLab features."
               : "Start your 7-day free trial to unlock all features — daily guided practice, AI simulators, clinical assessments, and more."}
           </p>
+          <div className="border-t pt-5">
+            <div className="flex items-start gap-3">
+              <LifeBuoy className="mt-0.5 h-4 w-4 text-primary" />
+              <div className="flex-1 space-y-4">
+                <div>
+                  <p className="font-medium">Billing support</p>
+                  <p className="text-xs text-muted-foreground">
+                    Refund requests and suspicious charges go straight to the
+                    StutterLab support queue with your billing context attached.
+                  </p>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-[180px_1fr]">
+                  <div>
+                    <Label htmlFor="billing-reason">Reason</Label>
+                    <select
+                      id="billing-reason"
+                      value={supportReason}
+                      onChange={(e) =>
+                        setSupportReason(
+                          e.target.value as
+                            | "billing_question"
+                            | "refund_request"
+                            | "suspicious_charge"
+                        )
+                      }
+                      className="border-input bg-background mt-1 h-9 w-full rounded-md border px-3 text-sm"
+                    >
+                      <option value="refund_request">Refund request</option>
+                      <option value="suspicious_charge">Suspicious charge</option>
+                      <option value="billing_question">Billing question</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="billing-message">What happened?</Label>
+                    <Textarea
+                      id="billing-message"
+                      className="mt-1 min-h-24"
+                      placeholder="Include the charge date, amount, or anything that looked unfamiliar."
+                      value={supportMessage}
+                      onChange={(e) => setSupportMessage(e.target.value)}
+                    />
+                  </div>
+                </div>
+                {supportStatus === "sent" && (
+                  <p className="text-sm text-emerald-600">
+                    Sent. Support will review the charge and follow up by email.
+                  </p>
+                )}
+                {supportStatus === "error" && (
+                  <p className="text-sm text-destructive">{supportError}</p>
+                )}
+                <Button
+                  variant="outline"
+                  onClick={handleBillingSupport}
+                  disabled={supportStatus === "sending" || supportMessage.trim().length < 10}
+                >
+                  {supportStatus === "sending" ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4 mr-2" />
+                  )}
+                  Send to Support
+                </Button>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -256,6 +354,11 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+      <EmbeddedCheckoutDialog
+        open={checkoutOpen}
+        onOpenChange={setCheckoutOpen}
+        interval="year"
+      />
     </div>
   );
 }
