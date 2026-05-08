@@ -23,7 +23,11 @@
       "Bash(npx eslint src/app/api/shadowing/scores/route.ts src/app/app/progress/weekly-audit/page.tsx \"src/app/app/ai-practice/[scenario]/page.tsx\" src/components/ai-conversations/performance-report.tsx src/components/premium-gate.tsx src/components/progress/reading-assessment.tsx)",
       "Bash(for f in src/app/app/presentation-mode/page.tsx src/app/app/exposure-ladder/page.tsx src/app/app/checkout/return/page.tsx src/app/app/mindset/traps/page.tsx src/app/app/mindset/page.tsx \"src/app/app/mindset/predictions/[id]/page.tsx\" src/app/app/layout.tsx \"src/app/app/feared-words/practice/[wordId]/page.tsx\" src/app/app/feared-words/page.tsx src/app/not-found.tsx src/components/insights/CohortInsightBadge.tsx src/components/dashboard/north-star.tsx src/components/community/i-did-it-wall.tsx)",
       "Bash(do sed -i '' 's|eslint-disable-next-line react-compiler/react-compiler|eslint-disable-next-line react-hooks/set-state-in-effect|g' \"$f\")",
-      "Bash(npx eslint --fix)"
+      "Bash(npx eslint --fix)",
+      "WebSearch",
+      "Bash(npx next:*)",
+      "Bash(sed -i '' 's/^STRIPE_PRICE_ID_PREMIUM_MONTHLY=.*/STRIPE_PRICE_ID_PREMIUM_MONTHLY=price_1T6wSKDQ3dxBuCnuMRyOOnFL/' .env)",
+      "Bash(sed -i '' 's/^STRIPE_PRICE_ID_PREMIUM_YEARLY=.*/STRIPE_PRICE_ID_PREMIUM_YEARLY=price_1T6wVRDQ3dxBuCnufvCpwEXH/' .env)"
     ],
     "additionalDirectories": [
       "/Users/RamG/Downloads/Projects (DND)/StutterLab/src/app/api/klaviyo"

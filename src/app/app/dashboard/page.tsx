@@ -96,12 +96,12 @@ export default function DashboardPage() {
   const progressPercent = Math.min(Math.round((currentDay / 90) * 100), 100);
 
   return (
-    <div className="p-6 max-w-2xl mx-auto space-y-6">
+    <div className="px-4 py-4 md:p-6 max-w-2xl mx-auto space-y-4 md:space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">{greeting}</h1>
-        <div className="flex items-center gap-2 mt-1.5">
-          <span className="text-base text-muted-foreground">
+        <h1 className="text-2xl md:text-3xl font-bold">{greeting}</h1>
+        <div className="flex items-center gap-2 mt-1">
+          <span className="text-sm md:text-base text-muted-foreground">
             Day {currentDay} of 90
           </span>
           <Badge variant="secondary" className="text-sm">

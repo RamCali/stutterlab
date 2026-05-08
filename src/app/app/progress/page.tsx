@@ -248,39 +248,39 @@ export default function ProgressPage() {
 
   const practiceMinutes = stats ? Math.round(stats.totalPracticeSeconds / 60) : 0;
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="px-4 py-4 md:p-6 max-w-5xl mx-auto space-y-4 md:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <LineChart className="h-7 w-7 text-primary" />
+        <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
+          <LineChart className="h-6 w-6 md:h-7 md:w-7 text-primary" />
           Progress
         </h1>
-        <p className="text-lg text-muted-foreground mt-1.5">
+        <p className="text-sm md:text-lg text-muted-foreground mt-1">
           Track your improvement with objective data and insights
         </p>
       </div>
 
       {/* Monthly Assessment CTA */}
       <Card className="border-primary/30 bg-primary/5">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-primary/10">
-                <FileText className="h-6 w-6 text-primary" />
+        <CardContent className="pt-5 md:pt-6">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-start md:items-center gap-3 md:gap-4">
+              <div className="p-2.5 md:p-3 rounded-full bg-primary/10 shrink-0">
+                <FileText className="h-5 w-5 md:h-6 md:w-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold flex items-center gap-2">
+                <h3 className="font-semibold flex items-center gap-2 text-sm md:text-base">
                   Monthly Clinical Assessment
                   <Badge variant="outline" className="text-xs">
                     <Crown className="h-2.5 w-2.5 mr-0.5" />
                     PRO
                   </Badge>
                 </h3>
-                <p className="text-base text-muted-foreground">
+                <p className="text-xs md:text-sm text-muted-foreground mt-0.5">
                   Read a standardized passage aloud. Get your %SS score, severity rating, and shareable report.
                 </p>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 ml-11 md:ml-0 shrink-0">
               <Link href="/app/progress/report">
                 <Badge variant="outline" className="cursor-pointer">
                   View Reports
@@ -298,36 +298,38 @@ export default function ProgressPage() {
 
       {/* Weekly Clinical Audit CTA */}
       <Card className="border-amber-500/30 bg-amber-500/5">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-amber-500/10">
-                <Activity className="h-6 w-6 text-amber-500" />
+        <CardContent className="pt-5 md:pt-6">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-start md:items-center gap-3 md:gap-4">
+              <div className="p-2.5 md:p-3 rounded-full bg-amber-500/10 shrink-0">
+                <Activity className="h-5 w-5 md:h-6 md:w-6 text-amber-500" />
               </div>
               <div>
-                <h3 className="font-semibold flex items-center gap-2">
+                <h3 className="font-semibold flex items-center gap-2 text-sm md:text-base">
                   Weekly Clinical Audit
                   <Badge variant="outline" className="text-xs">
                     <Crown className="h-2.5 w-2.5 mr-0.5" />
                     PRO
                   </Badge>
                 </h3>
-                <p className="text-base text-muted-foreground">
+                <p className="text-xs md:text-sm text-muted-foreground mt-0.5">
                   Record a 2-min narrative. Get SSI-4 grade %SS scoring, disfluency breakdown, and week-over-week trends.
                 </p>
               </div>
             </div>
-            <Link href="/app/progress/weekly-audit">
-              <Badge className="cursor-pointer bg-amber-500 text-white hover:bg-amber-600">
-                Take Audit
-              </Badge>
-            </Link>
+            <div className="ml-11 md:ml-0 shrink-0">
+              <Link href="/app/progress/weekly-audit">
+                <Badge className="cursor-pointer bg-amber-500 text-white hover:bg-amber-600">
+                  Take Audit
+                </Badge>
+              </Link>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {[
           {
             icon: Flame,
@@ -355,10 +357,10 @@ export default function ProgressPage() {
           },
         ].map((stat) => (
           <Card key={stat.label}>
-            <CardContent className="pt-5 pb-4">
-              <stat.icon className={`h-5 w-5 ${stat.color} mb-2`} />
-              <p className="text-2xl font-bold">{stat.value}</p>
-              <p className="text-sm text-muted-foreground">{stat.label}</p>
+            <CardContent className="p-4 md:pt-5 md:pb-4">
+              <stat.icon className={`h-5 w-5 ${stat.color} mb-1.5`} />
+              <p className="text-xl md:text-2xl font-bold">{stat.value}</p>
+              <p className="text-xs md:text-sm text-muted-foreground">{stat.label}</p>
             </CardContent>
           </Card>
         ))}
@@ -481,22 +483,22 @@ export default function ProgressPage() {
               {data.recentSessions.slice(0, 10).map((session) => (
                 <div
                   key={session.id}
-                  className="flex items-center justify-between p-3 rounded-lg border"
+                  className="flex items-center justify-between gap-3 p-3 rounded-lg border"
                 >
-                  <div>
-                    <p className="text-base font-medium">
+                  <div className="min-w-0">
+                    <p className="text-sm md:text-base font-medium truncate">
                       {session.exerciseType?.includes("ai-conversation")
                         ? "AI Conversation"
                         : session.exerciseType?.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Practice Session"}
                     </p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs md:text-sm text-muted-foreground truncate">
                       {session.exerciseType?.includes(":")
                         ? session.exerciseType.split(":")[1]?.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
                         : ""}{" "}
                       {session.durationSeconds ? `— ${formatDuration(session.durationSeconds)}` : ""}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right shrink-0">
                     {(session.aiFluencyScore || session.selfRatedFluency) && (
                       <Badge variant="secondary">
                         {session.aiFluencyScore
@@ -914,8 +916,8 @@ export default function ProgressPage() {
           <CardContent className="py-6">
             <div className="text-center space-y-3">
               <Crown className="h-8 w-8 text-amber-500 mx-auto" />
-              <h3 className="font-bold text-xl">Unlock Premium Analytics</h3>
-              <p className="text-base text-muted-foreground max-w-md mx-auto">
+              <h3 className="font-bold text-lg md:text-xl">Unlock Premium Analytics</h3>
+              <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto">
                 Get AI conversation insights, feared words mastery tracking,
                 anxiety reduction trends, and technique effectiveness analysis.
               </p>

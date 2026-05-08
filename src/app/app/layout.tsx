@@ -136,13 +136,13 @@ function AppShell({ children }: { children: React.ReactNode }) {
       {/* Main content area */}
       <div className="flex flex-1 flex-col">
         {/* Mobile top bar */}
-        <header className="flex md:hidden items-center justify-between border-b border-border/60 px-4 py-3 bg-card">
+        <header className="flex md:hidden items-center justify-between border-b border-border/60 px-4 py-2.5 bg-card">
           <Link href="/app/dashboard" className="flex items-center">
-            <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={200} height={40} className="h-10 w-auto dark:hidden" />
-            <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={200} height={40} className="h-10 w-auto hidden dark:block" />
+            <Image src="/logo/StutterLab_Logo.svg" alt="StutterLab" width={160} height={32} className="h-8 w-auto dark:hidden" />
+            <Image src="/logo/StutterLab_Logo_white.svg" alt="StutterLab" width={160} height={32} className="h-8 w-auto hidden dark:block" />
           </Link>
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 bg-primary/5 dark:bg-primary/10 rounded-lg px-2 py-1">
+            <div className="flex items-center gap-1 bg-primary/5 dark:bg-primary/10 rounded-full px-2.5 py-1">
               <Flame className="h-3.5 w-3.5 text-orange-500" />
               <span className="text-xs font-semibold">{streak}</span>
             </div>
@@ -151,7 +151,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main className="flex-1 overflow-y-auto overflow-x-hidden">{children}</main>
 
         {/* Panic Button */}
         <PanicButton />
