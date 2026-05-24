@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { EmbeddedCheckoutDialog } from "@/components/embedded-checkout";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 import { trackProductEvent } from "@/lib/analytics/client";
 import {
   Dialog,
@@ -328,6 +329,9 @@ export default function SettingsPage() {
               "Save Changes"
             )}
           </Button>
+          <div className="border-t border-border/60 pt-4">
+            <SignOutButton />
+          </div>
         </CardContent>
       </Card>
 

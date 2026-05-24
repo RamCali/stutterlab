@@ -14,6 +14,7 @@ import { ProgramProvider, useProgram } from "@/components/navigation/program-con
 import { ProgramSidebar } from "@/components/navigation/program-sidebar";
 import { MobileWeekNav } from "@/components/navigation/mobile-week-nav";
 import { SLPAuthorityBadge } from "@/components/slp-authority-badge";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 import { getProgressData } from "@/lib/actions/progress";
 
 function ThemeToggle() {
@@ -99,6 +100,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Bottom pinned items */}
         <div className="border-t border-border/60 p-3 space-y-0.5">
+          <SignOutButton variant="sidebar" />
           <div className="flex items-center justify-between px-3 py-1">
             <span className="text-sm text-muted-foreground">Theme</span>
             <ThemeToggle />
