@@ -18,6 +18,8 @@ import {
   MicOff,
   CheckCircle2,
   Keyboard,
+  Send,
+  Shuffle,
 } from "lucide-react";
 import Link from "next/link";
 import { VoiceConversation, type VoiceState, type TurnMetrics, type TurnMode } from "@/lib/audio/VoiceConversation";
@@ -34,25 +36,33 @@ import { getSessionComparison } from "@/lib/actions/analytics";
 import type { SessionScorecard, SessionComparison } from "@/lib/analysis/types";
 import { CohortInsightBadge } from "@/components/insights/CohortInsightBadge";
 import { trackProductEvent } from "@/lib/analytics/client";
+import { classifyDisfluencies, estimateSyllables } from "@/lib/audio/speech-metrics";
 import {
   getCompletedScenarioSteps,
   getScenarioTask,
 } from "@/lib/ai-practice/scenarios";
+import {
+  PHONE_PRACTICE_SCENARIOS,
+  getPhonePracticeScenario,
+} from "@/lib/phone-practice/scenarios";
 
 type Message = {
   role: "user" | "assistant";
   content: string;
 };
 
+type TextCallState = "ready" | "ringing" | "active" | "ended";
+
 const scenarioTitles: Record<string, string> = {
   "phone-call": "Phone Call",
   "job-interview": "Job Interview",
-  "ordering-food": "Ordering Food",
+  "ordering-food": "Fast Food Order",
   "class-presentation": "Class Presentation",
   "small-talk": "Small Talk",
   "shopping": "Shopping / Returns",
   "asking-directions": "Asking for Directions",
-  "customer-service": "Customer Service Call",
+  "customer-service": "Bank Customer Service",
+  florist: "Calling a Florist",
   "meeting-intro": "Meeting Introduction",
 };
 
@@ -85,6 +95,25 @@ export default function AIConversationPage() {
   const [usingElevenLabs, setUsingElevenLabs] = useState(false);
   const [completionHint, setCompletionHint] = useState(false);
   const [manualTranscript, setManualTranscript] = useState("");
+  const [selectedPhoneScenarioId, setSelectedPhoneScenarioId] = useState(
+    PHONE_PRACTICE_SCENARIOS[0].id
+  );
+  const selectedPhoneScenario = getPhonePracticeScenario(selectedPhoneScenarioId);
+  const [textCallState, setTextCallState] = useState<TextCallState>("ready");
+  const [textCallSeconds, setTextCallSeconds] = useState(0);
+  const textCallTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [xaiTextTestInput, setXaiTextTestInput] = useState("");
+  const [xaiTextTestMessages, setXaiTextTestMessages] = useState<Message[]>([]);
+  const [xaiTextTestError, setXaiTextTestError] = useState("");
+  const [xaiTextTestLoading, setXaiTextTestLoading] = useState(false);
+  const [xaiTextFeedbackLoading, setXaiTextFeedbackLoading] = useState(false);
+  const [xaiTextFeedback, setXaiTextFeedback] = useState("");
+  const [xaiTextSaveStatus, setXaiTextSaveStatus] = useState("");
+  const [xaiTextSaveError, setXaiTextSaveError] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneCallLoading, setPhoneCallLoading] = useState(false);
+  const [phoneCallStatus, setPhoneCallStatus] = useState("");
+  const [phoneCallError, setPhoneCallError] = useState("");
   const completedStepIds = useMemo(() => {
     if (!scenarioTask) return new Set<string>();
     const userTexts = messages
@@ -96,6 +125,26 @@ export default function AIConversationPage() {
   const taskProgress =
     scenarioTask && scenarioTask.steps.length > 0
       ? Math.round((completedStepIds.size / scenarioTask.steps.length) * 100)
+      : 0;
+  const textCallUserText = useMemo(
+    () =>
+      xaiTextTestMessages
+        .filter((message) => message.role === "user")
+        .map((message) => message.content)
+        .join(" "),
+    [xaiTextTestMessages]
+  );
+  const textCallDisfluencyMetrics = useMemo(
+    () => classifyDisfluencies(textCallUserText),
+    [textCallUserText]
+  );
+  const textCallSyllables = useMemo(
+    () => estimateSyllables(textCallUserText),
+    [textCallUserText]
+  );
+  const textCallDisfluencyRate =
+    textCallSyllables > 0
+      ? Math.round((textCallDisfluencyMetrics.stutterLike / textCallSyllables) * 100)
       : 0;
 
   // Stress mode state
@@ -139,6 +188,7 @@ export default function AIConversationPage() {
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      if (textCallTimerRef.current) clearInterval(textCallTimerRef.current);
       voiceConvRef.current?.stop();
       stressEngineRef.current?.stop();
     };
@@ -175,24 +225,9 @@ export default function AIConversationPage() {
       stressEngineRef.current = engine;
     }
 
-    // Try ElevenLabs Conversational AI first (single WebSocket, lower latency)
-    const elevenLabsSuccess = await elevenLabs.start();
-    if (elevenLabsSuccess) {
-      setUsingElevenLabs(true);
-      trackProductEvent("voice_provider_started", {
-        scenario,
-        provider: "elevenlabs",
-      });
-      return;
-    }
-
-    // Fallback to legacy pipeline (Web Speech API → Claude → ElevenLabs TTS)
+    // Primary path: Deepgram STT preserves stuttering-like repetitions better
+    // than cleaner transcription providers in the UCLASS benchmark.
     setUsingElevenLabs(false);
-    trackProductEvent("voice_provider_fallback", {
-      scenario,
-      from: "elevenlabs",
-      to: "legacy_deepgram_anthropic_tts",
-    });
 
     // Set up mic AnalyserNode for LiveCoachOverlay
     try {
@@ -222,7 +257,14 @@ export default function AIConversationPage() {
           setVoiceTranscript("");
         }
       },
-      onError: (err) => console.error("Voice error:", err),
+      onError: (err) => {
+        console.error("Voice error:", err);
+        trackProductEvent("voice_session_failed", {
+          scenario,
+          provider: "deepgram_anthropic_tts",
+          phase: "conversation",
+        });
+      },
     }, undefined, stressMode ? stressLevel : undefined, {
       silenceTimeoutMs: blockAwareMode ? 5000 : 2000,
       turnMode,
@@ -230,11 +272,243 @@ export default function AIConversationPage() {
 
     voiceConvRef.current = voiceConv;
     const legacyStarted = await voiceConv.start();
-    if (!legacyStarted) {
+    if (legacyStarted) {
+      trackProductEvent("voice_provider_started", {
+        scenario,
+        provider: "deepgram_anthropic_tts",
+      });
+      return;
+    }
+
+    trackProductEvent("voice_provider_fallback", {
+      scenario,
+      from: "deepgram_anthropic_tts",
+      to: "elevenlabs",
+    });
+
+    const elevenLabsSuccess = await elevenLabs.start();
+    if (elevenLabsSuccess) {
+      setUsingElevenLabs(true);
+      trackProductEvent("voice_provider_started", {
+        scenario,
+        provider: "elevenlabs",
+      });
+    } else {
       trackProductEvent("voice_session_failed", {
         scenario,
-        provider: "legacy_deepgram_anthropic_tts",
+        provider: "deepgram_anthropic_tts",
       });
+    }
+  }
+
+  async function runXaiTextTest() {
+    const message = xaiTextTestInput.trim();
+    if (!message || xaiTextTestLoading || textCallState !== "active") return;
+
+    setXaiTextTestLoading(true);
+    setXaiTextTestError("");
+
+    try {
+      const res = await fetch("/api/xai-phone-practice/text-test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message,
+          messages: xaiTextTestMessages,
+          scenarioId: selectedPhoneScenarioId,
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "xAI text test failed");
+      }
+
+      const assistantMessage = data.message || "";
+      setXaiTextTestMessages((current) => [
+        ...current,
+        { role: "user", content: message },
+        { role: "assistant", content: assistantMessage },
+      ]);
+      setXaiTextTestInput("");
+    } catch (error) {
+      setXaiTextTestError(
+        error instanceof Error ? error.message : "xAI text test failed"
+      );
+    } finally {
+      setXaiTextTestLoading(false);
+    }
+  }
+
+  function startTextPhoneCall() {
+    if (textCallTimerRef.current) clearInterval(textCallTimerRef.current);
+    setTextCallState("ringing");
+    setTextCallSeconds(0);
+    setXaiTextFeedback("");
+    setXaiTextSaveStatus("");
+    setXaiTextSaveError("");
+    setXaiTextTestError("");
+    setXaiTextTestInput("");
+    setXaiTextTestMessages([]);
+
+    setTimeout(() => {
+      setTextCallState("active");
+      setXaiTextTestMessages([
+        {
+          role: "assistant",
+          content: selectedPhoneScenario.openingLine,
+        },
+      ]);
+      textCallTimerRef.current = setInterval(() => {
+        setTextCallSeconds((seconds) => seconds + 1);
+      }, 1000);
+    }, 900);
+  }
+
+  function resetTextPhoneCall(nextScenarioId = selectedPhoneScenarioId) {
+    if (textCallTimerRef.current) clearInterval(textCallTimerRef.current);
+    textCallTimerRef.current = null;
+    setSelectedPhoneScenarioId(nextScenarioId);
+    setTextCallState("ready");
+    setTextCallSeconds(0);
+    setXaiTextTestInput("");
+    setXaiTextTestMessages([]);
+    setXaiTextTestError("");
+    setXaiTextFeedback("");
+    setXaiTextSaveStatus("");
+    setXaiTextSaveError("");
+  }
+
+  function tryDifferentTextCall() {
+    const currentIndex = PHONE_PRACTICE_SCENARIOS.findIndex(
+      (phoneScenario) => phoneScenario.id === selectedPhoneScenarioId
+    );
+    const nextScenario =
+      PHONE_PRACTICE_SCENARIOS[(currentIndex + 1) % PHONE_PRACTICE_SCENARIOS.length];
+    resetTextPhoneCall(nextScenario.id);
+  }
+
+  async function endTextPhoneCall() {
+    if (textCallTimerRef.current) clearInterval(textCallTimerRef.current);
+    textCallTimerRef.current = null;
+    setTextCallState("ended");
+    setXaiTextFeedbackLoading(true);
+    setXaiTextTestError("");
+
+    try {
+      const res = await fetch("/api/xai-phone-practice/text-test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message:
+            "End call. Step out of character and give concise feedback on this practice call.",
+          messages: xaiTextTestMessages,
+          scenarioId: selectedPhoneScenarioId,
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Could not create call feedback.");
+      }
+
+      setXaiTextFeedback(data.message || "");
+      await saveTextPhonePractice(data.message || "");
+    } catch (error) {
+      const fallbackFeedback =
+        "You completed the main call flow. Next time, try asking one extra follow-up question before ending.";
+      setXaiTextFeedback(fallbackFeedback);
+      await saveTextPhonePractice(fallbackFeedback);
+      setXaiTextTestError(
+        error instanceof Error ? error.message : "Could not create call feedback."
+      );
+    } finally {
+      setXaiTextFeedbackLoading(false);
+    }
+  }
+
+  async function saveTextPhonePractice(feedback: string) {
+    if (xaiTextTestMessages.filter((message) => message.role === "user").length === 0) {
+      return;
+    }
+
+    setXaiTextSaveStatus("");
+    setXaiTextSaveError("");
+
+    const turns = xaiTextTestMessages.map((message, index) => ({
+      role: message.role,
+      text: message.content,
+      disfluencyCount:
+        message.role === "user" ? classifyDisfluencies(message.content).total : 0,
+      speakingRate: 0,
+      techniquesUsed: [],
+      turnIndex: index,
+      timestamp: Date.now(),
+    }));
+
+    try {
+      const result = await saveAIConversation({
+        scenarioType: `text-phone:${selectedPhoneScenario.id}`,
+        messages: xaiTextTestMessages,
+        turns,
+        durationSeconds: Math.max(1, textCallSeconds),
+        sessionScorecard: {
+          type: "text-phone-practice",
+          scenario: selectedPhoneScenario.title,
+          feedback,
+          metrics: {
+            userTurns: turns.filter((turn) => turn.role === "user").length,
+            visibleDisfluencies: textCallDisfluencyMetrics.total,
+            visibleStutterLikeMoments: textCallDisfluencyMetrics.stutterLike,
+            approximateStutterLikeRate: textCallDisfluencyRate,
+            syllables: textCallSyllables,
+            scoringMode: "typed_transcript_estimate",
+          },
+        },
+      });
+      setXaiTextSaveStatus(`Saved practice. +${result.xp} XP`);
+    } catch (error) {
+      setXaiTextSaveError(
+        error instanceof Error ? error.message : "Could not save this practice yet."
+      );
+    }
+  }
+
+  async function startRealPhonePractice() {
+    const trimmedPhoneNumber = phoneNumber.trim();
+    if (!trimmedPhoneNumber || phoneCallLoading) return;
+
+    setPhoneCallLoading(true);
+    setPhoneCallStatus("");
+    setPhoneCallError("");
+
+    try {
+      const res = await fetch("/api/phone-practice/call", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phoneNumber: trimmedPhoneNumber,
+          scenario: "phone-call",
+          blockAware: true,
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Could not start the phone call yet.");
+      }
+
+      setPhoneCallStatus(
+        data.mvpContact?.fromNumber
+          ? `Calling now. Pick up when your phone rings. Save ${data.mvpContact.fromNumber} as StutterLab.`
+          : "Calling now. Pick up when your phone rings."
+      );
+    } catch (error) {
+      setPhoneCallError(
+        error instanceof Error ? error.message : "Could not start the phone call yet."
+      );
+    } finally {
+      setPhoneCallLoading(false);
     }
   }
 
@@ -266,6 +540,14 @@ export default function AIConversationPage() {
       ];
     }
 
+    if (turns.filter((t) => t.role === "user").length === 0 && !fallbackUserText?.trim()) {
+      trackProductEvent("voice_empty_transcript", {
+        scenario,
+        durationSeconds: elapsedSeconds,
+        provider: usingElevenLabs ? "elevenlabs" : "deepgram_anthropic_tts",
+      });
+    }
+
     setVoiceTurns(turns);
     stressEngineRef.current?.stop();
     stressEngineRef.current = null;
@@ -279,6 +561,18 @@ export default function AIConversationPage() {
         usedManualSummary: Boolean(fallbackUserText?.trim()),
         taskProgress,
       });
+      trackProductEvent("scenario_completed", {
+        scenario,
+        taskProgress,
+        durationSeconds: elapsedSeconds,
+      });
+      if (typeof window !== "undefined" && !localStorage.getItem("stutterlab_first_session_completed")) {
+        localStorage.setItem("stutterlab_first_session_completed", "true");
+        trackProductEvent("first_session_completed", {
+          scenario,
+          durationSeconds: elapsedSeconds,
+        });
+      }
       // Compute session scorecard (client-side, no DB needed)
       const scoringTurns = turns.map((t) => ({
         role: t.role as "user" | "assistant",
@@ -327,6 +621,7 @@ export default function AIConversationPage() {
     `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
 
   const isPhoneSim = scenario === "phone-call" || scenario === "customer-service";
+  const isXaiTextPhonePractice = scenario === "phone-call";
 
   // Show performance report
   if (showReport) {
@@ -347,7 +642,7 @@ export default function AIConversationPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
+    <div className="flex min-h-full flex-col">
       {/* Header */}
       <div className="border-b px-4 py-3 flex items-center justify-between bg-background">
         <div className="flex items-center gap-3">
@@ -399,10 +694,10 @@ export default function AIConversationPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto px-4 py-6">
         {!started ? (
           /* Pre-start screen */
-          <div className="flex flex-col items-center justify-center h-full text-center">
+          <div className="mx-auto flex w-full max-w-3xl flex-col items-center text-center">
             <div className="p-4 rounded-full bg-primary/10 mb-4">
               {isPhoneSim ? (
                 <Phone className="h-10 w-10 text-primary" />
@@ -412,10 +707,12 @@ export default function AIConversationPage() {
             </div>
             <h2 className="text-xl font-bold">{title}</h2>
             <p className="text-sm text-muted-foreground mt-2 max-w-md">
-              Speak naturally with the AI using your voice. Real-time fluency tracking included.
+              {isXaiTextPhonePractice
+                ? "Practice a realistic phone call in text first. Voice comes next."
+                : "Speak naturally with the AI using your voice. Real-time fluency tracking included."}
             </p>
             {scenarioTask && (
-              <div className="mt-4 w-full max-w-md rounded-xl border border-border bg-card/60 p-4 text-left">
+              <div className="mt-4 w-full rounded-xl border border-border bg-card/60 p-4 text-left">
                 <p className="text-sm font-semibold">{scenarioTask.goal}</p>
                 <div className="mt-3 space-y-2">
                   {scenarioTask.steps.map((step) => (
@@ -430,15 +727,15 @@ export default function AIConversationPage() {
             <div className="flex items-center gap-2 mt-4">
               <Badge variant="outline" className="text-xs">
                 <Sparkles className="h-3 w-3 mr-1" />
-                Powered by Claude
+                {isXaiTextPhonePractice ? "Powered by xAI" : "Powered by Claude"}
               </Badge>
               <Badge variant="outline" className="text-xs bg-primary/5">
-                Voice Mode
+                {isXaiTextPhonePractice ? "Text Mode" : "Voice Mode"}
               </Badge>
             </div>
             {/* Stress Simulator Toggle (premium only) */}
-            {isPro && (
-              <div className="mt-4 p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 max-w-md w-full">
+            {isPro && !isXaiTextPhonePractice && (
+              <div className="mt-4 w-full rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Shield className="h-4 w-4 text-amber-500" />
@@ -487,7 +784,8 @@ export default function AIConversationPage() {
               </div>
             )}
             {/* Block-Aware Pacing */}
-            <div className="mt-4 p-4 rounded-xl border border-teal-500/20 bg-teal-500/5 max-w-md w-full">
+            {!isXaiTextPhonePractice && (
+            <div className="mt-4 w-full rounded-xl border border-teal-500/20 bg-teal-500/5 p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Hand className="h-4 w-4 text-teal-500" />
@@ -541,8 +839,9 @@ export default function AIConversationPage() {
                 </div>
               )}
             </div>
+            )}
             {/* Community Insight */}
-            <div className="mt-4 max-w-md w-full">
+            <div className="mt-4 w-full">
               <CohortInsightBadge
                 context={{
                   page: "ai-practice",
@@ -550,25 +849,285 @@ export default function AIConversationPage() {
                 }}
               />
             </div>
-            <Button
-              className="mt-6"
-              size="lg"
-              onClick={startVoiceConversation}
-              disabled={!isPro}
-            >
-              {isPhoneSim ? (
-                <>
-                  <Phone className="h-4 w-4 mr-2" />
-                  Pick Up Call
-                </>
-              ) : (
-                <>
-                  <Brain className="h-4 w-4 mr-2" />
-                  Start Conversation
-                </>
-              )}
-            </Button>
-            {!isPro && (
+            {isXaiTextPhonePractice && (
+              <Card className="mt-4 w-full border-sky-500/20 bg-sky-500/5 text-left">
+                <CardContent className="space-y-3 p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Keyboard className="h-4 w-4 text-sky-500" />
+                        <p className="text-sm font-semibold">Today&apos;s call</p>
+                        <Badge variant="outline" className="text-xs">
+                          {selectedPhoneScenario.difficulty}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          xAI text
+                        </Badge>
+                      </div>
+                      <h3 className="mt-2 text-lg font-semibold">
+                        {selectedPhoneScenario.title}
+                      </h3>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {selectedPhoneScenario.userGoal}
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={tryDifferentTextCall}
+                      disabled={textCallState === "ringing" || xaiTextTestLoading}
+                    >
+                      <Shuffle className="mr-2 h-4 w-4" />
+                      Try different call
+                    </Button>
+                  </div>
+
+                  <div className="rounded-md border border-border bg-background/70">
+                    <div className="flex items-center justify-between border-b border-border px-4 py-3">
+                      <div>
+                        <p className="text-sm font-medium">
+                          {selectedPhoneScenario.businessName}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {textCallState === "ready" && "Ready"}
+                          {textCallState === "ringing" && "Ringing..."}
+                          {textCallState === "active" &&
+                            `Active call ${formatTime(textCallSeconds)}`}
+                          {textCallState === "ended" &&
+                            `Call ended ${formatTime(textCallSeconds)}`}
+                        </p>
+                      </div>
+                      {textCallState === "active" && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="destructive"
+                          onClick={endTextPhoneCall}
+                          disabled={xaiTextFeedbackLoading}
+                        >
+                          <PhoneOff className="mr-2 h-4 w-4" />
+                          End call
+                        </Button>
+                      )}
+                    </div>
+
+                    {textCallState === "ready" && (
+                      <div className="flex flex-col items-center justify-center gap-3 px-4 py-8 text-center">
+                        <div className="rounded-full bg-sky-500/10 p-4">
+                          <Phone className="h-8 w-8 text-sky-500" />
+                        </div>
+                        <Button type="button" onClick={startTextPhoneCall}>
+                          <Phone className="mr-2 h-4 w-4" />
+                          Start text call
+                        </Button>
+                      </div>
+                    )}
+
+                    {textCallState === "ringing" && (
+                      <div className="flex flex-col items-center justify-center gap-3 px-4 py-8 text-center">
+                        <div className="h-14 w-14 animate-pulse rounded-full bg-sky-500/20" />
+                        <p className="text-sm text-muted-foreground">
+                          Calling {selectedPhoneScenario.businessName}...
+                        </p>
+                      </div>
+                    )}
+
+                    {(textCallState === "active" || textCallState === "ended") && (
+                      <div className="space-y-3 p-3">
+                        <div className="max-h-80 space-y-2 overflow-y-auto">
+                          {xaiTextTestMessages.map((item, index) => (
+                            <div
+                              key={`${item.role}-${index}`}
+                              className={`rounded-md p-3 text-sm ${
+                                item.role === "user" ? "bg-primary/10" : "bg-muted/50"
+                              }`}
+                            >
+                              <p className="text-xs font-medium text-muted-foreground">
+                                {item.role === "user" ? "You" : selectedPhoneScenario.agentName}
+                              </p>
+                              <p className="mt-1">{item.content}</p>
+                            </div>
+                          ))}
+                        </div>
+
+                        {textCallState === "active" && (
+                          <>
+                            <textarea
+                              value={xaiTextTestInput}
+                              onChange={(event) => setXaiTextTestInput(event.target.value)}
+                              placeholder="Type what you would say on the phone..."
+                              className="min-h-20 w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+                            />
+                            <div className="flex flex-wrap gap-2">
+                              <Button
+                                type="button"
+                                size="sm"
+                                onClick={runXaiTextTest}
+                                disabled={xaiTextTestLoading || !xaiTextTestInput.trim()}
+                              >
+                                <Send className="mr-2 h-4 w-4" />
+                                {xaiTextTestLoading ? "Sending..." : "Send"}
+                              </Button>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={() => resetTextPhoneCall()}
+                              >
+                                Reset
+                              </Button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {textCallState === "ended" && (
+                    <div className="rounded-md border border-emerald-500/20 bg-emerald-500/5 p-4">
+                      <p className="text-sm font-semibold">Call feedback</p>
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        {xaiTextFeedbackLoading
+                          ? "Writing feedback..."
+                          : xaiTextFeedback ||
+                            "Call ended. Start another call when you're ready."}
+                      </p>
+                      <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                        <div className="rounded-md border border-border/60 bg-background/70 p-3">
+                          <p className="text-xs text-muted-foreground">Turns</p>
+                          <p className="mt-1 text-lg font-semibold">
+                            {
+                              xaiTextTestMessages.filter(
+                                (message) => message.role === "user"
+                              ).length
+                            }
+                          </p>
+                        </div>
+                        <div className="rounded-md border border-border/60 bg-background/70 p-3">
+                          <p className="text-xs text-muted-foreground">
+                            Visible stutter-like moments
+                          </p>
+                          <p className="mt-1 text-lg font-semibold">
+                            {textCallDisfluencyMetrics.stutterLike}
+                          </p>
+                        </div>
+                        <div className="rounded-md border border-border/60 bg-background/70 p-3">
+                          <p className="text-xs text-muted-foreground">
+                            Approx. rate
+                          </p>
+                          <p className="mt-1 text-lg font-semibold">
+                            {textCallDisfluencyRate}%
+                          </p>
+                        </div>
+                      </div>
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        Estimate only, based on typed transcript patterns like
+                        sound or syllable repetitions. Real phone audio will need
+                        a separate speech analysis pass.
+                      </p>
+                      {xaiTextSaveStatus && (
+                        <p className="mt-2 text-sm text-emerald-500">
+                          {xaiTextSaveStatus}
+                        </p>
+                      )}
+                      {xaiTextSaveError && (
+                        <p className="mt-2 text-sm text-destructive">
+                          {xaiTextSaveError}
+                        </p>
+                      )}
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            resetTextPhoneCall();
+                            setTimeout(startTextPhoneCall, 0);
+                          }}
+                        >
+                          Practice same call
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={tryDifferentTextCall}
+                        >
+                          Try different call
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {xaiTextTestError && (
+                    <p className="text-sm text-destructive">{xaiTextTestError}</p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+            {isXaiTextPhonePractice && (
+              <Card className="mt-4 w-full border-emerald-500/20 bg-emerald-500/5 text-left">
+                <CardContent className="space-y-3 p-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Phone className="h-4 w-4 text-emerald-500" />
+                    <p className="text-sm font-semibold">Real phone call practice</p>
+                    <Badge variant="outline" className="text-xs">
+                      Next
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Use your MVP phone number for real practice calls. Delivery
+                    and caller labeling are best effort, so save the number as
+                    StutterLab when you receive it.
+                  </p>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <input
+                      value={phoneNumber}
+                      onChange={(event) => setPhoneNumber(event.target.value)}
+                      placeholder="+14155552671"
+                      inputMode="tel"
+                      className="min-h-10 flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+                    />
+                    <Button
+                      type="button"
+                      onClick={startRealPhonePractice}
+                      disabled={phoneCallLoading || !phoneNumber.trim()}
+                    >
+                      <Phone className="mr-2 h-4 w-4" />
+                      {phoneCallLoading ? "Calling..." : "Call me"}
+                    </Button>
+                  </div>
+                  {phoneCallStatus && (
+                    <p className="text-sm text-emerald-500">{phoneCallStatus}</p>
+                  )}
+                  {phoneCallError && (
+                    <p className="text-sm text-muted-foreground">{phoneCallError}</p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+            {!isXaiTextPhonePractice && (
+              <Button
+                className="mt-6"
+                size="lg"
+                onClick={startVoiceConversation}
+                disabled={!isPro}
+              >
+                {isPhoneSim ? (
+                  <>
+                    <Phone className="h-4 w-4 mr-2" />
+                    Pick Up Call
+                  </>
+                ) : (
+                  <>
+                    <Brain className="h-4 w-4 mr-2" />
+                    Start Conversation
+                  </>
+                )}
+              </Button>
+            )}
+            {!isPro && !isXaiTextPhonePractice && (
               <p className="text-xs text-muted-foreground mt-2">
                 Premium required for voice conversations
               </p>

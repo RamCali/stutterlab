@@ -9,9 +9,9 @@
  * 3. AI response → /api/tts → audio blob → play through speaker
  * 4. Audio ends → resume listening
  *
- * Note: For lower-latency conversations, see useElevenLabsConversation hook
- * which uses ElevenLabs Conversational AI (single WebSocket connection).
- * This class is kept as a fallback when ElevenLabs is not configured.
+ * This is the primary stutter-sensitive voice path because Deepgram preserved
+ * more repetitions/disfluency artifacts in the UCLASS benchmark than OpenAI.
+ * ElevenLabs remains available for TTS and as a conversation fallback.
  */
 
 import { countDisfluencies, estimateSyllables } from "@/lib/audio/speech-metrics";
@@ -338,7 +338,7 @@ export class VoiceConversation {
       const res = await fetch("/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, scenario: this.scenario }),
       });
 
       if (res.ok) {

@@ -1,8 +1,6 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  AudioWaveform,
-  Baby,
   BookOpen,
   Brain,
   GraduationCap,
@@ -21,59 +19,59 @@ import { createMetadata, jsonLd } from "@/lib/seo";
 export const metadata = createMetadata({
   title: "Speech Training for Stuttering - Complete Guide & Tools",
   description:
-    "Everything you need to know about speech training for stuttering. Evidence-based techniques for kids and adults. Practice at home with StutterLab's browser-based tools.",
+    "Everything you need to know about speech training for stuttering in adults. Evidence-based techniques, daily practice tools, and browser-based training with StutterLab.",
   path: "/speech-training-for-stuttering",
 });
 
 const therapyTypes = [
   {
-    icon: AudioWaveform,
+    icon: Mic,
     title: "Fluency Shaping",
     description:
-      "Teaches a new, more fluent way of speaking through techniques like gentle onset, light contact, and controlled breathing.",
-    forWhom: "Kids & Adults",
+      "Teaches a more controlled way of speaking through techniques like gentle onset, light contact, and controlled breathing.",
+    forWhom: "Adults 18+",
   },
   {
     icon: Brain,
     title: "Stuttering Modification",
     description:
       "Helps you manage moments of stuttering with techniques like cancellation, pull-out, and preparatory set.",
-    forWhom: "Teens & Adults",
-  },
-  {
-    icon: Mic,
-    title: "Auditory Feedback (DAF/FAF)",
-    description:
-      "Altered auditory feedback has been shown to reduce stuttering by up to 80%. StutterLab provides both DAF and FAF in-browser.",
-    forWhom: "Kids & Adults",
+    forWhom: "Adults 18+",
   },
   {
     icon: Heart,
-    title: "Cognitive Behavioral Therapy (CBT)",
+    title: "Auditory Feedback (DAF/FAF)",
     description:
-      "Addresses the anxiety, avoidance, and negative thought patterns that often accompany stuttering.",
-    forWhom: "Teens & Adults",
+      "Altered auditory feedback has been shown to reduce stuttering in many speakers. StutterLab provides both DAF and FAF in-browser.",
+    forWhom: "Adults 18+",
   },
   {
     icon: BookOpen,
-    title: "Acceptance & Commitment (ACT)",
+    title: "Cognitive Behavioral Therapy (CBT)",
     description:
-      "Helps you accept stuttering as part of your experience while building confidence to speak in all situations.",
-    forWhom: "Teens & Adults",
+      "Addresses the anxiety, avoidance, and negative thought patterns that often accompany stuttering.",
+    forWhom: "Adults 18+",
   },
   {
     icon: GraduationCap,
-    title: "Lidcombe Program",
+    title: "Acceptance & Commitment (ACT)",
     description:
-      "A parent-delivered behavioral treatment for young children who stutter, with strong research backing.",
-    forWhom: "Children (2-6)",
+      "Helps you accept stuttering as part of your experience while building confidence to speak in all situations.",
+    forWhom: "Adults 18+",
+  },
+  {
+    icon: User,
+    title: "Licensed SLP Care",
+    description:
+      "Clinical assessment and individualized treatment should come from a licensed speech-language pathologist when concerns are significant.",
+    forWhom: "Referral when needed",
   },
 ];
 
 const faq = [
   {
-    q: "When should I see a speech therapist for stuttering?",
-    a: "If stuttering persists for more than 6 months, causes frustration or avoidance, or runs in your family, consult an SLP. Early intervention is key for children.",
+    q: "When should an adult see a speech-language pathologist for stuttering?",
+    a: "Consider an SLP if stuttering causes significant work, social, or emotional impact, if avoidance is increasing, or if you want a clinical assessment. StutterLab supports daily practice but does not replace licensed care.",
   },
   {
     q: "How long does speech therapy for stuttering take?",
@@ -127,9 +125,8 @@ export default function SpeechTherapyForStutteringPage() {
             <span className="text-primary">What Works</span>
           </h1>
           <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Understand the evidence-based approaches to stuttering, find
-            the right approach for you or your child, and practice at home with
-            StutterLab.
+            Understand evidence-based approaches for adults who stutter and
+            practice at home with StutterLab. Built for ages 18+.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button size="lg" className="px-8" asChild>
@@ -158,28 +155,17 @@ export default function SpeechTherapyForStutteringPage() {
             Treatment combines motor speech techniques (how you produce sounds)
             with cognitive approaches (how you think and feel about speaking).
           </p>
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-            <Card className="border-0">
-              <CardContent className="pt-6 flex items-start gap-3">
-                <Baby className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <div>
-                  <h3 className="font-semibold text-sm">For Children</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Early intervention (ages 2-6) has the best outcomes.
-                    Parent-involved programs like Lidcombe show strong results.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="mt-8 max-w-2xl mx-auto">
             <Card className="border-0">
               <CardContent className="pt-6 flex items-start gap-3">
                 <User className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold text-sm">For Adults</h3>
+                  <h3 className="font-semibold text-sm">Adults 18+ Only</h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Adults benefit from fluency shaping, stuttering
-                    modification, CBT, and daily practice with real-world
-                    scenarios.
+                    StutterLab is built for adult daily practice with fluency
+                    shaping, stuttering modification, CBT, and real-world
+                    speaking scenarios. Pediatric fluency concerns require direct
+                    SLP supervision.
                   </p>
                 </div>
               </CardContent>

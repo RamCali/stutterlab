@@ -20,6 +20,14 @@
 # production
 /build
 
+# local speech datasets
+/datasets
+/data
+*.wav
+*.flac
+*.mp3
+*.m4a
+
 # misc
 .DS_Store
 *.pem

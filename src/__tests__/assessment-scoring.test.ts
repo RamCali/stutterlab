@@ -131,6 +131,7 @@ describe("calculateScores", () => {
     expect(scores.recommendedEmphasis.fluencyShaping).toBeGreaterThan(0);
     expect(scores.recommendedEmphasis.stutteringModification).toBeGreaterThan(0);
     expect(scores.recommendedEmphasis.cbt).toBeGreaterThan(0);
+    expect(scores.referralGuidance).toBeDefined();
   });
 
   it("mild input produces mild severity label", () => {
@@ -191,6 +192,28 @@ describe("calculateScores", () => {
       stutteringTypes: ["blocks", "prolongations", "repetitions"],
     });
     expect(withTypes.severityScore).toBeGreaterThan(base.severityScore);
+  });
+
+  it("recommends SLP involvement for adult referral flags", () => {
+    const scores = calculateScores({
+      ...baseInput,
+      fluencyPersistence: "worsening",
+      stutteringTypes: ["block"],
+      physicalBehaviors: ["mouth-tension"],
+      stutterImpact: "significant",
+    });
+    expect(scores.referralGuidance.shouldRecommendSlp).toBe(true);
+    expect(scores.referralGuidance.reasons.length).toBeGreaterThan(0);
+  });
+
+  it("does not trigger SLP referral for low-impact adult practice data", () => {
+    const scores = calculateScores({
+      ...baseInput,
+      fluencyPersistence: "varies",
+      physicalBehaviors: [],
+      fastOrUnclearSpeech: "rarely",
+    });
+    expect(scores.referralGuidance.shouldRecommendSlp).toBe(false);
   });
 
   it("severity increases with more avoidance behaviors", () => {

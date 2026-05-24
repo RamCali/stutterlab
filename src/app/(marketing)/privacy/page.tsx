@@ -14,7 +14,7 @@ export default function PrivacyPage() {
         Privacy Policy
       </h1>
       <p className="text-muted-foreground mb-12">
-        Last updated: March 6, 2026
+        Last updated: May 24, 2026
       </p>
 
       <div className="prose prose-invert prose-teal max-w-none space-y-8">
@@ -29,7 +29,8 @@ export default function PrivacyPage() {
             committed to protecting your privacy, especially given the sensitive
             nature of speech and health-related data. This Privacy Policy
             explains how we collect, use, disclose, and safeguard your
-            information when you use our Service.
+            information when you use our Service. StutterLab is intended for
+            adults 18 and older only.
           </p>
         </Section>
 
@@ -220,12 +221,12 @@ export default function PrivacyPage() {
           </p>
         </Section>
 
-        <Section title="8. Children's Privacy">
+        <Section title="8. Adult-Only Service">
           <p>
-            StutterLab is not intended for children under 13. We do not
-            knowingly collect personal information from children under 13. If
-            you believe a child under 13 has provided us with personal data,
-            please contact us and we will delete it promptly.
+            StutterLab is intended for adults 18 and older only. We do not
+            knowingly collect personal information from anyone under 18. If you
+            believe a minor has created an account or provided us with personal
+            data, please contact us and we will delete it promptly.
           </p>
         </Section>
 

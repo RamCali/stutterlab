@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { requireAuth } from "@/lib/auth/helpers";
+import { isPremium } from "@/lib/auth/premium";
+import { checkRateLimit } from "@/lib/security/rate-limit";
 import { CLINICAL_AI_SAFETY_RULES } from "@/lib/clinical/safety";
 
 const anthropic = new Anthropic({
@@ -41,7 +43,19 @@ const FALLBACK_RESPONSE: ChallengeResponse = {
 
 export async function POST(req: NextRequest) {
   try {
-    await requireAuth();
+    const user = await requireAuth();
+    if (!(await isPremium(user.id))) {
+      return NextResponse.json({ error: "Premium subscription required" }, { status: 403 });
+    }
+
+    const rate = checkRateLimit(`cbt-challenge:${user.id}`, 30, 60 * 60 * 1000);
+    if (!rate.ok) {
+      return NextResponse.json(
+        { error: "Too many mindset requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const { situation, automaticThought, emotions } =
       (await req.json()) as ChallengeRequest;
 

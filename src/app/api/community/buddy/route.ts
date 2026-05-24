@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { buddyPairings, userStats } from "@/lib/db/schema";
-import { getUserId } from "@/lib/auth/helpers";
+import { requireCommunityAccess } from "@/lib/community/access";
 import { eq, or, and, sql, desc } from "drizzle-orm";
 
 const BUDDY_NAMES = [
@@ -14,10 +14,9 @@ const BUDDY_NAMES = [
 /** GET — get current buddy pairing */
 export async function GET() {
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ buddy: null });
-    }
+    const access = await requireCommunityAccess();
+    if (access.error) return access.error;
+    const { userId } = access;
 
     const [pairing] = await db
       .select()
@@ -58,10 +57,9 @@ export async function GET() {
 /** POST — request a new buddy (matchmaking) */
 export async function POST() {
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const access = await requireCommunityAccess();
+    if (access.error) return access.error;
+    const { userId } = access;
 
     // End any existing active pairing
     await db

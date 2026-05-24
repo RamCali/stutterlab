@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   getDailyPlan,
   getPhaseInfo,
+  personalizeDailyPlan,
   PHASE_LABELS,
   PHASE_RANGES,
   generateDailyPlans,
@@ -69,6 +70,23 @@ describe("getDailyPlan", () => {
       expect(task.type).toBeTruthy();
       expect(task.href).toBeTruthy();
     }
+  });
+
+  it("adds onboarding-based personalization reasons to matching tasks", () => {
+    const plan = getDailyPlan(3)!;
+    const personalized = personalizeDailyPlan(plan, {
+      completed: true,
+      name: "Test",
+      fearedSituations: [],
+      severity: "moderate",
+      stutteringTypes: ["block"],
+      avoidanceBehaviors: ["avoid-calls"],
+      physicalBehaviors: ["mouth-tension"],
+      fastOrUnclearSpeech: "often",
+    });
+
+    expect(personalized.tasks.some((task) => task.reason?.includes("Personal focus:"))).toBe(true);
+    expect(plan.tasks.some((task) => task.reason?.includes("Personal focus:"))).toBe(false);
   });
 });
 

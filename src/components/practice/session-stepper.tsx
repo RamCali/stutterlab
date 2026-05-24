@@ -1,12 +1,12 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Check, Wind, BookOpen, MessageSquare, Heart } from "lucide-react";
+import { Check, Wind, BookOpen, Phone, Heart } from "lucide-react";
 
 const STEPS = [
   { label: "Breathe", icon: Wind },
   { label: "Practice", icon: BookOpen },
-  { label: "Speak", icon: MessageSquare },
+  { label: "Call", icon: Phone },
   { label: "Reflect", icon: Heart },
 ] as const;
 

@@ -17,6 +17,7 @@
 
 import { getAdaptiveDailyPlan as getAdaptiveDailyPlanImport } from "./adaptive-engine";
 import { getHarrisonReflection, HARRISON_AFFIRMATIONS } from "./harrison-observations";
+import type { OnboardingData } from "@/lib/onboarding/feared-situations";
 
 export type TaskType =
   | "warmup"
@@ -1337,6 +1338,184 @@ export function getDailyPlan(day: number): DailyPlan | null {
   }
   // Day 91+: delegate to adaptive engine (balanced default when no outcome data)
   return getAdaptiveDailyPlanImport(day);
+}
+
+export function personalizeDailyPlan(
+  plan: DailyPlan,
+  onboardingData?: OnboardingData | null,
+): DailyPlan {
+  const focusReasons = getPersonalPracticeFocus(onboardingData);
+  if (focusReasons.length === 0) return plan;
+
+  return {
+    ...plan,
+    tasks: plan.tasks.map((task) => {
+      const personalReason = focusReasons.find((focus) => focus.taskTypes.includes(task.type));
+      if (!personalReason) return task;
+
+      return {
+        ...task,
+        reason: `${task.reason ?? getTaskReason(task.type, plan.day, plan.phase)} Personal focus: ${personalReason.reason}`,
+      };
+    }),
+  };
+}
+
+export function focusDailyPlanForMvp(plan: DailyPlan): DailyPlan {
+  return {
+    ...plan,
+    title: "Today's Speaking Rep",
+    tasks: [
+      {
+        title: "Daily Practice Session",
+        subtitle: "Breathe, use one technique, speak, then reflect",
+        duration: "10 min",
+        type: "warmup",
+        href: "/app/practice",
+        reason:
+          "This is the MVP core loop: one short, repeatable speaking rep every day.",
+      },
+      {
+        title: "AI Phone Call",
+        subtitle: "Practice a realistic call with block-aware pacing",
+        duration: "3-5 min",
+        type: "ai",
+        href: "/app/ai-practice/phone-call",
+        premium: true,
+        reason:
+          "Phone calls are a high-value exposure target, and short daily reps can reduce avoidance over time.",
+      },
+      {
+        title: "Technique Review",
+        subtitle: "Gentle onset, light contact, pausing, pull-outs, cancellations",
+        duration: "3 min",
+        type: "exercise",
+        href: "/app/techniques",
+        reason:
+          "Evidence-backed strategies work best when they are practiced before real speaking moments.",
+      },
+      {
+        title: "Feared Words",
+        subtitle: "Practice words you tend to avoid",
+        duration: "2 min",
+        type: "feared-words",
+        href: "/app/feared-words",
+        reason:
+          "Personal trigger words make practice specific to your actual speaking life.",
+      },
+    ],
+  };
+}
+
+function getPersonalPracticeFocus(onboardingData?: OnboardingData | null): {
+  taskTypes: TaskType[];
+  reason: string;
+}[] {
+  if (!onboardingData) return [];
+
+  const types = new Set(onboardingData.stutteringTypes ?? []);
+  const avoidance = new Set(onboardingData.avoidanceBehaviors ?? []);
+  const painPoints = new Set(onboardingData.painPoints ?? []);
+  const physical = new Set(onboardingData.physicalBehaviors ?? []);
+  const focus: { taskTypes: TaskType[]; reason: string }[] = [];
+
+  const hasBlock = hasAny(types, ["block", "blocks"]);
+  const hasProlongation = hasAny(types, ["prolongation", "prolongations"]);
+  const hasRepetition = hasAny(types, [
+    "repetitions",
+    "repetition",
+    "sound-repetition",
+    "syllable-repetition",
+    "whole-word-repetition",
+  ]);
+  const hasFillers = hasAny(types, ["interjection", "interjections"]);
+  const hasPhysical = physical.size > 0;
+  const hasAvoidance = avoidance.size > 0;
+  const hasTriedBefore = painPoints.has("tried-before");
+  const hasBusyPain = painPoints.has("busy");
+  const hasAlonePain = painPoints.has("alone");
+  const fearedWordCount = onboardingData.fearedWords?.length ?? 0;
+  const hasFearedWords = fearedWordCount > 0;
+  const wantsChallenge = onboardingData.practicePace === "challenge";
+  const hasFastSpeech =
+    onboardingData.fastOrUnclearSpeech === "often" ||
+    onboardingData.fastOrUnclearSpeech === "very-often";
+
+  if (hasBlock || hasPhysical) {
+    focus.push({
+      taskTypes: ["exercise", "audio-lab"],
+      reason: "your answers point to blocks or physical tension, so cancellation, pull-outs, airflow resets, and light contact deserve extra attention.",
+    });
+  }
+
+  if (hasProlongation) {
+    focus.push({
+      taskTypes: ["exercise", "warmup"],
+      reason: "you reported prolongations, so gentle onset, continuous airflow, and light articulatory contact are especially relevant.",
+    });
+  }
+
+  if (hasRepetition || hasFastSpeech) {
+    focus.push({
+      taskTypes: ["exercise", "audio-lab"],
+      reason: "you reported repetitions or fast/unclear speech, so pacing, rhythm reading, deliberate pausing, and metronome work get priority.",
+    });
+  }
+
+  if (hasFillers) {
+    focus.push({
+      taskTypes: ["warmup", "journal", "learn"],
+      reason: "you selected fillers or interjections, so planned pauses and message-focused speaking are useful practice targets.",
+    });
+  }
+
+  if (hasAvoidance) {
+    focus.push({
+      taskTypes: ["ai", "challenge", "feared-words", "mindfulness"],
+      reason: "you selected avoidance patterns, so gradual exposure, AI roleplay, feared-word practice, and CBT reflection matter most.",
+    });
+  }
+
+  if (hasTriedBefore) {
+    focus.push({
+      taskTypes: ["challenge", "ai", "feared-words"],
+      reason: "you said techniques have been hard to transfer into real conversations, so practice should connect skills to lifelike reps quickly.",
+    });
+  }
+
+  if (hasBusyPain) {
+    focus.push({
+      taskTypes: ["warmup", "exercise"],
+      reason: "you said time is tight, so short repeatable reps should do the heavy lifting.",
+    });
+  }
+
+  if (hasAlonePain) {
+    focus.push({
+      taskTypes: ["journal", "challenge", "mindfulness"],
+      reason: "you said this can feel lonely, so reflection, accountability, and low-pressure wins should stay visible.",
+    });
+  }
+
+  if (hasFearedWords) {
+    focus.push({
+      taskTypes: ["feared-words", "exercise", "ai"],
+      reason: `you named ${fearedWordCount} feared word${fearedWordCount === 1 ? "" : "s"}, so practice should start with your real trigger vocabulary.`,
+    });
+  }
+
+  if (wantsChallenge) {
+    focus.push({
+      taskTypes: ["challenge", "ai"],
+      reason: "you asked for a challenge-oriented pace, so real-world and simulated speaking reps can ramp sooner.",
+    });
+  }
+
+  return focus;
+}
+
+function hasAny(values: Set<string>, targets: string[]): boolean {
+  return targets.some((target) => values.has(target));
 }
 
 /** Get current phase info */

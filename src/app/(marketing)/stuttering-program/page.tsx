@@ -20,7 +20,7 @@ import { createMetadata, jsonLd } from "@/lib/seo";
 export const metadata = createMetadata({
   title: "AI Stuttering Program That Builds Real-World Confidence",
   description:
-    "Evidence-based stuttering program combining DAF, FAF, AI speech analysis, and daily structured practice. For kids and adults. Browser-based, no downloads.",
+    "Evidence-based stuttering program for adults 18+. DAF, FAF, AI speech analysis, and daily structured practice. Browser-based, no downloads.",
   path: "/stuttering-program",
 });
 
@@ -108,8 +108,8 @@ export default function StutteringTreatmentPage() {
           </h1>
           <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Practice the phone calls, meetings, and conversations that scare
-            you — with AI that adapts to your stuttering patterns. Build
-            real-world confidence 25 minutes a day, right in your browser.
+            you — with AI that adapts to your stuttering patterns. Built for
+            adults 18+. About 25 minutes a day, right in your browser.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button size="lg" className="px-8" asChild>

@@ -17,6 +17,7 @@ import {
   Zap,
   Target,
   ArrowRight,
+  Stethoscope,
 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -34,6 +35,11 @@ import {
 } from "recharts";
 import { TrendChart } from "./trend-chart";
 import { generateReportPDF } from "./ReportPDFGenerator";
+import {
+  ADULT_ONLY_NOTE,
+  getReferralReasons,
+  summarizeFluencyPatternGroups,
+} from "@/lib/clinical/adult-fluency";
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -128,22 +134,45 @@ export function getSeverityFromSSI4(total: number): {
 export function getRecommendations(
   disfluencyBreakdown?: Record<string, number>,
   percentSS?: number | null,
+  speakingRate?: number | null,
 ): { technique: string; reason: string; priority: "high" | "medium" | "low" }[] {
   const recs: { technique: string; reason: string; priority: "high" | "medium" | "low" }[] = [];
-  if (!disfluencyBreakdown) return recs;
+  if (!disfluencyBreakdown && speakingRate == null) return recs;
 
-  const total = Object.values(disfluencyBreakdown).reduce((s, v) => s + v, 0);
-  if (total === 0) return recs;
+  const total = Object.values(disfluencyBreakdown ?? {}).reduce((s, v) => s + v, 0);
+  if (total === 0 && speakingRate == null) return recs;
 
-  const blockCount = (disfluencyBreakdown["blocks"] || 0) + (disfluencyBreakdown["block"] || 0);
-  const prolongCount = (disfluencyBreakdown["prolongations"] || 0) + (disfluencyBreakdown["prolongation"] || 0);
-  const repetitionCount = (disfluencyBreakdown["repetitions"] || 0) + (disfluencyBreakdown["repetition"] || 0)
-    + (disfluencyBreakdown["sound_repetitions"] || 0) + (disfluencyBreakdown["word_repetitions"] || 0)
-    + (disfluencyBreakdown["syllable_repetitions"] || 0);
-  const interjectionCount = (disfluencyBreakdown["interjections"] || 0) + (disfluencyBreakdown["interjection"] || 0)
-    + (disfluencyBreakdown["fillers"] || 0);
+  const blockCount = getBreakdownCount(disfluencyBreakdown, ["blocks", "block"]);
+  const prolongCount = getBreakdownCount(disfluencyBreakdown, ["prolongations", "prolongation"]);
+  const repetitionCount = getBreakdownCount(disfluencyBreakdown, [
+    "repetitions",
+    "repetition",
+    "sound_repetitions",
+    "sound_repetition",
+    "sound-repetition",
+    "word_repetitions",
+    "word_repetition",
+    "whole-word-repetition",
+    "syllable_repetitions",
+    "syllable_repetition",
+    "syllable-repetition",
+  ]);
+  const interjectionCount = getBreakdownCount(disfluencyBreakdown, [
+    "interjections",
+    "interjection",
+    "fillers",
+    "filler",
+  ]);
+  const revisionCount = getBreakdownCount(disfluencyBreakdown, [
+    "revisions",
+    "revision",
+    "phrase_repetitions",
+    "phrase-repetition",
+    "pauses",
+    "hesitation",
+  ]);
 
-  if (blockCount / total > 0.2) {
+  if (total > 0 && blockCount / total > 0.2) {
     recs.push({
       technique: "Cancellation & Pull-out",
       reason: `${Math.round((blockCount / total) * 100)}% of disfluencies are blocks — these techniques help release and manage blocking moments.`,
@@ -151,27 +180,43 @@ export function getRecommendations(
     });
   }
 
-  if (prolongCount / total > 0.2) {
+  if (total > 0 && prolongCount / total > 0.2) {
     recs.push({
       technique: "Gentle Onset",
-      reason: `${Math.round((prolongCount / total) * 100)}% are prolongations — starting words with soft airflow prevents tension buildup.`,
+      reason: `${Math.round((prolongCount / total) * 100)}% are prolongations — soft airflow and light contact can reduce tension buildup.`,
       priority: "high",
     });
   }
 
-  if (repetitionCount / total > 0.3) {
+  if (total > 0 && repetitionCount / total > 0.3) {
     recs.push({
       technique: "Pacing & Rate Control",
-      reason: `${Math.round((repetitionCount / total) * 100)}% are repetitions — slower, deliberate rate reduces cycling on sounds.`,
+      reason: `${Math.round((repetitionCount / total) * 100)}% are repetitions — steadier rhythm and planned pauses can reduce cycling on sounds.`,
       priority: "high",
     });
   }
 
-  if (interjectionCount / total > 0.2) {
+  if (total > 0 && interjectionCount / total > 0.2) {
     recs.push({
       technique: "Pausing Strategy",
       reason: `${Math.round((interjectionCount / total) * 100)}% are interjections/fillers — replacing with deliberate pauses improves fluency.`,
       priority: "medium",
+    });
+  }
+
+  if (total > 0 && revisionCount / total > 0.4) {
+    recs.push({
+      technique: "Message-Focused Speaking",
+      reason: "Revisions and restarts suggest your practice should prioritize clear message planning over perfect wording.",
+      priority: "medium",
+    });
+  }
+
+  if (speakingRate != null && speakingRate > 220) {
+    recs.push({
+      technique: "Rate Control, Over-Articulation, Shadowing & Metronome",
+      reason: "Your speaking rate is elevated, so practice should emphasize clarity, pacing, and rhythm.",
+      priority: "high",
     });
   }
 
@@ -193,6 +238,14 @@ export function getRecommendations(
   }
 
   return recs;
+}
+
+function getBreakdownCount(
+  disfluencyBreakdown: Record<string, number> | undefined,
+  keys: string[],
+): number {
+  if (!disfluencyBreakdown) return 0;
+  return keys.reduce((sum, key) => sum + (disfluencyBreakdown[key] || 0), 0);
 }
 
 // ─── Chart Colors ────────────────────────────────────────────
@@ -283,7 +336,26 @@ export function ClinicalReport({
     : null;
 
   // ── Technique recommendations ──
-  const techniqueRecs = getRecommendations(analysis?.disfluency_breakdown, report.percentSS);
+  const techniqueRecs = getRecommendations(
+    analysis?.disfluency_breakdown,
+    report.percentSS,
+    report.speakingRate,
+  );
+  const patternGroups = summarizeFluencyPatternGroups(
+    analysis?.disfluency_breakdown,
+    prevAnalysis?.disfluency_breakdown,
+    report.speakingRate,
+  );
+  const referralReasons = getReferralReasons({
+    physicalBehaviors: (analysis?.vocal_effort ?? 0) > 0.5 ? ["vocal-effort"] : [],
+    impact:
+      report.severityRating === "Severe" || report.severityRating === "Very Severe"
+        ? "severe"
+        : null,
+    fastOrUnclearSpeech:
+      report.speakingRate != null && report.speakingRate > 220 ? "often" : undefined,
+    patternGroups,
+  });
 
   async function copyShareLink() {
     if (!report.shareToken) return;
@@ -336,6 +408,9 @@ export function ClinicalReport({
             </div>
           </div>
         </CardHeader>
+        <CardContent className="pt-0">
+          <p className="text-sm text-muted-foreground">{ADULT_ONLY_NOTE}</p>
+        </CardContent>
       </Card>
 
       {/* ─── SSI-4 Severity Matrix ─── */}
@@ -639,6 +714,81 @@ export function ClinicalReport({
                 </div>
               </div>
             )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ─── Adult Fluency Pattern Groups ─── */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <FileText className="h-4 w-4 text-primary" />
+            Adult Fluency Pattern Groups
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            These categories are practice insights, not a diagnosis. They help connect your speech
+            sample to the exercises most likely to be useful next.
+          </p>
+          <div className="space-y-2">
+            {patternGroups.map((group) => (
+              <div key={group.id} className="p-3 rounded-lg border bg-muted/20">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium">{group.label}</p>
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      {group.plainLanguage}
+                    </p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-lg font-bold">{group.count}</p>
+                    <Badge
+                      variant="secondary"
+                      className={`text-sm ${
+                        group.trend === "decreasing"
+                          ? "text-[#00E676] bg-[#00E676]/10"
+                          : group.trend === "increasing" || group.trend === "new"
+                            ? "text-[#FFB347] bg-[#FFB347]/10"
+                            : "text-muted-foreground"
+                      }`}
+                    >
+                      {group.trend}
+                    </Badge>
+                  </div>
+                </div>
+                {group.previousCount != null && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Previous report: {group.previousCount}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ─── SLP Referral Prompt ─── */}
+      {referralReasons.length > 0 && (
+        <Card className="border-amber-300/60 bg-amber-50 dark:bg-amber-950/20">
+          <CardHeader>
+            <CardTitle className="text-sm flex items-center gap-2 text-amber-950 dark:text-amber-100">
+              <Stethoscope className="h-4 w-4" />
+              Consider An SLP Check-In
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-amber-900/80 dark:text-amber-100/80">
+              A licensed Speech-Language Pathologist can help interpret these patterns and build a
+              treatment plan. StutterLab can continue supporting daily practice between visits.
+            </p>
+            <ul className="mt-2 space-y-1">
+              {referralReasons.map((reason) => (
+                <li key={reason} className="text-xs text-amber-900/80 dark:text-amber-100/80">
+                  {reason}
+                </li>
+              ))}
+            </ul>
           </CardContent>
         </Card>
       )}

@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { getAdaptiveDailyPlan } from "@/lib/curriculum/adaptive-engine";
+import type { TechniqueOutcomeSummary } from "@/lib/actions/user-progress";
 
 // ─── Adaptive Engine (Day 91+ Plans) ───
 
@@ -70,22 +71,25 @@ describe("getAdaptiveDailyPlan", () => {
   it("adjusts emphasis label based on weight", () => {
     const fluencyPlan = getAdaptiveDailyPlan(100, {
       recommendedWeight: 0.7,
-      fluencyShapingAvgScore: 80,
-      modificationAvgScore: 50,
+      fluencyShaping: categoryStats("fluency_shaping", 80),
+      modification: categoryStats("stuttering_modification", 50),
+      totalSessions: 10,
     });
     expect(fluencyPlan.phaseLabel).toContain("Fluency Shaping");
 
     const modPlan = getAdaptiveDailyPlan(100, {
       recommendedWeight: 0.3,
-      fluencyShapingAvgScore: 50,
-      modificationAvgScore: 80,
+      fluencyShaping: categoryStats("fluency_shaping", 50),
+      modification: categoryStats("stuttering_modification", 80),
+      totalSessions: 10,
     });
     expect(modPlan.phaseLabel).toContain("Modification");
 
     const balancedPlan = getAdaptiveDailyPlan(100, {
       recommendedWeight: 0.5,
-      fluencyShapingAvgScore: 65,
-      modificationAvgScore: 65,
+      fluencyShaping: categoryStats("fluency_shaping", 65),
+      modification: categoryStats("stuttering_modification", 65),
+      totalSessions: 10,
     });
     expect(balancedPlan.phaseLabel).toContain("Balanced");
   });
@@ -111,3 +115,15 @@ describe("getAdaptiveDailyPlan", () => {
     expect(audioTask?.premium).toBe(true);
   });
 });
+
+function categoryStats(
+  category: TechniqueOutcomeSummary["fluencyShaping"]["category"],
+  avgFluencyRating: number
+): TechniqueOutcomeSummary["fluencyShaping"] {
+  return {
+    category,
+    sessionCount: 5,
+    avgConfidenceDelta: 1,
+    avgFluencyRating,
+  };
+}

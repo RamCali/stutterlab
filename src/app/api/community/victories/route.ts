@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { communityVictories, userStats } from "@/lib/db/schema";
-import { getUserId } from "@/lib/auth/helpers";
+import { requireCommunityAccess } from "@/lib/community/access";
 import { desc, sql, eq } from "drizzle-orm";
 import { z } from "zod";
 import { checkRateLimit } from "@/lib/security/rate-limit";
@@ -29,6 +29,9 @@ const victorySchema = z.object({
 /** GET — fetch recent victories */
 export async function GET() {
   try {
+    const access = await requireCommunityAccess();
+    if (access.error) return access.error;
+
     const victories = await db
       .select()
       .from(communityVictories)
@@ -44,10 +47,9 @@ export async function GET() {
 /** POST — log a new victory */
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const access = await requireCommunityAccess();
+    if (access.error) return access.error;
+    const { userId } = access;
 
     const rate = checkRateLimit(`victory-post:${userId}`, 10, 60 * 60 * 1000);
     if (!rate.ok) {

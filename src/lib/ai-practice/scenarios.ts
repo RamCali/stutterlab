@@ -66,6 +66,60 @@ export const SCENARIO_TASKS: Record<string, ScenarioTask> = {
       },
     ],
   },
+  florist: {
+    scenario: "florist",
+    goal: "Place a simple flower order by phone.",
+    steps: [
+      { id: "hello", label: "Greet the florist", matcher: /\b(hello|hi|hey)\b/i },
+      {
+        id: "occasion",
+        label: "Say what the flowers are for",
+        matcher: /\b(birthday|anniversary|sympathy|wedding|gift|flowers|bouquet|arrangement)\b/i,
+      },
+      {
+        id: "details",
+        label: "Give a delivery or pickup detail",
+        matcher: /\b(delivery|deliver|pickup|pick up|today|tomorrow|morning|afternoon|address|date)\b/i,
+      },
+      {
+        id: "budget",
+        label: "Answer a budget or color question",
+        matcher: /\b(dollars?|budget|pink|red|white|yellow|blue|purple|bright|soft|small|medium|large)\b/i,
+      },
+      {
+        id: "close",
+        label: "Close the order politely",
+        matcher: /\b(thank you|thanks|bye|goodbye|that'?s all)\b/i,
+      },
+    ],
+  },
+  "customer-service": {
+    scenario: "customer-service",
+    goal: "Complete a bank-style customer service call.",
+    steps: [
+      { id: "hello", label: "Answer the representative", matcher: /\b(hello|hi|hey)\b/i },
+      {
+        id: "issue",
+        label: "Explain the account or card issue",
+        matcher: /\b(account|card|charge|payment|transaction|balance|deposit|withdrawal|issue|problem)\b/i,
+      },
+      {
+        id: "verify",
+        label: "Provide a requested detail",
+        matcher: /\b(name|number|address|email|phone|last four|date|yes|no)\b/i,
+      },
+      {
+        id: "confirm",
+        label: "Confirm next steps",
+        matcher: /\b(yes|correct|okay|ok|sounds good|please|confirm)\b/i,
+      },
+      {
+        id: "close",
+        label: "End politely",
+        matcher: /\b(thank you|thanks|bye|goodbye|have a good)\b/i,
+      },
+    ],
+  },
 };
 
 export function getScenarioTask(scenario: string): ScenarioTask | null {

@@ -8,10 +8,11 @@ import {
   Volume2,
   Loader2,
   CheckCircle2,
-  MessageSquare,
+  Phone,
 } from "lucide-react";
 import { LiveCoachOverlay } from "@/components/coaching/LiveCoachOverlay";
 import { useDeepgramSTT } from "@/hooks/useDeepgramSTT";
+import { Input } from "@/components/ui/input";
 
 interface SpeakStepProps {
   scenario: string;
@@ -19,9 +20,17 @@ interface SpeakStepProps {
 }
 
 const SCENARIO_LABELS: Record<string, { title: string; prompt: string }> = {
+  "phone-call": {
+    title: "Phone Call",
+    prompt: "Practice answering or making a short phone call.",
+  },
   "ordering-food": {
     title: "Ordering Food",
     prompt: "Practice ordering at a restaurant or coffee shop.",
+  },
+  "job-interview": {
+    title: "Job Interview",
+    prompt: "Practice one short interview answer with a patient listener.",
   },
   "small-talk": {
     title: "Small Talk",
@@ -46,6 +55,9 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
   const [speaking, setSpeaking] = useState(false);
   const [liveTranscript, setLiveTranscript] = useState("");
   const [statusText, setStatusText] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [callStatus, setCallStatus] = useState("");
+  const [calling, setCalling] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -302,7 +314,6 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
   useEffect(() => {
     if (listening) {
       const current = deepgram.transcript;
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLiveTranscript(current);
 
       // If transcript changed, user is speaking — reset silence timer
@@ -311,7 +322,6 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
         if (current.trim()) {
           hasSpokenRef.current = true;
           clearSilenceTimer();
-          // eslint-disable-next-line react-hooks/set-state-in-effect
           setStatusText("Listening — speak now...");
         }
       }
@@ -373,10 +383,46 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
     await speakText(fallback.content);
   }
 
+  async function startPracticeCall() {
+    if (!phoneNumber.trim() || calling) return;
+    setCalling(true);
+    setCallStatus("Starting your practice call...");
+
+    try {
+      const res = await fetch("/api/phone-practice/call", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phoneNumber: phoneNumber.trim(),
+          scenario,
+          blockAware: true,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setCallStatus(
+          data.error ||
+            "Phone calling is not configured yet. Use browser voice practice for now."
+        );
+        return;
+      }
+
+      setCallStatus(
+        data.mvpContact?.fromNumber
+          ? `Calling now. Save ${data.mvpContact.fromNumber} as StutterLab. After you hang up, tap Continue to reflect.`
+          : "Calling now. After you hang up, tap Continue to reflect."
+      );
+    } catch {
+      setCallStatus("Could not start the call. Use browser voice practice for now.");
+    } finally {
+      setCalling(false);
+    }
+  }
+
   /* ─── Waveform visualization ─── */
   useEffect(() => {
     if (!listening || !coachAnalyser) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setBars(Array(40).fill(3));
       return;
     }
@@ -416,19 +462,57 @@ export function SpeakStep({ scenario, onComplete }: SpeakStepProps) {
     return (
       <div className="flex flex-col items-center justify-center flex-1 py-8">
         <div className="p-4 rounded-full bg-primary/10 mb-4">
-          <MessageSquare className="h-8 w-8 text-primary" />
+          <Phone className="h-8 w-8 text-primary" />
         </div>
         <h2 className="text-xl font-semibold mb-2">{scenarioInfo.title}</h2>
         <p className="text-sm text-muted-foreground mb-2 text-center max-w-sm">
           {scenarioInfo.prompt}
         </p>
         <p className="text-sm text-muted-foreground mb-6 text-center max-w-xs">
-          Use your techniques from the previous step. The AI will speak first — then tap the mic to reply with your voice.
+          Use your technique from the previous step. Start with browser voice practice,
+          or have StutterLab call you from the MVP number.
         </p>
-        <Button size="lg" onClick={startConversation}>
-          <Volume2 className="h-5 w-5 mr-2" />
-          Start Voice Conversation
-        </Button>
+        <div className="w-full max-w-sm space-y-3">
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+            <p className="text-sm font-semibold mb-2">Practice by phone</p>
+            <p className="mb-2 text-xs text-muted-foreground">
+              Best effort during MVP. Save the caller as StutterLab after the first call.
+            </p>
+            <div className="flex gap-2">
+              <Input
+                type="tel"
+                value={phoneNumber}
+                onChange={(event) => setPhoneNumber(event.target.value)}
+                placeholder="+14155552671"
+                className="h-10"
+              />
+              <Button onClick={startPracticeCall} disabled={calling || !phoneNumber.trim()}>
+                {calling ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Phone className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            {callStatus && (
+              <p className="mt-2 text-sm text-muted-foreground">{callStatus}</p>
+            )}
+            {callStatus.startsWith("Calling now") && (
+              <Button
+                variant="outline"
+                className="mt-3 w-full"
+                onClick={onComplete}
+              >
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                Continue to Reflection
+              </Button>
+            )}
+          </div>
+          <Button size="lg" onClick={startConversation} className="w-full">
+            <Volume2 className="h-5 w-5 mr-2" />
+            Start Browser Voice Practice
+          </Button>
+        </div>
       </div>
     );
   }

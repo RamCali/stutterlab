@@ -21,7 +21,7 @@ import { createMetadata, jsonLd } from "@/lib/seo";
 export const metadata = createMetadata({
   title: "Stuttering Exercises - Daily Practice for Better Fluency",
   description:
-    "Free stuttering exercises you can practice daily. Gentle onset, breathing, prolonged speech, light contact, and more. Structured 90-day curriculum included.",
+    "Daily stuttering exercises for adults 18+. Gentle onset, breathing, prolonged speech, light contact, and more in a structured 90-day curriculum.",
   path: "/stuttering-exercises",
 });
 
@@ -256,38 +256,28 @@ export default function StutteringExercisesPage() {
         </div>
       </section>
 
-      {/* For kids and adults */}
+      {/* Adult-only exercises */}
       <section className="py-16 px-6 bg-muted/30">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-10">
-            Exercises for Everyone
+          <h2 className="text-3xl font-bold text-center mb-4">
+            Exercises for Adults 18+
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="border-0">
-              <CardContent className="pt-6">
-                <h3 className="font-semibold text-lg mb-3">For Kids</h3>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>Fun breathing games and activities</li>
-                  <li>Gentle onset with simple words</li>
-                  <li>Reading practice with DAF support</li>
-                  <li>Parent-guided exercises</li>
-                  <li>Progress rewards and streaks</li>
-                </ul>
-              </CardContent>
-            </Card>
-            <Card className="border-0">
-              <CardContent className="pt-6">
-                <h3 className="font-semibold text-lg mb-3">For Adults</h3>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>All 8 core exercises above</li>
-                  <li>AI phone call and conversation practice</li>
-                  <li>Feared word desensitization</li>
-                  <li>Real-world scenario challenges</li>
-                  <li>CBT & mindfulness for speaking anxiety</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
+          <p className="text-center text-muted-foreground max-w-2xl mx-auto mb-10">
+            StutterLab is built for adult daily practice. Pediatric fluency
+            concerns should be addressed with a licensed speech-language
+            pathologist.
+          </p>
+          <Card className="border-0 max-w-2xl mx-auto">
+            <CardContent className="pt-6">
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>All 8 core exercises above</li>
+                <li>AI phone call and conversation practice</li>
+                <li>Feared word desensitization</li>
+                <li>Real-world scenario challenges</li>
+                <li>CBT and mindfulness for speaking anxiety</li>
+              </ul>
+            </CardContent>
+          </Card>
         </div>
       </section>
 

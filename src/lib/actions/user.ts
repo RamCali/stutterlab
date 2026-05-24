@@ -98,8 +98,15 @@ export async function checkOnboardingStatus(): Promise<{
     name: string;
     severity: "mild" | "moderate" | "severe" | null;
     fearedSituations: string[];
+    fearedWords: string[];
+    wordReflection: string;
+    painPoints: string[];
     speechChallenges: string[];
     northStarGoal: string;
+    preferredPracticeTime: string | null;
+    practicePace: string | null;
+    coachingTone: string | null;
+    commitmentReason: string;
     confidenceRatings: Record<string, number>;
     avoidanceBehaviors: string[];
     stutteringTypes: string[];
@@ -107,6 +114,15 @@ export async function checkOnboardingStatus(): Promise<{
     stutterFrequency: string | null;
     stutterDuration: string | null;
     stutterImpact: string | null;
+    fluencyPersistence: string | null;
+    physicalBehaviors: string[];
+    fastOrUnclearSpeech: string | null;
+    familyHistory: string | null;
+    referralGuidance: {
+      shouldRecommendSlp: boolean;
+      urgency: "routine" | "recommended";
+      reasons: string[];
+    } | null;
     severityScore: number | null;
     confidenceScore: number | null;
   } | null;
@@ -136,8 +152,15 @@ export async function checkOnboardingStatus(): Promise<{
       name: (profile.displayName as string) || "",
       severity: profile.stutteringSeverity ?? null,
       fearedSituations: (tp.fearedSituations as string[]) || [],
+      fearedWords: (tp.fearedWords as string[]) || [],
+      wordReflection: (tp.wordReflection as string) || "",
+      painPoints: (tp.painPoints as string[]) || [],
       speechChallenges: (tp.speechChallenges as string[]) || [],
       northStarGoal: (tp.northStarGoal as string) || "",
+      preferredPracticeTime: (tp.preferredPracticeTime as string) || null,
+      practicePace: (tp.practicePace as string) || null,
+      coachingTone: (tp.coachingTone as string) || null,
+      commitmentReason: (tp.commitmentReason as string) || "",
       confidenceRatings: (tp.confidenceRatings as Record<string, number>) || {},
       avoidanceBehaviors: (tp.avoidanceBehaviors as string[]) || [],
       stutteringTypes: (tp.stutteringTypes as string[]) || [],
@@ -145,6 +168,15 @@ export async function checkOnboardingStatus(): Promise<{
       stutterFrequency: (tp.stutterFrequency as string) || null,
       stutterDuration: (tp.stutterDuration as string) || null,
       stutterImpact: (tp.stutterImpact as string) || null,
+      fluencyPersistence: (tp.fluencyPersistence as string) || null,
+      physicalBehaviors: (tp.physicalBehaviors as string[]) || [],
+      fastOrUnclearSpeech: (tp.fastOrUnclearSpeech as string) || null,
+      familyHistory: (tp.familyHistory as string) || null,
+      referralGuidance: (tp.referralGuidance as {
+        shouldRecommendSlp: boolean;
+        urgency: "routine" | "recommended";
+        reasons: string[];
+      }) || null,
       severityScore: (tp.severityScore as number) || null,
       confidenceScore: (tp.confidenceScore as number) || null,
     },

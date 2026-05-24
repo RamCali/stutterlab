@@ -4,12 +4,16 @@ import {
   communityChallenges,
   challengeParticipants,
 } from "@/lib/db/schema";
-import { getUserId } from "@/lib/auth/helpers";
+import { requireCommunityAccess } from "@/lib/community/access";
 import { eq, sql, and, gte } from "drizzle-orm";
 
 /** GET — fetch active challenges */
 export async function GET() {
   try {
+    const access = await requireCommunityAccess();
+    if (access.error) return access.error;
+    const { userId } = access;
+
     const now = new Date();
     const challenges = await db
       .select()
@@ -17,10 +21,9 @@ export async function GET() {
       .where(gte(communityChallenges.endDate, now));
 
     // Check user participation
-    const userId = await getUserId();
     const userParticipation: Record<string, number> = {};
 
-    if (userId && challenges.length > 0) {
+    if (challenges.length > 0) {
       const participations = await db
         .select()
         .from(challengeParticipants)
@@ -83,10 +86,9 @@ export async function GET() {
 /** POST — join a challenge or contribute */
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const access = await requireCommunityAccess();
+    if (access.error) return access.error;
+    const { userId } = access;
 
     const { challengeId, contribution } = await req.json();
 

@@ -15,17 +15,22 @@ import {
   Star,
   ClipboardCheck,
   Rocket,
+  Target,
 } from "lucide-react";
 import {
   FEARED_SITUATIONS,
   SPEECH_CHALLENGES,
   CONFIDENCE_SITUATIONS,
   AVOIDANCE_BEHAVIORS,
+  FAMILY_HISTORY_OPTIONS,
+  FAST_OR_UNCLEAR_SPEECH_OPTIONS,
+  FLUENCY_PERSISTENCE_OPTIONS,
+  PHYSICAL_BEHAVIORS,
   STUTTERING_TYPES,
   saveOnboardingData,
   type OnboardingData,
 } from "@/lib/onboarding/feared-situations";
-import { addFearedWord } from "@/lib/feared-words/store";
+import { seedFearedWords } from "@/lib/feared-words/store";
 import {
   calculateScores,
   getProfileDescription,
@@ -34,6 +39,7 @@ import {
 import { PHASE_LABELS } from "@/lib/curriculum/daily-plans";
 
 const SUGGESTED_WORDS = [
+  "my name",
   "specifically",
   "presentation",
   "schedule",
@@ -44,10 +50,77 @@ const SUGGESTED_WORDS = [
   "particularly",
 ];
 
-const TOTAL_STEPS = 8;
+const WORD_PROMPT_CATEGORIES = [
+  {
+    title: "Personal words",
+    prompts: "Your name, last name, company, school, city, street, email, job title",
+  },
+  {
+    title: "High-pressure words",
+    prompts: "Words you need for ordering, calls, interviews, meetings, dates, presentations",
+  },
+  {
+    title: "Sound patterns",
+    prompts: "Words starting with hard sounds like b, d, g, k, p, s, st, th, or vowels",
+  },
+];
+
+const PAIN_POINTS = [
+  {
+    id: "starting-over",
+    label: "I keep starting over",
+    description: "I get motivated, practice for a bit, then fall out of rhythm.",
+  },
+  {
+    id: "busy",
+    label: "I am busy and need something realistic",
+    description: "I do not have time for long sessions or complicated homework.",
+  },
+  {
+    id: "alone",
+    label: "I feel like I am doing this alone",
+    description: "I want structure, accountability, and a plan that sees the real me.",
+  },
+  {
+    id: "avoidance-cycle",
+    label: "Avoidance keeps winning",
+    description: "I skip calls, stay quiet, swap words, or let others speak for me.",
+  },
+  {
+    id: "pressure-moments",
+    label: "Pressure makes my speech harder",
+    description: "My speech changes when people are waiting, watching, or judging.",
+  },
+  {
+    id: "tried-before",
+    label: "I have tried things before",
+    description: "I know techniques, but I struggle to use them in real conversations.",
+  },
+];
+
+const PRACTICE_TIMES = [
+  { id: "morning", label: "Morning", desc: "Before the day starts" },
+  { id: "midday", label: "Midday", desc: "Between work or school blocks" },
+  { id: "evening", label: "Evening", desc: "After responsibilities settle" },
+  { id: "before-event", label: "Before speaking events", desc: "Right before calls, meetings, or classes" },
+];
+
+const PRACTICE_PACES = [
+  { id: "gentle", label: "Gentle ramp", desc: "Small wins first, then pressure" },
+  { id: "balanced", label: "Balanced", desc: "Technique plus real-world practice" },
+  { id: "challenge", label: "Challenge me", desc: "Faster exposure to hard situations" },
+];
+
+const COACHING_TONES = [
+  { id: "calm", label: "Calm", desc: "Grounded and reassuring" },
+  { id: "direct", label: "Direct", desc: "Clear, practical, no fluff" },
+  { id: "encouraging", label: "Encouraging", desc: "Motivating and confidence-focused" },
+];
+
+const TOTAL_STEPS = 10;
 
 interface OnboardingFlowProps {
-  onComplete: () => void;
+  onComplete: (data?: OnboardingData) => void;
 }
 
 export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
@@ -71,16 +144,30 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   // Step 4: Feared Words
   const [fearedWordInputs, setFearedWordInputs] = useState<string[]>([]);
   const [currentWordInput, setCurrentWordInput] = useState("");
+  const [wordReflection, setWordReflection] = useState("");
 
   // Step 5: Avoidance + Frequency
+  const [selectedPainPoints, setSelectedPainPoints] = useState<Set<string>>(new Set());
   const [avoidanceBehaviors, setAvoidanceBehaviors] = useState<Set<string>>(new Set());
   const [speakingFrequency, setSpeakingFrequency] = useState("");
 
-  // Step 6: Goals
+  // Step 6: Adult Fluency Context
+  const [fluencyPersistence, setFluencyPersistence] = useState("");
+  const [physicalBehaviors, setPhysicalBehaviors] = useState<Set<string>>(new Set());
+  const [fastOrUnclearSpeech, setFastOrUnclearSpeech] = useState("");
+  const [familyHistory, setFamilyHistory] = useState("");
+
+  // Step 7: Goals
   const [selectedChallenges, setSelectedChallenges] = useState<Set<string>>(new Set());
   const [goalText, setGoalText] = useState("");
 
-  // Step 7: Results
+  // Step 8: Practice fit + buy-in
+  const [preferredPracticeTime, setPreferredPracticeTime] = useState("");
+  const [practicePace, setPracticePace] = useState("");
+  const [coachingTone, setCoachingTone] = useState("");
+  const [commitmentReason, setCommitmentReason] = useState("");
+
+  // Step 9: Results
   const [scores, setScores] = useState<AssessmentScores | null>(null);
 
   function toggleSet(setter: React.Dispatch<React.SetStateAction<Set<string>>>, id: string) {
@@ -97,11 +184,18 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   }
 
   function addWord() {
-    const word = currentWordInput.trim().toLowerCase();
-    if (word && !fearedWordInputs.includes(word)) {
-      setFearedWordInputs((prev) => [...prev, word]);
-      setCurrentWordInput("");
-    }
+    addWordsFromText(currentWordInput);
+    setCurrentWordInput("");
+  }
+
+  function addWordsFromText(text: string) {
+    const words = text
+      .split(/[\n,;]+/)
+      .map((word) => word.trim().toLowerCase().replace(/\s+/g, " "))
+      .filter(Boolean);
+
+    if (words.length === 0) return;
+    setFearedWordInputs((prev) => Array.from(new Set([...prev, ...words])));
   }
 
   function removeWord(word: string) {
@@ -123,13 +217,18 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       stutteringTypes: Array.from(stutteringTypes),
       speakingFrequency,
       fearedSituations: Array.from(selectedFears),
+      fluencyPersistence,
+      physicalBehaviors: Array.from(physicalBehaviors),
+      fastOrUnclearSpeech,
+      familyHistory,
     };
   }
 
   function goToResults() {
+    addWordsFromText(currentWordInput);
     const result = calculateScores(buildScoringInput());
     setScores(result);
-    setStep(7);
+    setStep(9);
   }
 
   async function handleFinish() {
@@ -142,6 +241,13 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       severity: computed.severityLabel,
       speechChallenges: Array.from(selectedChallenges),
       northStarGoal: goalText.trim(),
+      fearedWords: fearedWordInputs,
+      wordReflection: wordReflection.trim(),
+      painPoints: Array.from(selectedPainPoints),
+      preferredPracticeTime,
+      practicePace,
+      coachingTone,
+      commitmentReason: commitmentReason.trim(),
       confidenceRatings,
       avoidanceBehaviors: Array.from(avoidanceBehaviors),
       stutteringTypes: Array.from(stutteringTypes),
@@ -151,12 +257,15 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       stutterImpact,
       severityScore: computed.severityScore,
       confidenceScore: computed.confidenceScore,
+      fluencyPersistence,
+      physicalBehaviors: Array.from(physicalBehaviors),
+      fastOrUnclearSpeech,
+      familyHistory,
+      referralGuidance: computed.referralGuidance,
     };
     saveOnboardingData(data);
 
-    for (const word of fearedWordInputs) {
-      addFearedWord(word);
-    }
+    seedFearedWords(fearedWordInputs);
 
     try {
       await fetch("/api/user/onboarding", {
@@ -169,6 +278,12 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           speechChallenges: Array.from(selectedChallenges),
           northStarGoal: goalText.trim(),
           fearedWords: fearedWordInputs,
+          wordReflection: wordReflection.trim(),
+          painPoints: Array.from(selectedPainPoints),
+          preferredPracticeTime,
+          practicePace,
+          coachingTone,
+          commitmentReason: commitmentReason.trim(),
           confidenceRatings,
           avoidanceBehaviors: Array.from(avoidanceBehaviors),
           stutteringTypes: Array.from(stutteringTypes),
@@ -178,6 +293,11 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           stutterImpact,
           severityScore: computed.severityScore,
           confidenceScore: computed.confidenceScore,
+          fluencyPersistence,
+          physicalBehaviors: Array.from(physicalBehaviors),
+          fastOrUnclearSpeech,
+          familyHistory,
+          referralGuidance: computed.referralGuidance,
           assessmentProfile: computed.profile,
           recommendedEmphasis: computed.recommendedEmphasis,
         }),
@@ -186,7 +306,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       // localStorage fallback is sufficient
     }
 
-    onComplete();
+    onComplete(data);
   }
 
   return (
@@ -212,6 +332,9 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               <h1 className="text-3xl font-bold">Speech Assessment</h1>
               <p className="text-muted-foreground mt-2">
                 Answer a few questions so we can build your personalized 90-day fluency program.
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                For adults 18+. This assessment guides practice and does not diagnose a fluency disorder.
               </p>
             </div>
 
@@ -343,28 +466,43 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 What types of disfluency do you experience?
               </label>
               <p className="text-sm text-muted-foreground mt-0.5 mb-2">Select all that apply.</p>
-              <div className="grid grid-cols-1 gap-2">
-                {STUTTERING_TYPES.map((type) => {
-                  const isSelected = stutteringTypes.has(type.id);
-                  return (
-                    <button
-                      key={type.id}
-                      onClick={() => toggleSet(setStutteringTypes, type.id)}
-                      className={`flex items-center gap-3 p-3 rounded-lg border text-left transition-all ${
-                        isSelected
-                          ? "border-primary bg-primary/5 ring-1 ring-primary/20"
-                          : "hover:border-primary/50"
-                      }`}
-                    >
-                      <span className="text-xl">{type.emoji}</span>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{type.label}</p>
-                        <p className="text-sm text-muted-foreground">{type.description}</p>
-                      </div>
-                      {isSelected && <Check className="h-4 w-4 text-primary flex-shrink-0" />}
-                    </button>
-                  );
-                })}
+              <div className="space-y-4">
+                {[
+                  { category: "typical", heading: "Typical speech breaks" },
+                  { category: "stutter-like", heading: "More stutter-like" },
+                ].map((group) => (
+                  <div key={group.category} className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      {group.heading}
+                    </p>
+                    <div className="grid grid-cols-1 gap-2">
+                      {STUTTERING_TYPES.filter((type) => type.category === group.category).map((type) => {
+                        const isSelected = stutteringTypes.has(type.id);
+                        return (
+                          <button
+                            key={type.id}
+                            onClick={() => toggleSet(setStutteringTypes, type.id)}
+                            className={`flex items-center gap-3 p-3 rounded-lg border text-left transition-all ${
+                              isSelected
+                                ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                                : "hover:border-primary/50"
+                            }`}
+                          >
+                            <span className="text-xl">{type.emoji}</span>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">{type.label}</p>
+                              <p className="text-sm text-muted-foreground">{type.description}</p>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                Example: {type.example}
+                              </p>
+                            </div>
+                            {isSelected && <Check className="h-4 w-4 text-primary flex-shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -383,7 +521,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
             {(!stutterFrequency || !stutterDuration || !stutterImpact) && (
               <p className="text-sm text-muted-foreground text-center">
-                Please answer all three questions above to continue.
+                Please answer the required questions above to continue.
               </p>
             )}
           </div>
@@ -520,23 +658,39 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         {step === 4 && (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-2xl font-bold">Any words that trip you up?</h2>
+              <h2 className="text-2xl font-bold">Which words make you scan ahead?</h2>
               <p className="text-muted-foreground mt-1 text-sm">
-                Type words you find difficult. We&apos;ll create personalized practice for each one.
+                Add the words you avoid, swap, rush, or tense up before. These seed your feared-word
+                drills from day one.
               </p>
             </div>
 
-            <div className="flex gap-2 max-w-sm mx-auto">
-              <Input
-                placeholder="Type a word..."
-                value={currentWordInput}
-                onChange={(e) => setCurrentWordInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && addWord()}
-                autoFocus
-              />
-              <Button size="sm" onClick={addWord} disabled={!currentWordInput.trim()}>
-                <Plus className="h-4 w-4" />
-              </Button>
+            <div className="grid gap-2">
+              {WORD_PROMPT_CATEGORIES.map((category) => (
+                <div key={category.title} className="rounded-lg border p-3">
+                  <p className="text-sm font-medium">{category.title}</p>
+                  <p className="text-sm text-muted-foreground mt-0.5">{category.prompts}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Add words or phrases</label>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Name, company, presentation, coffee..."
+                  value={currentWordInput}
+                  onChange={(e) => setCurrentWordInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && addWord()}
+                  autoFocus
+                />
+                <Button size="sm" onClick={addWord} disabled={!currentWordInput.trim()}>
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Separate multiple entries with commas. You can include short phrases like your full name.
+              </p>
             </div>
 
             {fearedWordInputs.length > 0 && (
@@ -554,6 +708,19 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 ))}
               </div>
             )}
+
+            <div>
+              <label className="text-sm font-medium">
+                What usually happens when one of these words is coming up?
+              </label>
+              <Textarea
+                placeholder="e.g., I switch words, look away, push harder, rush, or stop talking."
+                value={wordReflection}
+                onChange={(e) => setWordReflection(e.target.value)}
+                rows={3}
+                className="mt-1.5 resize-none"
+              />
+            </div>
 
             <div className="text-center">
               <p className="text-sm text-muted-foreground mb-2">
@@ -591,7 +758,13 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     {fearedWordInputs.length} word{fearedWordInputs.length !== 1 ? "s" : ""}
                   </Badge>
                 )}
-                <Button onClick={() => setStep(5)}>
+                <Button
+                  onClick={() => {
+                    addWordsFromText(currentWordInput);
+                    setCurrentWordInput("");
+                    setStep(5);
+                  }}
+                >
                   {fearedWordInputs.length === 0 ? "Skip" : "Continue"}
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
@@ -600,16 +773,48 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
         )}
 
-        {/* Step 5: Avoidance Behaviors + Speaking Frequency */}
+        {/* Step 5: Pain Points + Avoidance Behaviors + Speaking Frequency */}
         {step === 5 && (
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-2xl font-bold">
-                How does stuttering affect your daily life?
+                What feels most frustrating right now?
               </h2>
               <p className="text-muted-foreground mt-1 text-sm">
-                This helps us understand your avoidance patterns.
+                Tap every struggle that feels true. We use this to personalize your plan and keep it realistic.
               </p>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Which pain points sound like you?</label>
+              <div className="grid grid-cols-1 gap-2 mt-1.5">
+                {PAIN_POINTS.map((pain) => {
+                  const isSelected = selectedPainPoints.has(pain.id);
+                  return (
+                    <button
+                      key={pain.id}
+                      onClick={() => toggleSet(setSelectedPainPoints, pain.id)}
+                      className={`w-full p-3 rounded-lg border text-left transition-all ${
+                        isSelected
+                          ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                          : "hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium flex-1">{pain.label}</p>
+                        {isSelected && (
+                          <Badge variant="secondary" className="text-xs">
+                            That&apos;s my struggle
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        {pain.description}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <div>
@@ -667,7 +872,134 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
-              <Button onClick={() => setStep(6)}>
+              <Button
+                onClick={() => setStep(6)}
+                disabled={selectedPainPoints.size === 0}
+              >
+                Continue
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+            {selectedPainPoints.size === 0 && (
+              <p className="text-sm text-muted-foreground text-center">
+                Choose at least one pain point so your plan can reflect what matters most.
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Step 6: Adult Fluency Context */}
+        {step === 6 && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold">A little more context</h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                These adult-only questions help us tailor practice. They are not used for diagnosis.
+              </p>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">
+                How long have fluency difficulties been part of your life?
+              </label>
+              <div className="grid grid-cols-2 gap-2 mt-1.5">
+                {FLUENCY_PERSISTENCE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setFluencyPersistence(opt.id)}
+                    className={`p-3 rounded-lg border text-left transition-all ${
+                      fluencyPersistence === opt.id
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                        : "hover:border-primary/50"
+                    }`}
+                  >
+                    <p className="text-sm font-medium">{opt.label}</p>
+                    <p className="text-sm text-muted-foreground">{opt.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">
+                Do any physical behaviors happen during difficult speaking moments?
+              </label>
+              <p className="text-sm text-muted-foreground mt-0.5 mb-2">Select all that apply.</p>
+              <div className="space-y-2">
+                {PHYSICAL_BEHAVIORS.map((behavior) => {
+                  const isSelected = physicalBehaviors.has(behavior.id);
+                  return (
+                    <button
+                      key={behavior.id}
+                      onClick={() => toggleSet(setPhysicalBehaviors, behavior.id)}
+                      className={`w-full flex items-center gap-3 p-3 rounded-lg border text-left transition-all ${
+                        isSelected
+                          ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                          : "hover:border-primary/50"
+                      }`}
+                    >
+                      <span className="text-lg">{behavior.emoji}</span>
+                      <span className="text-sm flex-1">{behavior.label}</span>
+                      {isSelected && <Check className="h-4 w-4 text-primary flex-shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">
+                Do you ever speak faster or less clearly than you intend?
+              </label>
+              <div className="grid grid-cols-2 gap-2 mt-1.5">
+                {FAST_OR_UNCLEAR_SPEECH_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setFastOrUnclearSpeech(opt.id)}
+                    className={`p-3 rounded-lg border text-left transition-all ${
+                      fastOrUnclearSpeech === opt.id
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                        : "hover:border-primary/50"
+                    }`}
+                  >
+                    <p className="text-sm font-medium">{opt.label}</p>
+                    <p className="text-sm text-muted-foreground">{opt.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">
+                Does stuttering or cluttering run in your family?
+              </label>
+              <div className="grid grid-cols-3 gap-2 mt-1.5">
+                {FAMILY_HISTORY_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setFamilyHistory(opt.id)}
+                    className={`p-3 rounded-lg border text-left transition-all ${
+                      familyHistory === opt.id
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                        : "hover:border-primary/50"
+                    }`}
+                  >
+                    <p className="text-sm font-medium">{opt.label}</p>
+                    <p className="text-sm text-muted-foreground">{opt.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Button variant="ghost" size="sm" onClick={() => setStep(5)}>
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                Back
+              </Button>
+              <Button
+                onClick={() => setStep(7)}
+                disabled={!fluencyPersistence || !fastOrUnclearSpeech || !familyHistory}
+              >
                 Continue
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
@@ -675,8 +1007,8 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
         )}
 
-        {/* Step 6: Speech Goals / North Star */}
-        {step === 6 && (
+        {/* Step 7: Speech Goals / North Star */}
+        {step === 7 && (
           <div className="space-y-6">
             <div className="text-center">
               <Star className="h-10 w-10 text-primary mx-auto mb-3" />
@@ -729,11 +1061,110 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
 
             <div className="flex items-center justify-between">
-              <Button variant="ghost" size="sm" onClick={() => setStep(5)}>
+              <Button variant="ghost" size="sm" onClick={() => setStep(6)}>
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
-              <Button onClick={goToResults}>
+              <Button onClick={() => setStep(8)}>
+                Continue
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 8: Practice Fit + Buy-In */}
+        {step === 8 && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <Target className="h-10 w-10 text-primary mx-auto mb-3" />
+              <h2 className="text-2xl font-bold">Build a plan you&apos;ll actually use</h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                The best program is the one that fits your real life. These details shape your reminders,
+                challenge intensity, and coaching style.
+              </p>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">When are you most likely to practice?</label>
+              <div className="grid grid-cols-2 gap-2 mt-1.5">
+                {PRACTICE_TIMES.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setPreferredPracticeTime(opt.id)}
+                    className={`p-3 rounded-lg border text-left transition-all ${
+                      preferredPracticeTime === opt.id
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                        : "hover:border-primary/50"
+                    }`}
+                  >
+                    <p className="text-sm font-medium">{opt.label}</p>
+                    <p className="text-sm text-muted-foreground">{opt.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">What pace feels right for week one?</label>
+              <div className="grid grid-cols-1 gap-2 mt-1.5">
+                {PRACTICE_PACES.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setPracticePace(opt.id)}
+                    className={`p-3 rounded-lg border text-left transition-all ${
+                      practicePace === opt.id
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                        : "hover:border-primary/50"
+                    }`}
+                  >
+                    <p className="text-sm font-medium">{opt.label}</p>
+                    <p className="text-sm text-muted-foreground">{opt.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">How should StutterLab coach you?</label>
+              <div className="grid grid-cols-3 gap-2 mt-1.5">
+                {COACHING_TONES.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setCoachingTone(opt.id)}
+                    className={`p-3 rounded-lg border text-left transition-all ${
+                      coachingTone === opt.id
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                        : "hover:border-primary/50"
+                    }`}
+                  >
+                    <p className="text-sm font-medium">{opt.label}</p>
+                    <p className="text-sm text-muted-foreground">{opt.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm font-medium mb-2">Why is now the right time to work on this?</p>
+              <Textarea
+                placeholder="e.g., I want to stop avoiding calls before my new job starts."
+                value={commitmentReason}
+                onChange={(e) => setCommitmentReason(e.target.value)}
+                rows={3}
+                className="resize-none"
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Button variant="ghost" size="sm" onClick={() => setStep(7)}>
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                Back
+              </Button>
+              <Button
+                onClick={goToResults}
+                disabled={!preferredPracticeTime || !practicePace || !coachingTone}
+              >
                 See My Results
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
@@ -741,8 +1172,8 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
         )}
 
-        {/* Step 7: Results Screen */}
-        {step === 7 && scores && (
+        {/* Step 9: Results Screen */}
+        {step === 9 && scores && (
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-2xl font-bold">Your Speech Assessment</h2>
@@ -813,6 +1244,27 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               </CardContent>
             </Card>
 
+            {scores.referralGuidance.shouldRecommendSlp && (
+              <Card className="border-amber-300/60 bg-amber-50 dark:bg-amber-950/20">
+                <CardContent className="pt-5 pb-4">
+                  <p className="text-sm font-medium text-amber-950 dark:text-amber-100">
+                    We recommend involving a speech-language pathologist.
+                  </p>
+                  <p className="text-sm text-amber-900/80 dark:text-amber-100/80 mt-1">
+                    StutterLab can support adult practice, but these answers suggest a licensed
+                    SLP could provide helpful evaluation and guidance.
+                  </p>
+                  <ul className="mt-2 space-y-1">
+                    {scores.referralGuidance.reasons.map((reason) => (
+                      <li key={reason} className="text-xs text-amber-900/80 dark:text-amber-100/80">
+                        {reason}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            )}
+
             {/* 90-Day Roadmap Preview */}
             <div>
               <h3 className="text-lg font-bold mb-3">Your 90-Day Fluency Roadmap</h3>
@@ -862,8 +1314,30 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               </div>
             )}
 
+            {fearedWordInputs.length > 0 && (
+              <div className="rounded-lg border p-3">
+                <p className="text-sm font-medium">Your first feared-word drills</p>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  We&apos;ll start with these in word-level exposure, then move into phrases,
+                  sentences, and paragraphs.
+                </p>
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {fearedWordInputs.slice(0, 8).map((word) => (
+                    <Badge key={word} variant="secondary" className="text-xs">
+                      {word}
+                    </Badge>
+                  ))}
+                  {fearedWordInputs.length > 8 && (
+                    <Badge variant="outline" className="text-xs">
+                      +{fearedWordInputs.length - 8} more
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center justify-between">
-              <Button variant="ghost" size="sm" onClick={() => setStep(6)}>
+              <Button variant="ghost" size="sm" onClick={() => setStep(8)}>
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>

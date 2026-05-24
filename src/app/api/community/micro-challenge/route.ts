@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { microChallengeCompletions, userStats } from "@/lib/db/schema";
-import { getUserId } from "@/lib/auth/helpers";
+import { requireCommunityAccess } from "@/lib/community/access";
 import { eq, and, sql } from "drizzle-orm";
 
 /** GET — check if today's micro-challenge is completed */
 export async function GET() {
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ completed: false });
-    }
+    const access = await requireCommunityAccess();
+    if (access.error) return access.error;
+    const { userId } = access;
 
     const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
@@ -34,10 +33,9 @@ export async function GET() {
 /** POST — complete today's micro-challenge */
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const access = await requireCommunityAccess();
+    if (access.error) return access.error;
+    const { userId } = access;
 
     const { challengeTitle, technique } = await req.json();
     const today = new Date().toISOString().slice(0, 10);

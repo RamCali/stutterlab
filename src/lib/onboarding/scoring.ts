@@ -1,3 +1,12 @@
+import { STUTTER_LIKE_DISFLUENCY_IDS } from "@/lib/clinical/disfluency";
+import { getReferralReasons } from "@/lib/clinical/adult-fluency";
+
+export interface ReferralGuidance {
+  shouldRecommendSlp: boolean;
+  urgency: "routine" | "recommended";
+  reasons: string[];
+}
+
 /**
  * Assessment scoring algorithm for the Speech Assessment quiz funnel.
  * Produces severity + confidence scores and a user profile that
@@ -26,6 +35,7 @@ export interface AssessmentScores {
     stutteringModification: number;  // 0-1
     cbt: number;                     // 0-1
   };
+  referralGuidance: ReferralGuidance;
 }
 
 export interface ScoringInput {
@@ -40,6 +50,10 @@ export interface ScoringInput {
   stutteringTypes: string[];
   speakingFrequency: string;  // "rarely" | "sometimes" | "often" | "daily"
   fearedSituations: string[];
+  fluencyPersistence?: string;
+  physicalBehaviors?: string[];
+  fastOrUnclearSpeech?: string;
+  familyHistory?: string;
 }
 
 /* ─── Dimension scoring tables ─── */
@@ -81,11 +95,19 @@ export function calculateScores(data: ScoringInput): AssessmentScores {
   // Weighted composite: frequency 40%, duration 30%, impact 30%
   let severityScore = freqScore * 0.4 + durScore * 0.3 + impactScore * 0.3;
 
-  // Adjust for stuttering types (more types = more complex presentation)
-  severityScore += data.stutteringTypes.length * 3;
+  // Stutter-like disfluencies carry more clinical weight than typical speech breaks.
+  const stutterLikeCount = data.stutteringTypes.filter(isStutterLikeType).length;
+  const typicalCount = Math.max(0, data.stutteringTypes.length - stutterLikeCount);
+  severityScore += stutterLikeCount * 4 + typicalCount * 1;
 
   // Adjust for avoidance behaviors
   severityScore += data.avoidanceBehaviors.length * 2;
+
+  // Adult context signals nudge practice intensity and referral guidance.
+  severityScore += (data.physicalBehaviors?.length ?? 0) * 2;
+  if (data.fluencyPersistence === "worsening") severityScore += 4;
+  if (data.fastOrUnclearSpeech === "often") severityScore += 2;
+  if (data.fastOrUnclearSpeech === "very-often") severityScore += 4;
 
   // Adjust for speaking frequency (frequent speakers get small bonus)
   severityScore += SPEAKING_FREQ_ADJUSTMENT[data.speakingFrequency] ?? 0;
@@ -116,7 +138,25 @@ export function calculateScores(data: ScoringInput): AssessmentScores {
   const profile = determineProfile(confidenceScore, data.avoidanceBehaviors.length, severityScore);
 
   // --- Recommended Emphasis ---
-  const recommendedEmphasis = getEmphasis(profile);
+  const recommendedEmphasis = getEmphasis(profile, data);
+
+  const referralReasons = getReferralReasons({
+    persistence: data.fluencyPersistence,
+    avoidanceBehaviors: data.avoidanceBehaviors,
+    physicalBehaviors: data.physicalBehaviors,
+    impact: data.stutterImpact,
+    fastOrUnclearSpeech: data.fastOrUnclearSpeech,
+  });
+
+  const referralGuidance: ReferralGuidance = {
+    shouldRecommendSlp: referralReasons.length > 0,
+    urgency:
+      data.stutterImpact === "severe" ||
+      data.fluencyPersistence === "worsening"
+        ? "recommended"
+        : "routine",
+    reasons: referralReasons,
+  };
 
   // --- Derive severity label for DB enum ---
   const severityLabel: "mild" | "moderate" | "severe" =
@@ -128,7 +168,15 @@ export function calculateScores(data: ScoringInput): AssessmentScores {
     profile,
     severityLabel,
     recommendedEmphasis,
+    referralGuidance,
   };
+}
+
+function isStutterLikeType(type: string): boolean {
+  if (STUTTER_LIKE_DISFLUENCY_IDS.includes(type)) return true;
+
+  // Backwards compatibility for older onboarding payloads/tests.
+  return ["blocks", "prolongations", "repetitions"].includes(type);
 }
 
 function determineProfile(
@@ -142,8 +190,9 @@ function determineProfile(
   return "balanced";
 }
 
-function getEmphasis(profile: AssessmentProfile) {
-  switch (profile) {
+function getEmphasis(profile: AssessmentProfile, data: ScoringInput) {
+  const base = (() => {
+    switch (profile) {
     case "avoidance-heavy":
       return { fluencyShaping: 0.35, stutteringModification: 0.30, cbt: 0.35 };
     case "anxiety-heavy":
@@ -152,7 +201,44 @@ function getEmphasis(profile: AssessmentProfile) {
       return { fluencyShaping: 0.45, stutteringModification: 0.40, cbt: 0.15 };
     case "balanced":
       return { fluencyShaping: 0.40, stutteringModification: 0.35, cbt: 0.25 };
+    }
+  })();
+
+  if (data.fastOrUnclearSpeech === "often" || data.fastOrUnclearSpeech === "very-often") {
+    base.fluencyShaping += 0.08;
+    base.stutteringModification -= 0.04;
+    base.cbt -= 0.04;
   }
+
+  if ((data.physicalBehaviors?.length ?? 0) > 0) {
+    base.stutteringModification += 0.08;
+    base.fluencyShaping -= 0.04;
+    base.cbt -= 0.04;
+  }
+
+  return normalizeEmphasis(base);
+}
+
+function normalizeEmphasis(input: {
+  fluencyShaping: number;
+  stutteringModification: number;
+  cbt: number;
+}) {
+  const values = {
+    fluencyShaping: Math.max(0.05, input.fluencyShaping),
+    stutteringModification: Math.max(0.05, input.stutteringModification),
+    cbt: Math.max(0.05, input.cbt),
+  };
+  const total = values.fluencyShaping + values.stutteringModification + values.cbt;
+  return {
+    fluencyShaping: round(values.fluencyShaping / total),
+    stutteringModification: round(values.stutteringModification / total),
+    cbt: round(values.cbt / total),
+  };
+}
+
+function round(value: number): number {
+  return Math.round(value * 100) / 100;
 }
 
 /** Get a human-readable description for a profile */

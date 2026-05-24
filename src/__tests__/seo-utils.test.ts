@@ -32,7 +32,7 @@ describe("createMetadata", () => {
     expect(meta.openGraph?.title).toBe("OG Test");
     expect(meta.openGraph?.description).toBe("OG description");
     expect(meta.openGraph?.siteName).toBe("StutterLab");
-    expect(meta.openGraph?.type).toBe("website");
+    expect((meta.openGraph as Record<string, unknown> | undefined)?.type).toBe("website");
   });
 
   it("includes Twitter card data", () => {
@@ -41,7 +41,9 @@ describe("createMetadata", () => {
       description: "Twitter desc",
       path: "/twitter-test",
     });
-    expect(meta.twitter?.card).toBe("summary_large_image");
+    expect((meta.twitter as Record<string, unknown> | undefined)?.card).toBe(
+      "summary_large_image"
+    );
     expect(meta.twitter?.title).toBe("Twitter Test");
   });
 

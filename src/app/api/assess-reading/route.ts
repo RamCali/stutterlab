@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { requireAuth } from "@/lib/auth/helpers";
+import { isPremium } from "@/lib/auth/premium";
+import { checkRateLimit } from "@/lib/security/rate-limit";
 import { getPassage } from "@/lib/assessment/reading-passages";
 import {
   countSyllables,
@@ -16,6 +18,18 @@ const anthropic = new Anthropic();
 export async function POST(req: NextRequest) {
   try {
     const user = await requireAuth();
+    if (!(await isPremium(user.id))) {
+      return NextResponse.json({ error: "Premium subscription required" }, { status: 403 });
+    }
+
+    const rate = checkRateLimit(`assess-reading:${user.id}`, 10, 60 * 60 * 1000);
+    if (!rate.ok) {
+      return NextResponse.json(
+        { error: "Too many reading assessments. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const { passageId, transcription } = await req.json();
 
     if (!passageId || !transcription) {

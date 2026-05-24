@@ -14,7 +14,7 @@ export default function TermsPage() {
         Terms of Service
       </h1>
       <p className="text-muted-foreground mb-12">
-        Last updated: March 6, 2026
+        Last updated: May 24, 2026
       </p>
 
       <div className="prose prose-invert prose-teal max-w-none space-y-8">
@@ -34,9 +34,10 @@ export default function TermsPage() {
         <Section title="2. Description of Service">
           <p>
             StutterLab is an AI-powered speech training platform designed for
-            people who stutter. The Service provides a structured 90-day
-            program with daily exercises, AI speech coaching, progress tracking,
-            and community features to help users build speaking confidence.
+            adults 18 and older who stutter. The Service provides a structured
+            90-day program with daily exercises, AI speech coaching, progress
+            tracking, and community features to help users build speaking
+            confidence.
           </p>
           <p className="mt-3 font-semibold text-foreground">
             StutterLab is not a medical service, therapy, or substitute for
@@ -62,8 +63,10 @@ export default function TermsPage() {
             </li>
           </ul>
           <p className="mt-2">
-            You must be at least 13 years old to create an account. If you are
-            under 18, you must have parental or guardian consent.
+            You must be at least 18 years old to create an account and use
+            StutterLab. The Service is not intended for minors. Pediatric
+            fluency concerns should be addressed with a licensed
+            speech-language pathologist or other qualified healthcare provider.
           </p>
         </Section>
 

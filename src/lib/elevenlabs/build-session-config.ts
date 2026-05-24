@@ -5,48 +5,7 @@ import { db } from "@/lib/db/client";
 import { profiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { getPhonemeHeatmap, getTechniqueMastery, getTransferGaps } from "@/lib/actions/analytics";
-
-const SCENARIO_PROMPTS: Record<string, string> = {
-  "phone-call":
-    "You are a receptionist at a doctor's office. The user is calling to schedule an appointment. Be natural, ask relevant questions (name, preferred date/time, reason for visit). Be patient and kind.",
-  "job-interview":
-    "You are a friendly but professional hiring manager conducting a job interview. Ask common interview questions one at a time. Be encouraging. The user is practicing speaking fluently during interviews.",
-  "ordering-food":
-    "You are a barista/waiter at a coffee shop. Take the user's order naturally. Ask about size, additions, name for the order. Be casual and friendly.",
-  "class-presentation":
-    "You are a supportive audience member at a presentation. The user will present a topic. Ask a question or two after they finish. Be encouraging.",
-  "small-talk":
-    "You are at a casual social gathering. Start a light conversation with the user. Topics: weather, weekend plans, hobbies, movies. Be warm and easygoing.",
-  "shopping":
-    "You are a store employee. The user wants to return an item or ask about a product. Be helpful but ask for details like receipt, reason for return, etc.",
-  "asking-directions":
-    "You are a friendly stranger. The user is asking for directions to a place. Give clear but conversational directions. Ask if they need clarification.",
-  "customer-service":
-    "You are a customer service representative on a phone call. Help the user resolve an issue with their account/order. Ask for details, be professional.",
-  "meeting-intro":
-    "You are at a professional meeting. The user is introducing themselves. React naturally, ask a follow-up question about their role or background.",
-};
-
-const FIRST_MESSAGES: Record<string, string> = {
-  "phone-call":
-    "Hello, thank you for calling Dr. Johnson's office. How can I help you today?",
-  "job-interview":
-    "Hi, welcome! Thanks for coming in today. Why don't you start by telling me a little about yourself?",
-  "ordering-food":
-    "Hi there! Welcome to The Daily Grind. What can I get started for you?",
-  "class-presentation":
-    "Hi! I'm excited to hear your presentation. Whenever you're ready, go ahead.",
-  "small-talk":
-    "Hey! Great to see you here. How's your week been going?",
-  "shopping":
-    "Hi there, welcome! Is there something I can help you find today?",
-  "asking-directions":
-    "Oh hey, sure thing! Where are you trying to get to?",
-  "customer-service":
-    "Thank you for calling customer support. My name is Alex. How can I help you today?",
-  "meeting-intro":
-    "Welcome to the team meeting! We'd love to hear a quick introduction from you.",
-};
+import { getVoicePersonaForScenario } from "@/lib/voice/personas";
 
 const STRESS_PROMPTS: Record<number, string> = {
   1: `STRESS SIMULATION (Level 1 — Mild):
@@ -89,14 +48,17 @@ Adapt naturally: if they're practicing a feared situation, be extra patient and 
     // Goal fetch is non-critical
   }
 
-  const scenarioPrompt =
-    SCENARIO_PROMPTS[scenario] ||
-    "You are a friendly conversation partner. Have a natural conversation with the user.";
+  const persona = getVoicePersonaForScenario(scenario);
+  const scenarioPrompt = [
+    persona.scenarioPrompt,
+    `Voice persona: ${persona.label}. Role: ${persona.role}. Pace: ${persona.pace}. Affect: ${persona.affect}.`,
+    "Sound like the selected real-world role, not like a generic AI therapist.",
+    "Use natural spoken texture: short confirmations, realistic wording, and concise turns.",
+  ].join("\n");
 
   const stressContext = stressLevel ? STRESS_PROMPTS[stressLevel] || "" : "";
 
-  const firstMessage =
-    FIRST_MESSAGES[scenario] || "Hi there! How are you doing today?";
+  const firstMessage = persona.firstMessage;
 
   // Fetch intelligence context (non-critical — continue without it if fails)
   let phonemeContext = "";
@@ -162,6 +124,10 @@ If the user stutters, do NOT react differently. If they're quiet, give space wit
       phoneme_context: phonemeContext,
       technique_context: techniqueContext,
       transfer_context: transferContext,
+      voice_persona: persona.label,
+      voice_role: persona.role,
+      voice_pace: persona.pace,
+      voice_affect: persona.affect,
     },
   };
 }

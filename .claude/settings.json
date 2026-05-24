@@ -27,7 +27,9 @@
       "WebSearch",
       "Bash(npx next:*)",
       "Bash(sed -i '' 's/^STRIPE_PRICE_ID_PREMIUM_MONTHLY=.*/STRIPE_PRICE_ID_PREMIUM_MONTHLY=price_1T6wSKDQ3dxBuCnuMRyOOnFL/' .env)",
-      "Bash(sed -i '' 's/^STRIPE_PRICE_ID_PREMIUM_YEARLY=.*/STRIPE_PRICE_ID_PREMIUM_YEARLY=price_1T6wVRDQ3dxBuCnufvCpwEXH/' .env)"
+      "Bash(sed -i '' 's/^STRIPE_PRICE_ID_PREMIUM_YEARLY=.*/STRIPE_PRICE_ID_PREMIUM_YEARLY=price_1T6wVRDQ3dxBuCnufvCpwEXH/' .env)",
+      "Bash(grep -c \"tanstack\" package.json package-lock.json)",
+      "Bash(ls node_modules/@tanstack)"
     ],
     "additionalDirectories": [
       "/Users/RamG/Downloads/Projects (DND)/StutterLab/src/app/api/klaviyo"

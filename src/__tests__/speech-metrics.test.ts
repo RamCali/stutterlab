@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
+  classifyDisfluencies,
+  cleanTranscriptForSummary,
   countDisfluencies,
   estimateSyllables,
 } from "@/lib/audio/speech-metrics";
@@ -50,6 +52,44 @@ describe("countDisfluencies", () => {
 
   it("handles multiple fillers in sequence", () => {
     expect(countDisfluencies("um uh er ah")).toBe(4);
+  });
+});
+
+describe("classifyDisfluencies", () => {
+  it("separates typical transcript disfluencies from stutter-like patterns", () => {
+    const metrics = classifyDisfluencies("um I I saw a b-b-ball");
+    expect(metrics.fillerCount).toBe(1);
+    expect(metrics.wholeWordRepetitionCount).toBe(1);
+    expect(metrics.possibleSoundRepetitionCount).toBe(1);
+    expect(metrics.typical).toBe(2);
+    expect(metrics.stutterLike).toBe(1);
+    expect(metrics.total).toBe(3);
+  });
+
+  it("detects possible syllable repetitions when transcripts preserve hyphens", () => {
+    const metrics = classifyDisfluencies("I want the ba-ba-ball");
+    expect(metrics.possibleSyllableRepetitionCount).toBe(1);
+    expect(metrics.stutterLike).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe("cleanTranscriptForSummary", () => {
+  it("removes non-meaningful repeated words", () => {
+    expect(cleanTranscriptForSummary("it's, it's very good")).toBe("it's very good");
+  });
+
+  it("preserves meaningful emphatic repetitions", () => {
+    expect(cleanTranscriptForSummary("Yes, yes, it's, it's very good")).toBe(
+      "Yes, yes, it's very good"
+    );
+  });
+
+  it("edits down overused verbal tics while leaving natural flavor", () => {
+    expect(
+      cleanTranscriptForSummary(
+        "I was you know thinking that you know this is sort of useful sort of"
+      )
+    ).toBe("I was, you know, thinking that this is, sort of, useful");
   });
 });
 

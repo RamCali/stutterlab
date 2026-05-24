@@ -1,7 +1,7 @@
 /**
  * DeepgramStreamingClient — Real-time speech-to-text via Deepgram WebSocket
  *
- * Replaces the browser's Web Speech API with Deepgram Nova-2 for
+ * Replaces the browser's Web Speech API with Deepgram Nova-3 for
  * cross-browser, higher-accuracy transcription tuned for stuttering.
  *
  * Flow:
@@ -44,7 +44,7 @@ export interface DeepgramClientConfig {
 
 const DEFAULT_CONFIG: Required<DeepgramClientConfig> = {
   language: "en-US",
-  model: "nova-2",
+  model: "nova-3",
   interimResults: true,
   smartFormat: true,
   punctuate: true,

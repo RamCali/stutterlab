@@ -138,9 +138,9 @@ A comprehensive web platform that gives users their "SLP in their pocket" — co
 
 ## 4. Core Features
 
-### 4.1 Onboarding / Speech Assessment (8 Steps)
+### 4.1 Onboarding / Speech Assessment (10 Steps)
 
-Users complete an 8-step "Speech Assessment" that produces personalized severity and confidence scores, determines their stuttering profile, and customizes their 90-day program emphasis.
+Users complete a detailed "Speech Assessment" that produces personalized severity and confidence scores, determines their stuttering profile, captures emotional pain points, and customizes their 90-day program emphasis.
 
 | Step | Screen | Data Collected |
 |------|--------|----------------|
@@ -149,9 +149,16 @@ Users complete an 8-step "Speech Assessment" that produces personalized severity
 | 2 | Confidence Rating | `confidenceRatings` — rate 8 situations 1-5 (phone calls, ordering food, job interviews, presentations, small talk, asking directions, doctor appointments, meeting new people) |
 | 3 | Feared Situations | `fearedSituations` — select from predefined list |
 | 4 | Feared Words | `fearedWords` — enter specific trigger words |
-| 5 | Avoidance Behaviors + Speaking Frequency | `avoidanceBehaviors` (word substitution, avoiding phone calls, etc.), `speakingFrequency` |
-| 6 | Speech Goals / North Star | `goals` — user's personal speaking goal |
-| 7 | Results Screen | Displays: severity score (1-100), confidence score (1-100), profile type, personalized 90-day roadmap preview, "Begin Your Program" CTA |
+| 5 | Pain Points + Avoidance Behaviors + Speaking Frequency | `painPoints` (busy, restarting, alone, avoidance cycle, pressure moments, tried before), `avoidanceBehaviors`, `speakingFrequency` |
+| 6 | Adult Fluency Context | `fluencyPersistence`, `physicalBehaviors`, `fastOrUnclearSpeech`, `familyHistory` |
+| 7 | Speech Goals / North Star | `goals` — user's personal speaking goal |
+| 8 | Practice Fit + Buy-In | `preferredPracticeTime`, `practicePace`, `coachingTone`, `commitmentReason` |
+| 9 | Results Screen | Displays: severity score (1-100), confidence score (1-100), profile type, feared-word drill preview, personalized 90-day roadmap preview, "Begin Your Program" CTA |
+
+**Conversion Psychology:**
+- Pain point screen uses acceptance copy ("That's my struggle") to help users feel seen and increase commitment.
+- Results screen reflects back feared words, real-life goals, and practice preferences before the program begins.
+- Future paywall should be shown as the next step into the personalized plan, not a generic feature gate.
 
 **Scoring Algorithm** (`src/lib/onboarding/scoring.ts`):
 - **Severity Score (1-100):** Base from self-report (mild=25, moderate=50, severe=75), adjusted by stuttering types count, avoidance behaviors, speaking frequency

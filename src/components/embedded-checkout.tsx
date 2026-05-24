@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   EmbeddedCheckoutProvider,
@@ -30,6 +30,12 @@ export function EmbeddedCheckoutDialog({
   onOpenChange,
   interval,
 }: EmbeddedCheckoutDialogProps) {
+  useEffect(() => {
+    if (open) {
+      trackProductEvent("checkout_started", { interval, surface: "dialog" });
+    }
+  }, [open, interval]);
+
   const fetchClientSecret = useCallback(async () => {
     trackProductEvent("checkout_session_requested", { interval, surface: "dialog" });
     const res = await fetch("/api/stripe/checkout", {

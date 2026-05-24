@@ -66,9 +66,31 @@ export default function FindSLPPage() {
           Find an SLP
         </h1>
         <p className="text-muted-foreground mt-1">
-          Connect with Speech-Language Pathologists who specialize in stuttering
+          Connect with Speech-Language Pathologists who specialize in adult fluency
         </p>
       </div>
+
+      <Card className="border-amber-300/60 bg-amber-50 dark:bg-amber-950/20">
+        <CardContent className="py-4">
+          <p className="text-sm font-medium text-amber-950 dark:text-amber-100">
+            Consider an SLP check-in if any of these fit
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+            {[
+              "Longstanding or worsening fluency concerns",
+              "Strong avoidance of words or situations",
+              "Speech-linked physical behaviors",
+              "Significant work, social, or emotional impact",
+              "Fast or hard-to-understand speech patterns",
+            ].map((item) => (
+              <div key={item} className="flex items-start gap-2 text-sm text-amber-900/80 dark:text-amber-100/80">
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-amber-500 flex-shrink-0" />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Search */}
       <div className="relative">
@@ -136,7 +158,7 @@ export default function FindSLPPage() {
       </div>
 
       <p className="text-xs text-muted-foreground text-center">
-        All listed SLPs hold CCC-SLP certification and specialize in fluency disorders.
+        All listed SLPs hold CCC-SLP certification and specialize in adult fluency disorders.
       </p>
     </div>
   );

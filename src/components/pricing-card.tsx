@@ -16,6 +16,7 @@ const features = [
   "Feared Words Trainer",
   "CBT & Mindfulness module",
   "Real-world challenges with XP & streaks",
+  "Private member community with wins & accountability",
   "Voice Journal with AI fluency scoring",
   "Clinical progress reports",
 ];

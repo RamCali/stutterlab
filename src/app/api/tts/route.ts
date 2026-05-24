@@ -1,10 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/helpers";
+import { isPremium } from "@/lib/auth/premium";
+import { checkRateLimit } from "@/lib/security/rate-limit";
+import { getProviderVoice, getServerVoicePersona } from "@/lib/voice/server-personas";
 
 export async function POST(req: NextRequest) {
   try {
-    await requireAuth();
-    const { text, voiceId } = await req.json();
+    const user = await requireAuth();
+    if (!(await isPremium(user.id))) {
+      return NextResponse.json({ error: "Premium subscription required" }, { status: 403 });
+    }
+
+    const rate = checkRateLimit(`tts:${user.id}`, 60, 60 * 60 * 1000);
+    if (!rate.ok) {
+      return NextResponse.json(
+        { error: "Too many text-to-speech requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
+    const { text, voiceId, scenario, therapistMode } = await req.json();
 
     if (!text) {
       return NextResponse.json({ error: "No text provided" }, { status: 400 });
@@ -13,7 +28,14 @@ export async function POST(req: NextRequest) {
     // ElevenLabs TTS (high quality, natural voice)
     const apiKey = process.env.ELEVENLABS_API_KEY;
     if (apiKey) {
-      const defaultVoiceId = process.env.ELEVENLABS_VOICE_ID || "21m00Tcm4TlvDq8ikWAM";
+      const persona = getServerVoicePersona(
+        typeof scenario === "string" ? scenario : undefined,
+        therapistMode === true
+      );
+      const defaultVoiceId = getProviderVoice("elevenLabsTts", persona);
+      const stability =
+        persona.pace === "brisk" ? 0.38 : persona.pace === "slow" ? 0.7 : 0.55;
+      const style = persona.pace === "brisk" ? 0.35 : 0.15;
 
       const response = await fetch(
         `https://api.elevenlabs.io/v1/text-to-speech/${voiceId || defaultVoiceId}`,
@@ -27,9 +49,9 @@ export async function POST(req: NextRequest) {
             text,
             model_id: "eleven_turbo_v2_5",
             voice_settings: {
-              stability: 0.5,
+              stability,
               similarity_boost: 0.75,
-              style: 0.0,
+              style,
               use_speaker_boost: true,
             },
           }),

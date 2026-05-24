@@ -1,54 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { Check, LineChart, Settings, Play } from "lucide-react";
-import { getDaysForWeek, getWeekForDay } from "@/lib/curriculum/weeks";
-import { cn } from "@/lib/utils";
-
-const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
+import { Brain, Home, LineChart, MicVocal, Play, Settings } from "lucide-react";
 
 interface MobileWeekNavProps {
   currentDay: number;
 }
 
-export function MobileWeekNav({ currentDay }: MobileWeekNavProps) {
-  const currentWeek = getWeekForDay(currentDay);
-  const days = getDaysForWeek(currentWeek, currentDay);
+export function MobileWeekNav(_props: MobileWeekNavProps) {
+  void _props;
 
   return (
     <div className="border-t border-border/60 bg-card pb-safe">
-      {/* Day selector strip */}
-      <div className="flex justify-around px-3 pt-2 pb-1">
-        {days.map((day, i) => (
-          <Link
-            key={day.dayNumber}
-            href={day.isLocked ? "#" : "/app/practice"}
-            onClick={(e) => day.isLocked && e.preventDefault()}
-            className="flex flex-col items-center gap-0.5"
-          >
-            <span className="text-xs text-muted-foreground">
-              {DAY_LABELS[i] || "D"}
-            </span>
-            <div
-              className={cn(
-                "h-8 w-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all",
-                day.isCompleted && "bg-primary/10 text-primary",
-                day.isCurrent && "bg-primary text-primary-foreground",
-                day.isLocked && "bg-muted/50 text-muted-foreground/30"
-              )}
-            >
-              {day.isCompleted ? (
-                <Check className="h-3 w-3" />
-              ) : (
-                day.dayNumber
-              )}
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      {/* Action bar */}
-      <div className="flex justify-around px-4 py-1.5 border-t border-border/40">
+      <div className="flex justify-around px-3 py-2">
+        <Link
+          href="/app/dashboard"
+          className="flex flex-col items-center gap-0.5 text-muted-foreground"
+        >
+          <Home className="h-5 w-5" />
+          <span className="text-xs font-medium">Home</span>
+        </Link>
         <Link
           href="/app/practice"
           className="flex flex-col items-center gap-0.5 text-primary"
@@ -62,6 +33,20 @@ export function MobileWeekNav({ currentDay }: MobileWeekNavProps) {
         >
           <LineChart className="h-5 w-5" />
           <span className="text-xs font-medium">Progress</span>
+        </Link>
+        <Link
+          href="/app/ai-practice"
+          className="flex flex-col items-center gap-0.5 text-muted-foreground"
+        >
+          <Brain className="h-5 w-5" />
+          <span className="text-xs font-medium">AI</span>
+        </Link>
+        <Link
+          href="/app/feared-words"
+          className="flex flex-col items-center gap-0.5 text-muted-foreground"
+        >
+          <MicVocal className="h-5 w-5" />
+          <span className="text-xs font-medium">Words</span>
         </Link>
         <Link
           href="/app/settings"

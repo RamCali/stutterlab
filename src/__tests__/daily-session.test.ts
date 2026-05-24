@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import type { TechniqueOutcomeSummary } from "@/lib/actions/user-progress";
 import {
   getTodaysTechnique,
   getAdaptiveTechnique,
@@ -60,8 +61,9 @@ describe("getAdaptiveTechnique", () => {
     // With high fluency shaping weight, should mostly pick FS techniques
     const fsTechnique = getAdaptiveTechnique(35, {
       recommendedWeight: 0.95,
-      fluencyShapingAvgScore: 80,
-      modificationAvgScore: 50,
+      fluencyShaping: categoryStats("fluency_shaping", 80),
+      modification: categoryStats("stuttering_modification", 50),
+      totalSessions: 10,
     });
     expect(fsTechnique.category).toBeTruthy(); // Should return a valid technique
   });
@@ -76,6 +78,18 @@ describe("getAdaptiveTechnique", () => {
     expect(getAdaptiveTechnique(45).id).toBe(getAdaptiveTechnique(45).id);
   });
 });
+
+function categoryStats(
+  category: TechniqueOutcomeSummary["fluencyShaping"]["category"],
+  avgFluencyRating: number
+): TechniqueOutcomeSummary["fluencyShaping"] {
+  return {
+    category,
+    sessionCount: 5,
+    avgConfidenceDelta: 1,
+    avgFluencyRating,
+  };
+}
 
 describe("getTechniqueById", () => {
   it("returns correct technique for valid IDs", () => {
@@ -130,15 +144,15 @@ describe("getContentLevel", () => {
 // ─── Scenario Rotation ───
 
 describe("getScenarioForDay", () => {
-  it("cycles through 3 easy scenarios", () => {
+  it("cycles through 3 MVP scenarios", () => {
     const scenarios = new Set<string>();
     for (let day = 1; day <= 3; day++) {
       scenarios.add(getScenarioForDay(day));
     }
     expect(scenarios.size).toBe(3);
+    expect(scenarios).toContain("phone-call");
     expect(scenarios).toContain("ordering-food");
-    expect(scenarios).toContain("small-talk");
-    expect(scenarios).toContain("asking-directions");
+    expect(scenarios).toContain("job-interview");
   });
 
   it("is deterministic", () => {

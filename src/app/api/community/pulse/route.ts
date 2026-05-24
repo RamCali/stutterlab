@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { userStats, sessions, speechSituations } from "@/lib/db/schema";
+import { requireCommunityAccess } from "@/lib/community/access";
 import { sql, gte } from "drizzle-orm";
 
 export async function GET() {
   try {
+    const access = await requireCommunityAccess();
+    if (access.error) return access.error;
+
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 

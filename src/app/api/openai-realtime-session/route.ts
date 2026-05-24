@@ -1,14 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/helpers";
 import { isPremium } from "@/lib/auth/premium";
 import { checkRateLimit } from "@/lib/security/rate-limit";
 import { fetchWithTimeout } from "@/lib/observability/timeout";
 import { logError, measureAsync } from "@/lib/observability/logger";
+import { getProviderVoice, getServerVoicePersona } from "@/lib/voice/server-personas";
 
 const DEFAULT_MODEL = "gpt-realtime";
 const DEFAULT_VOICE = "alloy";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
     const user = await requireAuth();
 
@@ -36,8 +37,15 @@ export async function POST() {
       );
     }
 
+    const body = await request.json().catch(() => ({}));
+    const scenario = typeof body.scenario === "string" ? body.scenario : undefined;
+    const therapistMode = body.therapistMode === true;
+    const language = typeof body.language === "string" ? body.language : "";
+    const country = typeof body.country === "string" ? body.country : "";
+    const accent = typeof body.accent === "string" ? body.accent : "";
+    const persona = getServerVoicePersona(scenario, therapistMode);
     const model = process.env.OPENAI_REALTIME_MODEL || DEFAULT_MODEL;
-    const voice = process.env.OPENAI_REALTIME_VOICE || DEFAULT_VOICE;
+    const voice = getProviderVoice("openai", persona) || DEFAULT_VOICE;
 
     const response = await measureAsync(
       "provider.openai.realtime_session",
@@ -55,6 +63,15 @@ export async function POST() {
               session: {
                 type: "realtime",
                 model,
+                instructions: [
+                  persona.scenarioPrompt,
+                  `Voice persona: ${persona.label}. Role: ${persona.role}. Pace: ${persona.pace}. Affect: ${persona.affect}.`,
+                  language || country || accent
+                    ? `Locale adaptation: preferred language=${language || "unspecified"}, country/region=${country || "unspecified"}, accent/dialect=${accent || "unspecified"}. Use local phrasing where appropriate without stereotyping.`
+                    : "",
+                  "Keep spoken turns concise and natural. Ask one question at a time.",
+                  "Do not mention stuttering, blocks, or techniques during roleplay.",
+                ].filter(Boolean).join("\n"),
                 audio: {
                   output: { voice },
                 },
@@ -81,6 +98,7 @@ export async function POST() {
       provider: "openai",
       model,
       voice,
+      persona: persona.id,
       clientSecret: data.value,
       expiresAt: data.expires_at,
     });

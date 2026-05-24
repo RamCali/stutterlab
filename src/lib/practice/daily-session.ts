@@ -153,7 +153,7 @@ export function getContentLevel(
   return "paragraphs";
 }
 
-const EASY_SCENARIOS = ["ordering-food", "small-talk", "asking-directions"];
+const EASY_SCENARIOS = ["phone-call", "ordering-food", "job-interview"];
 
 export function getScenarioForDay(day: number): string {
   return EASY_SCENARIOS[(day - 1) % EASY_SCENARIOS.length];

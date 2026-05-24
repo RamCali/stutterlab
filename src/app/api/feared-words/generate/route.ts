@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { requireAuth } from "@/lib/auth/helpers";
+import { isPremium } from "@/lib/auth/premium";
+import { checkRateLimit } from "@/lib/security/rate-limit";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -8,7 +10,19 @@ const anthropic = new Anthropic({
 
 export async function POST(req: NextRequest) {
   try {
-    await requireAuth();
+    const user = await requireAuth();
+    if (!(await isPremium(user.id))) {
+      return NextResponse.json({ error: "Premium subscription required" }, { status: 403 });
+    }
+
+    const rate = checkRateLimit(`feared-words-generate:${user.id}`, 20, 60 * 60 * 1000);
+    if (!rate.ok) {
+      return NextResponse.json(
+        { error: "Too many content generation requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const { word, difficulty } = await req.json();
 
     if (!word || typeof word !== "string") {

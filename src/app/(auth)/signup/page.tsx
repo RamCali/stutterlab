@@ -10,6 +10,7 @@ import Image from "next/image";
 import { Loader2, Check, ArrowLeft } from "lucide-react";
 
 const benefits = [
+  "Adult-only speech practice for ages 18+",
   "Daily guided practice sessions",
   "AI conversation simulators",
   "Clinical fluency assessments",
@@ -79,6 +80,10 @@ export default function SignupPage() {
           <p className="text-sm text-muted-foreground text-center">
             Credit card required. Secure checkout is processed by Stripe for
             StutterLab only, and you won&apos;t be charged for 7 days.
+          </p>
+          <p className="text-xs text-muted-foreground text-center">
+            Built for adults 18+. StutterLab supports practice and progress
+            tracking, but does not diagnose or replace care from a licensed SLP.
           </p>
         </CardContent>
       </Card>

@@ -29,6 +29,13 @@
       "when": 1775523600000,
       "tag": "0003_product_events",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1778457600000,
+      "tag": "0004_paid_community",
+      "breakpoints": true
     }
   ]
 }

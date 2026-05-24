@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { communityVictories } from "@/lib/db/schema";
-import { getUserId } from "@/lib/auth/helpers";
+import { requireCommunityAccess } from "@/lib/community/access";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { checkRateLimit } from "@/lib/security/rate-limit";
@@ -13,10 +13,9 @@ const celebrateSchema = z.object({
 /** POST — celebrate (heart) a victory */
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const access = await requireCommunityAccess();
+    if (access.error) return access.error;
+    const { userId } = access;
 
     const rate = checkRateLimit(`victory-celebrate:${userId}`, 60, 60 * 60 * 1000);
     if (!rate.ok) {

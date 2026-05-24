@@ -1,13 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { requireAuth } from "@/lib/auth/helpers";
+import { isPremium } from "@/lib/auth/premium";
+import { checkRateLimit } from "@/lib/security/rate-limit";
 import { CLINICAL_AI_SAFETY_RULES } from "@/lib/clinical/safety";
+import { cleanTranscriptForSummary } from "@/lib/audio/speech-metrics";
 
 const anthropic = new Anthropic();
 
 export async function POST(req: NextRequest) {
   try {
-    await requireAuth();
+    const user = await requireAuth();
+    if (!(await isPremium(user.id))) {
+      return NextResponse.json({ error: "Premium subscription required" }, { status: 403 });
+    }
+
+    const rate = checkRateLimit(`reading-feedback:${user.id}`, 30, 60 * 60 * 1000);
+    if (!rate.ok) {
+      return NextResponse.json(
+        { error: "Too many reading feedback requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const { passage, transcript, sectionIndex } = await req.json();
 
     if (!passage || !transcript) {
@@ -16,6 +31,8 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const cleanedTranscript = cleanTranscriptForSummary(transcript);
 
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-5-20250929",
@@ -39,7 +56,7 @@ Original passage:
 "${passage}"
 
 Their transcription:
-"${transcript}"
+"${cleanedTranscript}"
 
 Give a brief, encouraging reaction.`,
         },

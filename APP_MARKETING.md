@@ -144,6 +144,57 @@ Make app **free for 2 days** → promote on deal sites → revert to full price.
 3. After earning first achievement/XP milestone
 4. After completing first challenge
 
+### Conversion-Onboarding Takeaways
+
+Use onboarding as the primary conversion surface, not just a setup flow.
+
+| Step | Goal |
+|------|------|
+| Pain | Ask which moments the user avoids: calls, meetings, introductions, ordering, interviews, presentations, feared words |
+| Duration | Ask how long this has shaped their speaking life |
+| Impact | Surface work, relationship, confidence, and daily-life cost |
+| Future pace | Ask which 90-day win would make the app worth it |
+| Plan reveal | Show a personalized plan tied to that win |
+| Paywall | Present checkout as the next step into the plan |
+
+**Message to test:** "Practice the speaking situations you avoid most."
+
+**Hooks to test in ads and onboarding:**
+- "Do you switch words before saying your name?"
+- "Do you rehearse a phone call before making it?"
+- "Do you stay quiet in meetings even when you know the answer?"
+- "Do you avoid ordering what you actually want?"
+
+**Paywall tests:**
+- Current 7-day trial as control
+- Hard paywall after personalized onboarding
+- Discounted first month, renewing at full price
+- Annual-first checkout with monthly as the price anchor
+
+### App Masters / Faithful Case Study Notes
+
+Source: App Masters video "How He 3X'd Install-to-Paid in a Niche Fitness App Category" with Mike Durst.
+
+**Main learning:** onboarding was the biggest conversion lever, ahead of pricing and paywall UI. The winning pattern was a long, emotionally specific onboarding that works like a sales script:
+
+| Stage | StutterLab Application |
+|-------|------------------------|
+| Understand | Ask users to name their real pain: avoiding calls, restarting programs, feeling busy, feeling alone, word switching, pressure moments |
+| Acceptance | Use explicit self-identification copy like "That's my struggle" so users feel seen and commit emotionally |
+| Future pacing | Ask users to picture a concrete 90-day speaking win: a phone call, interview, meeting, presentation, order, or name introduction |
+| Plan reveal | Reflect back their pain points, feared situations, feared words, and practice constraints as the reason for the plan |
+| Checkout | Present payment as entry into the personalized plan, not as a generic feature unlock |
+
+**Marketing tests inspired by the video:**
+- Test a no-trial hard paywall for paid-social traffic against the current free-trial model.
+- Push annual as the serious 90-day commitment; use monthly as the price anchor.
+- Test higher pricing as a value signal once the personalized plan/paywall story is strong.
+- Add one premium-value screen before paywall, similar to the live coaching screen in the case study. For StutterLab: private community, weekly progress reports, AI phone reps, or SLP-informed practice plan.
+- Feed Meta pre-purchase events: registration complete, pain selected, onboarding complete, plan preview viewed, paywall viewed, checkout started.
+- Keep a clean purchase-optimization ad account; avoid mixing awareness and purchase campaigns.
+- Test creative on Android first where attribution feedback is faster, then move winners to iOS/SKAN.
+- Map engaged-user events such as 7-day practice streak, first AI call completed, first feared-word practice, and first real-world challenge as optimization signals.
+
 ---
 
 ## Action Items
@@ -152,10 +203,12 @@ Make app **free for 2 days** → promote on deal sites → revert to full price.
 - [ ] Research ASO keywords using asommobile.net
 - [ ] Set up Apple Search Ads campaign with niche stuttering keywords
 - [ ] Implement ratings prompt after first completed practice session
+- [ ] Add onboarding event tracking for pain, avoidance, impact, future goal, paywall view, and plan selection
 - [ ] Create 5 short-form content pieces about stuttering tips for TikTok/Instagram
 
 ### Short-term (Month 1)
 - [ ] A/B test discounted first month ($9.99) vs current 7-day free trial
+- [ ] A/B test hard paywall after personalized onboarding vs the current free-trial flow
 - [ ] Build web-to-app quiz funnel (Typeform or custom) for paid social
 - [ ] Run first Meta ads campaign targeting stuttering-related interests
 - [ ] Test content on a fresh TikTok account in the stuttering/speech niche

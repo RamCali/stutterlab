@@ -203,8 +203,8 @@ export default function LandingPage() {
             variant="secondary"
             className="mb-6 bg-primary/10 text-primary border-0 text-sm px-4 py-1.5 text-center"
           >
-            <span className="hidden sm:inline">AI-powered speech training for people who stutter — designed by an SLP</span>
-            <span className="sm:hidden">Speech training for stutterers — by an SLP</span>
+            <span className="hidden sm:inline">AI-powered speech training for adults who stutter — designed by an SLP</span>
+            <span className="sm:hidden">Adult speech training — by an SLP</span>
           </Badge>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-center leading-tight">
             Built for people who stutter.
@@ -225,6 +225,9 @@ export default function LandingPage() {
           </div>
           <p className="text-sm text-muted-foreground mt-1.5">
             If any of these sound familiar — you&apos;re in the right place.
+          </p>
+          <p className="text-xs text-muted-foreground mt-3 text-center max-w-lg">
+            Built for adults 18+. StutterLab provides practice support and progress tracking, not diagnosis or a replacement for care from a licensed SLP.
           </p>
           <div className="mt-10 w-full">
             <EarlyAccessSignup size="large" />

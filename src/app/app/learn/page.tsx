@@ -24,7 +24,7 @@ const modules = [
   {
     id: 1,
     title: "Understanding Stuttering",
-    description: "What causes stuttering, how it develops, and why it varies day to day.",
+    description: "Adult stuttering patterns, brain-based variability, and why it changes day to day.",
     icon: Brain,
     color: "text-purple-500",
     bg: "bg-purple-500/10",
@@ -121,6 +121,16 @@ const modules = [
     lessons: 3,
     isPremium: true,
   },
+  {
+    id: 11,
+    title: "Typical vs. Stutter-Like Disfluencies",
+    description: "Understand common speech breaks, stutter-like signs, and when an SLP can help.",
+    icon: HelpCircle,
+    color: "text-teal-500",
+    bg: "bg-teal-500/10",
+    lessons: 5,
+    isPremium: false,
+  },
 ];
 
 // Lesson content for Module 7 — Managing Speech Anxiety (expanded with performance anxiety cycle)
@@ -168,8 +178,8 @@ const lessonContent: Record<number, { title: string; content: string }[]> = {
       content: "Clinicians describe stuttering's impact through three dimensions: Affective (feelings of shame, guilt, frustration), Behavioral (blocks, repetitions, prolongations, plus secondary behaviors like eye blinking or jaw tension), and Cognitive (negative self-talk and constant 'scanning' for difficult words to swap for easier ones). Effective treatment addresses all three, not just the physical stuttering.",
     },
     {
-      title: "Prevalence & Recovery",
-      content: "About 5-8% of children experience stuttering during development. 75-80% recover naturally — especially girls (the childhood ratio is 2:1 boys to girls, but the adult ratio shifts to 4:1 because girls recover more often). About 1% of the global adult population — roughly 70 million people — stutter chronically. Key persistence risk factors: family history, male gender, and stuttering for more than 12 months.",
+      title: "Adult Stuttering Is Common Enough To Deserve Real Tools",
+      content: "About 1% of adults stutter. For many adults, the challenge is not just the visible disfluency; it is the mental load of anticipating words, avoiding situations, and trying to speak while being watched. StutterLab focuses on daily practice, confidence, and communication impact, not on pretending speech has to be perfect.",
     },
   ],
   3: [
@@ -190,6 +200,33 @@ const lessonContent: Record<number, { title: string; content: string }[]> = {
     },
   ],
   7: anxietyLessons,
+  11: [
+    {
+      title: "Typical Disfluencies",
+      content:
+        "Everyone has moments of normal speech disruption: fillers like um or uh, occasional whole-word or phrase repetitions, revisions, restarts, and thinking pauses. Children often show more of these while developing longer sentences. In StutterLab, these patterns are useful context for pacing and clarity practice, not a diagnosis.",
+    },
+    {
+      title: "Stutter-Like Disfluencies",
+      content:
+        "Blocks, prolongations, and sound or syllable repetitions are the patterns most often associated with stuttering. People may also notice speech-linked tension, blinking, looking away, covering the mouth, or avoiding certain words. These patterns can guide practice choices such as pull-outs, cancellation, gentle onset, light contact, and exposure work.",
+    },
+    {
+      title: "Cluttering-like Indicators",
+      content:
+        "Some adults experience fast or irregular speech, unusual pausing, reduced clarity, omitted syllables, or a feeling that thoughts move faster than speech. People may not notice this pattern until others mention it. StutterLab can use these as practice signals for rate control, pausing, over-articulation, shadowing, and metronome work, but only an SLP can evaluate whether cluttering is present.",
+    },
+    {
+      title: "When To Involve An SLP",
+      content:
+        "Consider working with a licensed Speech-Language Pathologist if speech concerns are longstanding or worsening, create strong avoidance, include visible physical struggle, affect work or relationships, or cause significant emotional distress. StutterLab is designed to support practice between sessions or on your own, but it does not diagnose or replace professional care.",
+    },
+    {
+      title: "How StutterLab Uses This Information",
+      content:
+        "The app groups speech patterns into practice categories: typical-like, stuttering-like, and cluttering-like indicators. These labels help choose exercises and track change over time. They are practice insights only, not clinical conclusions.",
+    },
+  ],
 };
 
 const faqs = [
@@ -206,7 +243,7 @@ const faqs = [
   { q: "Why does my stutter get better right after an embarrassing moment?", a: "After the feared event happens, anticipatory anxiety drops. Your muscles relax, breathing normalizes, and the tension that was causing blocks disappears. This post-relief fluency is proof that your speech system works well — the anxiety was the main bottleneck, not your speech ability." },
   { q: "Is performance anxiety making my stutter worse?", a: "Very likely. The anticipatory struggle cycle — anxiety → tension → blocks → more anxiety — is one of the most common patterns in adults who stutter. The fear of stuttering often creates more disfluency than the underlying neurological difference alone. CBT, gradual exposure, and acceptance-based approaches directly target this cycle." },
   { q: "Does caffeine affect stuttering?", a: "Some people report increased tension due to caffeine's stimulant nature, which can temporarily increase disfluency. It varies person to person." },
-  { q: "Do most children outgrow it?", a: "Yes — 75-80% recover naturally, especially with early intervention. Persistence risk factors include family history, male gender, and stuttering beyond 12 months." },
+  { q: "Is StutterLab for children?", a: "No. StutterLab is currently built for adults 18+. Pediatric fluency concerns should be discussed with a licensed Speech-Language Pathologist or healthcare provider." },
 ];
 
 export default function LearnPage() {
@@ -220,8 +257,8 @@ export default function LearnPage() {
           <GraduationCap className="h-7 w-7 text-primary" />
           Learn
         </h1>
-        <p className="text-lg text-muted-foreground mt-1.5">
-          10 evidence-based modules covering everything from breathing to real-world confidence
+          <p className="text-lg text-muted-foreground mt-1.5">
+          Adult-focused modules covering everything from breathing to real-world confidence
         </p>
       </div>
 
@@ -231,8 +268,8 @@ export default function LearnPage() {
           <p className="text-sm text-muted-foreground">
             <span className="font-medium text-foreground">Backed by neuroscience.</span>{" "}
             Stuttering is a neurodevelopmental disorder with ~70% genetic basis. fMRI studies show
-            structural differences in speech motor areas. Every technique in this app targets these
-            specific neural pathways.
+            structural differences in speech motor areas. StutterLab is for adults 18+ and turns
+            speech patterns into practice guidance, not diagnosis.
           </p>
         </CardContent>
       </Card>

@@ -184,6 +184,13 @@
 
 ### Tasks
 - [ ] Build onboarding flow (severity assessment → personalized path)
+- [x] Reframe onboarding as a conversion journey: pain, duration, life impact, future goal, then plan reveal
+- [x] Add pain-point acceptance prompts: "That's my struggle" for busy users, restarting, loneliness, avoidance cycle, pressure moments, and failed transfer from prior techniques
+- [ ] Add avoidance-first onboarding questions for calls, meetings, introductions, presentations, ordering, interviews, and word switching
+- [ ] Add a future-pacing screen: "Which real-world speaking moment would make this worth it 90 days from now?"
+- [ ] Add a high-value plan preview before checkout: weekly reports, AI speaking reps, feared-word practice, and real-world exposure missions
+- [ ] Track every onboarding step as a product event for funnel analysis
+- [ ] A/B test paywall timing after onboarding against the current free-trial checkout flow
 - [ ] Smart notifications (practice reminders via email)
 - [ ] SEO optimization (meta tags, OG images, sitemap)
 - [ ] PWA support (service worker, offline exercises)
@@ -224,3 +231,67 @@
 6. **Phase 6** (Community) — ~2 sessions → Forums + practice partners
 7. **Phase 7** (SLP Portal) — ~3 sessions → B2B revenue channel
 8. **Phase 8** (Polish) — ~2 sessions → Launch ready
+
+---
+
+## Product Takeaways From Faithful-Style Conversion Playbook
+
+### Positioning Wedge
+
+StutterLab should focus on a sharply felt micro-niche:
+
+> Adults who stutter and avoid real-world speaking situations: calls, meetings, introductions, presentations, ordering, interviews, and feared words.
+
+This is stronger than broad "AI speech training" because it names the moments users already organize their lives around.
+
+### Onboarding As The Main Sales Surface
+
+The onboarding should feel less like clinical intake and more like a guided realization:
+
+1. Identify the user's most avoided speaking situations.
+2. Identify the user's pain points and get explicit acceptance: "That's my struggle."
+3. Ask how long the pattern has affected them.
+4. Surface the life cost: work, relationships, confidence, social participation.
+5. Ask them to imagine one concrete 90-day win.
+6. Reveal a personalized plan tied directly to that win.
+7. Then show the paywall as the natural next step.
+
+### App Masters / Faithful Playbook Additions
+
+- [ ] Consider a 20+ screen onboarding test for paid traffic. Do not make it feel like paperwork; make it feel like being understood.
+- [ ] Add a premium-value screen before paywall and test ARPPU lift. Candidates: private community, weekly reports, AI phone reps, feared-word practice, or SLP-informed plan.
+- [ ] Test no-trial hard paywall for Meta traffic against the current trial model.
+- [ ] Test annual-first pricing with monthly as an anchor.
+- [ ] Build funnel event mapping for Meta and SKAN: registration complete, pain selected, onboarding complete, plan preview, paywall view, checkout start, purchase, streak milestones.
+- [ ] Use Android paid-social tests for faster creative feedback before moving winning ads to iOS/SKAN.
+- [ ] Treat community as retention infrastructure, not a nice-to-have: users stay when they feel seen, heard, and accountable.
+
+### Product Priorities
+
+- [ ] Sell the first win before the full curriculum: "Make your next phone call with more control" beats "Start a 90-day program."
+- [ ] Personalize the first practice plan immediately after onboarding.
+- [ ] Build real-world exposure missions around calls, meetings, introductions, ordering, interviews, and presentations.
+- [ ] Make accountability feel human through weekly progress reports, community challenges, or SLP-led check-ins.
+- [ ] Keep the tone ethical: no cure promises, no shame, no diagnosis. The promise is more control, more willingness, and less avoidance.
+
+### Paywall And Pricing Experiments
+
+- [ ] Test the current 7-day trial against a hard paywall.
+- [ ] Test a discounted first month against a free trial.
+- [ ] Test annual-first checkout against monthly-first checkout.
+- [ ] Use monthly pricing as an anchor so the annual plan feels like the serious 90-day commitment.
+- [ ] Track conversion by onboarding segment: phone avoiders, meeting avoiders, presentation avoiders, feared-word users, and high-avoidance users.
+
+### Funnel Metrics To Track
+
+- `onboarding_started`
+- `pain_selected`
+- `avoidance_selected`
+- `impact_selected`
+- `future_goal_selected`
+- `plan_preview_viewed`
+- `paywall_viewed`
+- `plan_selected`
+- `checkout_started`
+- `checkout_completed`
+- `first_practice_completed`

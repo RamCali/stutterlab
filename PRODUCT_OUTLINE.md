@@ -30,9 +30,17 @@ These are the minimum features needed to deliver value on day one. Nothing else 
 | 5 | **Evidence Badges** | Each technique shows its evidence level and citation | Core differentiator. Builds trust. |
 | 6 | **Progress Dashboard** | Simple charts: days practiced, self-rated confidence over time | Users need to see improvement |
 | 7 | **Auth + Profile** | Sign up / log in, basic profile (age, severity, goals) | Required infrastructure |
-| 8 | **Paywall** | Hard paywall with 7-day free trial. Full access during trial, then $9.99/mo or $59.99/yr | Revenue from day one |
+| 8 | **Paywall** | Hard paywall with 7-day free trial. Test no-trial hard paywall and annual-first checkout for paid traffic | Revenue from day one |
 
-**MVP scope: 4 screens (onboarding) + 4 tabs (Home, Practice, Progress, Profile). That's it.**
+**MVP scope: detailed conversion onboarding + 4 tabs (Home, Practice, Progress, Profile). That's it.**
+
+### App Masters / Faithful Product Ideas
+
+- Treat onboarding as the first product experience, not account setup. It should gather pain points, feared situations, feared words, practice constraints, and a concrete future win.
+- Use acceptance moments inside onboarding: users should actively identify with statements like "Avoidance keeps winning" and "I have tried things before."
+- Add a pre-paywall value screen for the strongest retention feature. Candidate StutterLab screens: private community, weekly reports, AI phone reps, feared-word drills, or SLP-informed practice plan.
+- Make community a retention pillar once core practice is working: wins, accountability, low-pressure challenges, and feeling seen/heard.
+- Product event milestones should become ad optimization signals: first practice, first AI call, first feared-word drill, first challenge, 7-day streak.
 
 ### V1.1 (Month 2-3)
 

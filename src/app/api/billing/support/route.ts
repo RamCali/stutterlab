@@ -29,8 +29,14 @@ export async function POST(req: NextRequest) {
     }
 
     const sub = await getSubscription(user.id);
-    const supportEmail = process.env.SUPPORT_EMAIL || "support@stutterlab.com";
-    const fromEmail = process.env.RESEND_FROM_EMAIL || "StutterLab <support@stutterlab.com>";
+    const supportEmail =
+      process.env.BILLING_SUPPORT_EMAIL ||
+      process.env.SUPPORT_EMAIL ||
+      "support@stutterlab.com";
+    const fromEmail =
+      process.env.BILLING_SUPPORT_FROM_EMAIL ||
+      process.env.RESEND_FROM_EMAIL ||
+      "StutterLab <support@stutterlab.com>";
 
     const payload = {
       userId: user.id,

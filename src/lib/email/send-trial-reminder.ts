@@ -3,8 +3,16 @@ import { subscriptions, users } from "@/lib/db/schema";
 import { eq, and, gte, lte } from "drizzle-orm";
 import { getResend } from "./client";
 import { buildTrialReminderEmail } from "./templates/trial-reminder";
+import { logInfo } from "@/lib/observability/logger";
 
 export async function sendTrialReminders() {
+  if (!process.env.RESEND_API_KEY) {
+    logInfo("trial_reminders.email_skipped", {
+      reason: "missing_resend_api_key",
+    });
+    return { sent: 0, skipped: "missing_resend_api_key" };
+  }
+
   const now = new Date();
   const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
   const dayAfterTomorrow = new Date(now.getTime() + 48 * 60 * 60 * 1000);
@@ -25,6 +33,10 @@ export async function sendTrialReminders() {
     );
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://stutterlab.com";
+  const fromEmail =
+    process.env.BILLING_SUPPORT_FROM_EMAIL ||
+    process.env.RESEND_FROM_EMAIL ||
+    "StutterLab <noreply@stutterlab.com>";
   let sent = 0;
 
   for (const sub of trialingSubs) {
@@ -48,7 +60,7 @@ export async function sendTrialReminders() {
     });
 
     await getResend().emails.send({
-      from: "StutterLab <noreply@stutterlab.com>",
+      from: fromEmail,
       to: user.email,
       subject,
       html,

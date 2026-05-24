@@ -1,3 +1,5 @@
+import { DISFLUENCY_TYPES } from "@/lib/clinical/disfluency";
+
 export interface FearedSituation {
   id: string;
   label: string;
@@ -72,10 +74,17 @@ export interface OnboardingData {
   completed: boolean;
   name: string;
   fearedSituations: string[];
+  fearedWords?: string[];
+  wordReflection?: string;
+  painPoints?: string[];
   /** Derived label for DB backwards compat (computed from 3-dimension scoring) */
   severity: "mild" | "moderate" | "severe" | null;
   speechChallenges?: string[];
   northStarGoal?: string;
+  preferredPracticeTime?: string;
+  practicePace?: string;
+  coachingTone?: string;
+  commitmentReason?: string;
   // Assessment scoring fields
   confidenceRatings?: Record<string, number>;
   avoidanceBehaviors?: string[];
@@ -87,6 +96,15 @@ export interface OnboardingData {
   stutterImpact?: string;
   severityScore?: number;
   confidenceScore?: number;
+  fluencyPersistence?: string;
+  physicalBehaviors?: string[];
+  fastOrUnclearSpeech?: string;
+  familyHistory?: string;
+  referralGuidance?: {
+    shouldRecommendSlp: boolean;
+    urgency: "routine" | "recommended";
+    reasons: string[];
+  };
 }
 
 export interface ConfidenceSituation {
@@ -121,19 +139,52 @@ export const AVOIDANCE_BEHAVIORS: AvoidanceBehavior[] = [
   { id: "rush-speech", label: "I rush through words", emoji: "⚡" },
 ];
 
+export interface PhysicalBehavior {
+  id: string;
+  label: string;
+  emoji: string;
+}
+
+export const PHYSICAL_BEHAVIORS: PhysicalBehavior[] = [
+  { id: "eye-blink", label: "Blinking or closing my eyes", emoji: "👁" },
+  { id: "look-away", label: "Looking away during a stutter", emoji: "↗" },
+  { id: "mouth-tension", label: "Tensing my mouth, jaw, or lips", emoji: "〰" },
+  { id: "cover-mouth", label: "Covering my mouth or hiding the moment", emoji: "✋" },
+  { id: "cough-yawn", label: "Coughing, yawning, or restarting to mask it", emoji: "💭" },
+];
+
 export interface StutteringType {
   id: string;
   label: string;
   description: string;
+  example: string;
+  category: "typical" | "stutter-like";
   emoji: string;
 }
 
 export const STUTTERING_TYPES: StutteringType[] = [
-  { id: "blocks", label: "Blocks", description: "Getting stuck, no sound comes out", emoji: "🧱" },
-  { id: "repetitions", label: "Repetitions", description: "Repeating sounds: b-b-b-but", emoji: "🔁" },
-  { id: "prolongations", label: "Prolongations", description: "Stretching sounds: ssssnake", emoji: "➡" },
-  { id: "interjections", label: "Filler words", description: "Excessive um, uh, like", emoji: "💭" },
+  ...DISFLUENCY_TYPES,
 ];
+
+export const FLUENCY_PERSISTENCE_OPTIONS = [
+  { id: "months", label: "Months", desc: "A newer or recently noticeable concern" },
+  { id: "years", label: "Years", desc: "Something I have dealt with for a long time" },
+  { id: "worsening", label: "Worsening", desc: "It has become harder recently" },
+  { id: "varies", label: "It varies", desc: "Some seasons or contexts are harder" },
+] as const;
+
+export const FAST_OR_UNCLEAR_SPEECH_OPTIONS = [
+  { id: "rarely", label: "Rarely", desc: "My rate and clarity usually feel steady" },
+  { id: "sometimes", label: "Sometimes", desc: "It happens under pressure or excitement" },
+  { id: "often", label: "Often", desc: "People sometimes ask me to slow down or repeat" },
+  { id: "very-often", label: "Very often", desc: "Fast or unclear speech is a major pattern" },
+] as const;
+
+export const FAMILY_HISTORY_OPTIONS = [
+  { id: "yes", label: "Yes", desc: "A family member stutters or clutters" },
+  { id: "no", label: "No", desc: "Not that I know of" },
+  { id: "unsure", label: "Unsure", desc: "I am not certain" },
+] as const;
 
 export interface SpeechChallenge {
   id: string;

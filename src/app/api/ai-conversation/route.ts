@@ -9,31 +9,11 @@ import { eq } from "drizzle-orm";
 import { checkRateLimit } from "@/lib/security/rate-limit";
 import { measureAsync } from "@/lib/observability/logger";
 import { withTimeout } from "@/lib/observability/timeout";
+import { getVoicePersonaForScenario } from "@/lib/voice/personas";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
-
-const SCENARIO_PROMPTS: Record<string, string> = {
-  "phone-call":
-    "You are a receptionist at a doctor's office. The user is calling to schedule an appointment. Be natural, ask relevant questions (name, preferred date/time, reason for visit). Be patient and kind.",
-  "job-interview":
-    "You are a friendly but professional hiring manager conducting a job interview. Ask common interview questions one at a time. Be encouraging. The user is practicing speaking fluently during interviews.",
-  "ordering-food":
-    "You are a barista/waiter at a coffee shop. Take the user's order naturally. Ask about size, additions, name for the order. Be casual and friendly.",
-  "class-presentation":
-    "You are a supportive audience member at a presentation. The user will present a topic. Ask a question or two after they finish. Be encouraging.",
-  "small-talk":
-    "You are at a casual social gathering. Start a light conversation with the user. Topics: weather, weekend plans, hobbies, movies. Be warm and easygoing.",
-  "shopping":
-    "You are a store employee. The user wants to return an item or ask about a product. Be helpful but ask for details like receipt, reason for return, etc.",
-  "asking-directions":
-    "You are a friendly stranger. The user is asking for directions to a place. Give clear but conversational directions. Ask if they need clarification.",
-  "customer-service":
-    "You are a customer service representative on a phone call. Help the user resolve an issue with their account/order. Ask for details, be professional.",
-  "meeting-intro":
-    "You are at a professional meeting. The user is introducing themselves. React naturally, ask a follow-up question about their role or background.",
-};
 
 const aiConversationSchema = z.object({
   scenario: z.string().max(80).optional(),
@@ -62,6 +42,9 @@ const aiConversationSchema = z.object({
     .passthrough()
     .optional(),
   stressLevel: z.number().int().min(0).max(3).optional(),
+  language: z.string().max(80).optional(),
+  country: z.string().max(80).optional(),
+  accent: z.string().max(80).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -89,7 +72,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     }
 
-    const { scenario, messages, userMessage, voiceMode, speechMetrics, stressLevel } = parsed.data;
+    const {
+      scenario,
+      messages,
+      userMessage,
+      voiceMode,
+      speechMetrics,
+      stressLevel,
+      language,
+      country,
+      accent,
+    } = parsed.data;
 
     if (!process.env.ANTHROPIC_API_KEY) {
       return NextResponse.json(
@@ -194,10 +187,14 @@ Frequently interrupt mid-sentence. Express urgency. Change topics suddenly. Ask 
     }
 
     const scenarioKey = scenario ?? "";
-    const systemPrompt = `You are helping someone who stutters practice real-world speaking scenarios. ${
-      SCENARIO_PROMPTS[scenarioKey] ||
-      "You are a friendly conversation partner. Have a natural conversation with the user."
-    }
+    const persona = getVoicePersonaForScenario(scenarioKey);
+    const systemPrompt = `You are helping someone who stutters practice real-world speaking scenarios. ${persona.scenarioPrompt}
+
+VOICE PERSONA:
+- Persona: ${persona.label}
+- Role: ${persona.role}
+- Pace: ${persona.pace}
+- Affect: ${persona.affect}
 
 IMPORTANT RULES:
 - Keep responses SHORT (1-3 sentences). This is a conversation, not a monologue.
@@ -205,6 +202,9 @@ IMPORTANT RULES:
 - Stay in character. Don't break the fourth wall.
 - Ask one question at a time to keep the conversation flowing.
 - Match the user's energy and pace.
+- Sound like the selected real-world role, not like a generic AI therapist.
+- Use normal phone/dialogue texture: brief confirmations, natural wording, and occasional short hesitations where appropriate.
+${language || country || accent ? `- Locale adaptation: preferred language=${language || "unspecified"}, country/region=${country || "unspecified"}, accent/dialect=${accent || "unspecified"}. Use local phrasing where appropriate without stereotyping.` : ""}
 
 ANXIETY-FLUENCY AWARENESS (DO NOT mention any of this — use it to adapt naturally):
 People who stutter often experience a cyclical pattern: anticipatory anxiety builds before speaking → causes muscle tension and blocks → an embarrassing moment may occur → after the moment passes, anxiety temporarily drops and speech becomes much more fluent → but the next high-stakes situation brings the anxiety back. This is the "anticipatory struggle cycle."

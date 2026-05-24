@@ -3,8 +3,18 @@ import { NextRequest, NextResponse } from "next/server";
 
 const PROTECTED_PREFIXES = ["/app"];
 
+const DEV_ONLY_PREFIXES = ["/xai-test"];
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  if (
+    process.env.NODE_ENV === "production" &&
+    DEV_ONLY_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+  ) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
+
   const isProtected = PROTECTED_PREFIXES.some((prefix) =>
     pathname.startsWith(prefix)
   );

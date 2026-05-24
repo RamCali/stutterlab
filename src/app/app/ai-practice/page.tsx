@@ -10,12 +10,8 @@ import {
   Phone,
   Briefcase,
   Coffee,
-  GraduationCap,
-  ShoppingCart,
-  Users,
-  MapPin,
-  Headphones,
-  MessageSquare,
+  Flower2,
+  Landmark,
   Sparkles,
   Star,
   Lock,
@@ -30,7 +26,7 @@ const scenarios = [
   {
     id: "phone-call",
     title: "Phone Call",
-    description: "Practice making and receiving phone calls. The AI will call you and you respond naturally.",
+    description: "Practice the call you would normally avoid, with a patient AI partner.",
     icon: Phone,
     color: "text-red-500",
     bg: "bg-red-500/10",
@@ -40,7 +36,7 @@ const scenarios = [
   {
     id: "job-interview",
     title: "Job Interview",
-    description: "Practice answering common interview questions. The AI adapts to your field and experience level.",
+    description: "Practice high-stakes answers with gentle coaching and space to finish.",
     icon: Briefcase,
     color: "text-blue-500",
     bg: "bg-blue-500/10",
@@ -49,8 +45,8 @@ const scenarios = [
   },
   {
     id: "ordering-food",
-    title: "Ordering Food",
-    description: "Practice ordering at a restaurant or coffee shop. Start simple and increase complexity.",
+    title: "Fast Food Order",
+    description: "Practice ordering with a realistic cashier who may be a little rushed.",
     icon: Coffee,
     color: "text-orange-500",
     bg: "bg-orange-500/10",
@@ -58,64 +54,24 @@ const scenarios = [
     isPhoneSimulator: false,
   },
   {
-    id: "class-presentation",
-    title: "Class Presentation",
-    description: "Practice giving a presentation. The AI provides an audience with questions.",
-    icon: GraduationCap,
-    color: "text-purple-500",
-    bg: "bg-purple-500/10",
-    difficulty: "Hard",
-    isPhoneSimulator: false,
-  },
-  {
-    id: "small-talk",
-    title: "Small Talk",
-    description: "Practice casual conversation at a party or social gathering. Natural, flowing dialogue.",
-    icon: Users,
-    color: "text-green-500",
-    bg: "bg-green-500/10",
-    difficulty: "Easy",
-    isPhoneSimulator: false,
-  },
-  {
-    id: "shopping",
-    title: "Shopping / Returns",
-    description: "Practice asking for help in a store, returning items, or making complaints.",
-    icon: ShoppingCart,
-    color: "text-cyan-500",
-    bg: "bg-cyan-500/10",
-    difficulty: "Medium",
-    isPhoneSimulator: false,
-  },
-  {
-    id: "asking-directions",
-    title: "Asking for Directions",
-    description: "Practice asking strangers for directions and following up with clarifying questions.",
-    icon: MapPin,
-    color: "text-yellow-600",
-    bg: "bg-yellow-500/10",
-    difficulty: "Easy",
-    isPhoneSimulator: false,
-  },
-  {
     id: "customer-service",
-    title: "Customer Service Call",
-    description: "Practice calling customer service to resolve an issue. The AI simulates wait times and transfers.",
-    icon: Headphones,
-    color: "text-teal-500",
-    bg: "bg-teal-500/10",
+    title: "Bank Customer Service",
+    description: "Practice a formal support call with a professional male bank representative.",
+    icon: Landmark,
+    color: "text-emerald-600",
+    bg: "bg-emerald-500/10",
     difficulty: "Hard",
     isPhoneSimulator: true,
   },
   {
-    id: "meeting-intro",
-    title: "Meeting Introduction",
-    description: "Practice introducing yourself in a professional meeting or conference.",
-    icon: MessageSquare,
-    color: "text-indigo-500",
-    bg: "bg-indigo-500/10",
+    id: "florist",
+    title: "Calling a Florist",
+    description: "Practice placing a friendly local flower order by phone.",
+    icon: Flower2,
+    color: "text-pink-500",
+    bg: "bg-pink-500/10",
     difficulty: "Medium",
-    isPhoneSimulator: false,
+    isPhoneSimulator: true,
   },
 ];
 
@@ -160,11 +116,11 @@ export default function AIPracticePage() {
       <div>
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <Brain className="h-7 w-7 text-primary" />
-          AI Situation Simulators
+          AI Practice
         </h1>
         <p className="text-lg text-muted-foreground mt-1.5">
-          Practice real-world speaking scenarios with an AI partner that adapts
-          to your fluency level. Not scripted -- every conversation is unique.
+          Three launch scenarios: one daily phone call, one everyday public moment,
+          and one high-stakes conversation.
         </p>
       </div>
 
@@ -194,9 +150,8 @@ export default function AIPracticePage() {
                 </Badge>
               </h3>
               <p className="text-base text-muted-foreground">
-                The most realistic phone practice available. The AI &ldquo;calls&rdquo; you
-                with a ring sound -- pick up and have a natural conversation.
-                Designed specifically for phone anxiety.
+                Start in-browser today. When the Twilio bridge is enabled, this
+                same practice can place a real outbound call to the user.
               </p>
             </div>
           </div>

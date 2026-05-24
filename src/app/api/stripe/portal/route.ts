@@ -17,7 +17,9 @@ export async function POST() {
 
     const session = await createPortalSession(sub.stripeCustomerId);
     return NextResponse.json({ url: session.url });
-  } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Could not open billing portal";
+    const status = message === "Unauthorized" ? 401 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }

@@ -35,6 +35,86 @@
 
 ---
 
+## Conversion Positioning Takeaways
+
+The strongest marketing lesson from the Faithful-style playbook is to niche down until the message feels uncomfortably specific.
+
+### Core Wedge
+
+StutterLab should lead with:
+
+> Practice the speaking situations you avoid most.
+
+Primary audience:
+- Adults who stutter and avoid calls, meetings, introductions, presentations, ordering, interviews, or specific feared words.
+
+This is more emotionally precise than "AI speech training" or "speech therapy exercises."
+
+### Message Pillars
+
+| Pillar | Marketing Angle |
+|--------|-----------------|
+| Avoidance | Stop planning your day around the words and situations you avoid. |
+| Real-world reps | Practice calls, meetings, introductions, ordering, and presentations before they happen. |
+| Adult-only | Built for adults navigating work, relationships, and daily speaking pressure. |
+| Guided plan | A 90-day practice path, not a random library of tools. |
+| Ethical progress | More control, more willingness, less avoidance. No cure promises. |
+| SLP trust | Designed with clinical speech-language pathology principles. |
+
+### Copy Direction
+
+Use private-thought hooks that mirror what users already say to themselves:
+
+- "Do you switch words before saying your name?"
+- "Do you rehearse a phone call before making it?"
+- "Do you stay quiet in meetings even when you know the answer?"
+- "Do you avoid ordering what you actually want?"
+- "Do presentations feel harder because of the words you might block on?"
+
+Avoid leading with generic claims:
+- "AI-powered speech training"
+- "Improve fluency fast"
+- "Fix your stutter"
+- "Speak perfectly"
+
+### Landing Page Variants To Build
+
+| Page | Search/Ad Intent | Promise |
+|------|------------------|---------|
+| `/stuttering-phone-calls` | Phone-call avoidance | Practice phone calls before they happen. |
+| `/stuttering-at-work` | Meetings/interviews | Build reps for meetings, introductions, and interviews. |
+| `/stuttering-presentations` | Public speaking | Prepare for presentations with guided speech practice. |
+| `/feared-words-practice` | Word avoidance | Practice the words you avoid switching away from. |
+| `/stuttering-practice-app` | Category intent | Daily practice for adults who stutter. |
+
+Each page should match the exact pain point from the ad or keyword, then route into onboarding with that situation preselected when possible.
+
+### Paywall And Trial Testing
+
+The current funnel uses a 7-day free trial. Keep it as the control, but test:
+
+- Hard paywall after personalized onboarding.
+- Discounted first month, renewing at full price.
+- Annual-first checkout with monthly as the price anchor.
+- Paywall after the first check-in versus paywall after full onboarding.
+
+The lesson is not "free trials are bad." The lesson is to measure whether committed paid users engage more and retain better than trial users.
+
+### Marketing Metrics
+
+Track each message and landing page by:
+
+- Visitor-to-onboarding-start rate
+- Onboarding completion rate
+- Paywall view rate
+- Checkout start rate
+- Checkout completion rate
+- First-practice completion rate
+- Trial-to-paid rate or first-month retention
+- Annual-plan selection rate
+
+---
+
 ## Free & Low-Cost Marketing Channels
 
 ### 1. Community Outreach (High Trust)
@@ -331,6 +411,27 @@ StutterLab uses a **hard paywall with free trial** — no permanent free tier.
 - A/B test credit card upfront vs no card required
 - Track: trial start rate, trial-to-paid conversion, time-to-first-practice during trial
 - Target: >60% trial start rate, >15% trial-to-paid conversion
+
+**App Masters / Faithful pricing lessons to test:**
+- No-trial hard paywall for paid acquisition cohorts, especially Meta traffic.
+- Annual-first checkout positioned as the 90-day program commitment.
+- Monthly price as anchor so annual feels obvious.
+- Higher-price test after onboarding improves perceived value; measure conversion and refund/cancel rate, not just top-line revenue.
+- Pre-paywall premium-value screen: show community, weekly progress reports, AI speaking reps, feared-word drills, and real-world exposure missions.
+- Track ARPPU lift from each value screen, similar to the case study's live-coaching screen lift.
+
+**Paid social funnel events:**
+- `registration_complete`
+- `pain_selected`
+- `onboarding_complete`
+- `plan_preview_viewed`
+- `paywall_viewed`
+- `checkout_started`
+- `purchase`
+- `first_practice_completed`
+- `seven_day_practice_streak`
+- `first_ai_call_completed`
+- `first_feared_word_practice`
 
 **Reducing churn after conversion:**
 - Day 3 of trial: push notification — "You've practiced 3 days in a row. Here's what that means for your fluency."

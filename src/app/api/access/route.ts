@@ -1,6 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit } from "@/lib/security/rate-limit";
 
 export async function POST(req: NextRequest) {
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
+  const rate = checkRateLimit(`early-access:${ip}`, 10, 60 * 60 * 1000);
+  if (!rate.ok) {
+    return NextResponse.json(
+      { error: "Too many passcode attempts. Please try again later." },
+      { status: 429 }
+    );
+  }
+
   const { passcode } = await req.json();
   const secret = process.env.EARLY_ACCESS_PASSCODE;
 

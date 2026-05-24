@@ -4,6 +4,7 @@ import { userStats } from "@/lib/db/schema";
 import { getUserId } from "@/lib/auth/helpers";
 import { eq, sql } from "drizzle-orm";
 import { isPremium } from "@/lib/auth/premium";
+import { checkRateLimit } from "@/lib/security/rate-limit";
 
 /** GET — fetch current user's stats */
 export async function GET() {
@@ -43,6 +44,10 @@ export async function POST(req: NextRequest) {
     }
 
     const { action, value } = await req.json();
+    const rate = checkRateLimit(`user-stats:${userId}`, 60, 60 * 60 * 1000);
+    if (!rate.ok) {
+      return NextResponse.json({ error: "Too many stats updates" }, { status: 429 });
+    }
 
     let [stats] = await db
       .select()
@@ -59,16 +64,22 @@ export async function POST(req: NextRequest) {
 
     switch (action) {
       case "add_xp":
-        await db
-          .update(userStats)
-          .set({ totalXp: sql`${userStats.totalXp} + ${value || 0}` })
-          .where(eq(userStats.userId, userId));
-        break;
+        return NextResponse.json(
+          { error: "XP is awarded by trusted server-side actions only" },
+          { status: 400 }
+        );
 
       case "record_practice": {
         const today = new Date();
         const lastPractice = stats.lastPracticeDate;
         let newStreak = stats.currentStreak;
+        const practiceSeconds = Math.max(
+          0,
+          Math.min(
+            typeof value === "number" && Number.isFinite(value) ? Math.round(value) : 0,
+            60 * 60
+          )
+        );
 
         if (lastPractice) {
           const daysSinceLast = Math.floor(
@@ -112,7 +123,7 @@ export async function POST(req: NextRequest) {
             currentStreak: newStreak,
             longestStreak: sql`GREATEST(${userStats.longestStreak}, ${newStreak})`,
             lastPracticeDate: today,
-            totalPracticeSeconds: sql`${userStats.totalPracticeSeconds} + ${value || 0}`,
+            totalPracticeSeconds: sql`${userStats.totalPracticeSeconds} + ${practiceSeconds}`,
             totalExercisesCompleted: sql`${userStats.totalExercisesCompleted} + 1`,
           })
           .where(eq(userStats.userId, userId));

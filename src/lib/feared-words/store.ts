@@ -57,13 +57,28 @@ export function saveFearedWordsStore(store: FearedWordsStore): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
 }
 
+function normalizeWord(word: string): string {
+  return word.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function createId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
 /* ─── CRUD ─── */
 
 export function addFearedWord(word: string, difficulty: "easy" | "medium" | "hard" = "medium"): FearedWordEntry {
   const store = getOrCreateStore();
+  const normalized = normalizeWord(word);
+  const existing = store.words.find((entry) => entry.word === normalized);
+  if (existing) return existing;
+
   const entry: FearedWordEntry = {
-    id: Date.now().toString(),
-    word: word.trim().toLowerCase(),
+    id: createId(),
+    word: normalized,
     difficulty,
     practiceCount: 0,
     mastered: false,
@@ -74,6 +89,16 @@ export function addFearedWord(word: string, difficulty: "easy" | "medium" | "har
   store.words.push(entry);
   saveFearedWordsStore(store);
   return entry;
+}
+
+export function seedFearedWords(words: string[], difficulty: "easy" | "medium" | "hard" = "medium"): FearedWordEntry[] {
+  const seeded: FearedWordEntry[] = [];
+  for (const word of words) {
+    const normalized = normalizeWord(word);
+    if (!normalized) continue;
+    seeded.push(addFearedWord(normalized, difficulty));
+  }
+  return seeded;
 }
 
 export function removeFearedWord(id: string): void {

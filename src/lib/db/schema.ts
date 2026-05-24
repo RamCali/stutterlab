@@ -327,6 +327,82 @@ export const communityComments = pgTable("community_comments", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const communityMemberProfiles = pgTable("community_member_profiles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull().unique(),
+  alias: text("alias").notNull(),
+  avatarColor: text("avatar_color").default("teal").notNull(),
+  bio: text("bio"),
+  showRealName: boolean("show_real_name").default(false).notNull(),
+  status: text("status").default("active").notNull(), // active, suspended
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const communityPostReactions = pgTable(
+  "community_post_reactions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    postId: uuid("post_id")
+      .references(() => communityPosts.id)
+      .notNull(),
+    userId: text("user_id").notNull(),
+    reactionType: text("reaction_type").default("support").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("community_post_reactions_post_idx").on(table.postId)]
+);
+
+export const communityReports = pgTable(
+  "community_reports",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    reporterUserId: text("reporter_user_id").notNull(),
+    targetType: text("target_type").notNull(), // post, comment, profile, room
+    targetId: text("target_id").notNull(),
+    reason: text("reason").notNull(),
+    details: text("details"),
+    status: text("status").default("open").notNull(), // open, reviewed, dismissed
+    reviewedBy: text("reviewed_by"),
+    reviewedAt: timestamp("reviewed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("community_reports_status_idx").on(table.status)]
+);
+
+export const communityPracticeRooms = pgTable(
+  "community_practice_rooms",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    hostUserId: text("host_user_id").notNull(),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    scheduledAt: timestamp("scheduled_at").notNull(),
+    durationMinutes: integer("duration_minutes").default(30).notNull(),
+    capacity: integer("capacity").default(6).notNull(),
+    participantCount: integer("participant_count").default(0).notNull(),
+    status: text("status").default("scheduled").notNull(), // scheduled, live, ended, canceled
+    joinUrl: text("join_url"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [index("community_practice_rooms_scheduled_idx").on(table.scheduledAt)]
+);
+
+export const communityRoomParticipants = pgTable(
+  "community_room_participants",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    roomId: uuid("room_id")
+      .references(() => communityPracticeRooms.id)
+      .notNull(),
+    userId: text("user_id").notNull(),
+    status: text("status").default("joined").notNull(), // joined, left
+    joinedAt: timestamp("joined_at").defaultNow().notNull(),
+  },
+  (table) => [index("community_room_participants_room_idx").on(table.roomId)]
+);
+
 // ==================== SLP CONNECTIONS ====================
 
 export const slpConnections = pgTable("slp_connections", {

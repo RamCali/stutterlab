@@ -39,6 +39,12 @@ export default function CheckoutTrialPage() {
     }
   }, [status, router]);
 
+  useEffect(() => {
+    if (status === "authenticated") {
+      trackProductEvent("checkout_started", { interval, surface: "trial_page" });
+    }
+  }, [status, interval]);
+
   const fetchClientSecret = useCallback(async () => {
     trackProductEvent("checkout_session_requested", { interval });
     const res = await fetch("/api/stripe/checkout", {
