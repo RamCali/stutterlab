@@ -3,6 +3,7 @@ import { z } from "zod";
 import { checkRateLimit } from "@/lib/security/rate-limit";
 import { fetchWithTimeout } from "@/lib/observability/timeout";
 import { logError, measureAsync } from "@/lib/observability/logger";
+import { appendWaitlistToGoogleSheet } from "@/lib/google-sheets/waitlist";
 
 const KLAVIYO_API_KEY = process.env.KLAVIYO_API_KEY;
 const KLAVIYO_LIST_ID = process.env.KLAVIYO_LIST_ID;
@@ -98,6 +99,11 @@ export async function POST(req: NextRequest) {
         status: res.status,
       });
     }
+
+    await appendWaitlistToGoogleSheet(
+      email.trim().toLowerCase(),
+      source || "website"
+    );
 
     return NextResponse.json({ success: true });
   } catch (err) {

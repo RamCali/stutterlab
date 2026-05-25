@@ -27,6 +27,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.1",
+    "google-auth-library": "^10.6.2",
     "gray-matter": "^4.0.3",
     "jspdf": "^4.1.0",
     "lucide-react": "^0.563.0",

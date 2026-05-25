@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db/client";
 import { earlyAccessSignups } from "@/lib/db/schema";
+import { appendWaitlistToGoogleSheet } from "@/lib/google-sheets/waitlist";
 
 async function syncToKlaviyo(email: string, source: string) {
   const apiKey = process.env.KLAVIYO_API_KEY;
@@ -83,7 +84,10 @@ export async function joinEarlyAccess(email: string, source = "early-access") {
       .values({ email: trimmed })
       .onConflictDoNothing();
 
-    await syncToKlaviyo(trimmed, source);
+    await Promise.all([
+      syncToKlaviyo(trimmed, source),
+      appendWaitlistToGoogleSheet(trimmed, source),
+    ]);
 
     return { success: true };
   } catch {
