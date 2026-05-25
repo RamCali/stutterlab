@@ -19,7 +19,25 @@ export async function GET() {
     });
   }
 
-  const privateKey = rawKey.replace(/\\n/g, "\n");
+  const keyDiagnostics = {
+    length: rawKey.length,
+    hasLiteralBackslashN: rawKey.includes("\\n"),
+    hasActualNewlines: rawKey.includes("\n"),
+    startsCorrectly:
+      rawKey.startsWith("-----BEGIN PRIVATE KEY-----") ||
+      rawKey.startsWith("-----BEGIN PRIVATE KEY-----\\n"),
+    endsCorrectly:
+      rawKey.endsWith("-----END PRIVATE KEY-----\n") ||
+      rawKey.endsWith("-----END PRIVATE KEY-----\\n") ||
+      rawKey.endsWith("-----END PRIVATE KEY-----"),
+    first50: rawKey.slice(0, 50),
+    last30: rawKey.slice(-30),
+  };
+
+  // Try both \n replacement variants
+  const privateKey = rawKey.includes("\\n")
+    ? rawKey.replace(/\\n/g, "\n")
+    : rawKey;
 
   let token: string | null = null;
   try {
@@ -35,6 +53,7 @@ export async function GET() {
       ok: false,
       step: "auth",
       error: String(err),
+      keyDiagnostics,
     });
   }
 
