@@ -16,7 +16,11 @@ import {
   ClipboardCheck,
   Rocket,
   Target,
+  Phone,
 } from "lucide-react";
+import { CommunicationsConsentForm } from "@/components/comms/communications-consent-form";
+import { validateCommsConsentInput } from "@/lib/comms/consent";
+import { isValidE164PhoneNumber } from "@/lib/sms/mvp";
 import {
   FEARED_SITUATIONS,
   SPEECH_CHALLENGES,
@@ -117,7 +121,7 @@ const COACHING_TONES = [
   { id: "encouraging", label: "Encouraging", desc: "Motivating and confidence-focused" },
 ];
 
-const TOTAL_STEPS = 10;
+const TOTAL_STEPS = 11;
 
 interface OnboardingFlowProps {
   onComplete: (data?: OnboardingData) => void;
@@ -167,7 +171,13 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [coachingTone, setCoachingTone] = useState("");
   const [commitmentReason, setCommitmentReason] = useState("");
 
-  // Step 9: Results
+  // Step 9: Communications consent
+  const [contactPhoneNumber, setContactPhoneNumber] = useState("");
+  const [smsConsent, setSmsConsent] = useState(false);
+  const [phoneCallConsent, setPhoneCallConsent] = useState(false);
+  const [commsError, setCommsError] = useState<string | null>(null);
+
+  // Step 10: Results
   const [scores, setScores] = useState<AssessmentScores | null>(null);
 
   function toggleSet(setter: React.Dispatch<React.SetStateAction<Set<string>>>, id: string) {
@@ -224,11 +234,36 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     };
   }
 
-  function goToResults() {
+  function goToCommsConsent() {
     addWordsFromText(currentWordInput);
+    setCommsError(null);
+    setStep(9);
+  }
+
+  function skipCommsConsent() {
+    setContactPhoneNumber("");
+    setSmsConsent(false);
+    setPhoneCallConsent(false);
+    setCommsError(null);
+    goToResults();
+  }
+
+  function goToResults() {
+    const validationError = validateCommsConsentInput({
+      contactPhoneNumber,
+      smsConsent,
+      phoneCallConsent,
+      isValidE164: isValidE164PhoneNumber,
+    });
+    if (validationError) {
+      setCommsError(validationError);
+      return;
+    }
+
+    setCommsError(null);
     const result = calculateScores(buildScoringInput());
     setScores(result);
-    setStep(9);
+    setStep(10);
   }
 
   async function handleFinish() {
@@ -262,6 +297,9 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       fastOrUnclearSpeech,
       familyHistory,
       referralGuidance: computed.referralGuidance,
+      contactPhoneNumber: contactPhoneNumber.trim() || undefined,
+      smsConsent: smsConsent || undefined,
+      phoneCallConsent: phoneCallConsent || undefined,
     };
     saveOnboardingData(data);
 
@@ -300,8 +338,21 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           referralGuidance: computed.referralGuidance,
           assessmentProfile: computed.profile,
           recommendedEmphasis: computed.recommendedEmphasis,
+          contactPhoneNumber: contactPhoneNumber.trim() || null,
+          smsConsent,
+          phoneCallConsent,
         }),
       });
+
+      if (smsConsent && contactPhoneNumber.trim()) {
+        await fetch("/api/sms/welcome", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phoneNumber: contactPhoneNumber.trim() }),
+        }).catch(() => {
+          // Welcome text is best-effort during onboarding
+        });
+      }
     } catch {
       // localStorage fallback is sufficient
     }
@@ -1162,18 +1213,58 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 Back
               </Button>
               <Button
-                onClick={goToResults}
+                onClick={goToCommsConsent}
                 disabled={!preferredPracticeTime || !practicePace || !coachingTone}
               >
-                See My Results
+                Continue
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </div>
           </div>
         )}
 
-        {/* Step 9: Results Screen */}
-        {step === 9 && scores && (
+        {/* Step 9: Communications consent */}
+        {step === 9 && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <Phone className="h-10 w-10 text-primary mx-auto mb-3" />
+              <h2 className="text-2xl font-bold">Practice reminders &amp; calls</h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Optional. Add your mobile number if you want text nudges or AI phone practice
+                calls. You can change this anytime in Settings.
+              </p>
+            </div>
+
+            <CommunicationsConsentForm
+              phoneNumber={contactPhoneNumber}
+              onPhoneNumberChange={setContactPhoneNumber}
+              smsConsent={smsConsent}
+              onSmsConsentChange={setSmsConsent}
+              phoneCallConsent={phoneCallConsent}
+              onPhoneCallConsentChange={setPhoneCallConsent}
+              error={commsError}
+            />
+
+            <div className="flex items-center justify-between gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setStep(8)}>
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                Back
+              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={skipCommsConsent}>
+                  Skip for now
+                </Button>
+                <Button onClick={goToResults}>
+                  See My Results
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 10: Results Screen */}
+        {step === 10 && scores && (
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-2xl font-bold">Your Speech Assessment</h2>

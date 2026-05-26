@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/helpers";
+import { hasSmsConsentForNumber } from "@/lib/actions/comms";
 import { checkRateLimit } from "@/lib/security/rate-limit";
 import { logError, measureAsync } from "@/lib/observability/logger";
 import {
@@ -28,6 +29,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Phone number must be in E.164 format, like +14155552671" },
         { status: 400 }
+      );
+    }
+
+    const consented = await hasSmsConsentForNumber(phoneNumber);
+    if (!consented) {
+      return NextResponse.json(
+        {
+          error:
+            "SMS consent is required. Enable text messages in Settings or during onboarding.",
+        },
+        { status: 403 }
       );
     }
 

@@ -3,6 +3,7 @@ import { getUserId } from "@/lib/auth/helpers";
 import { db } from "@/lib/db/client";
 import { profiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { commsConsentPatch } from "@/lib/comms/consent";
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,6 +39,9 @@ export async function POST(req: NextRequest) {
       confidenceScore,
       assessmentProfile,
       recommendedEmphasis,
+      contactPhoneNumber,
+      smsConsent,
+      phoneCallConsent,
     } = body;
 
     const {
@@ -47,6 +51,12 @@ export async function POST(req: NextRequest) {
     } = body;
 
     const treatmentPath = {
+      ...commsConsentPatch({
+        contactPhoneNumber:
+          typeof contactPhoneNumber === "string" ? contactPhoneNumber : null,
+        smsConsent: smsConsent === true,
+        phoneCallConsent: phoneCallConsent === true,
+      }),
       fearedSituations: fearedSituations || [],
       speechChallenges: speechChallenges || [],
       northStarGoal: northStarGoal || "",

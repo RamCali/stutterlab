@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { EmbeddedCheckoutDialog } from "@/components/embedded-checkout";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { ResearchParticipationSettings } from "@/components/settings/research-participation";
+import { CommunicationsConsentSettings } from "@/components/settings/communications-consent-settings";
 import { trackProductEvent } from "@/lib/analytics/client";
 import {
   Dialog,
@@ -88,7 +89,6 @@ export default function SettingsPage() {
     "idle"
   );
   const [supportError, setSupportError] = useState("");
-  const [smsPhoneNumber, setSmsPhoneNumber] = useState("");
   const [smsSetupStatus, setSmsSetupStatus] = useState<
     "idle" | "sending" | "sent" | "error"
   >("idle");
@@ -121,8 +121,7 @@ export default function SettingsPage() {
     setCheckoutOpen(true);
   }
 
-  async function sendSmsSetupText() {
-    const phoneNumber = smsPhoneNumber.trim();
+  async function sendSmsSetupText(phoneNumber: string) {
     if (!phoneNumber || smsSetupStatus === "sending") return;
 
     setSmsSetupStatus("sending");
@@ -345,54 +344,11 @@ export default function SettingsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-lg border border-border bg-muted/30 p-3">
-            <div className="mb-3 flex items-center gap-2">
-              <MessageCircle className="h-4 w-4 text-primary" />
-              <div>
-                <p className="text-sm font-medium">MVP text reminders</p>
-                <p className="text-xs text-muted-foreground">
-                  Texts are best effort while StutterLab uses an MVP number.
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <Input
-                type="tel"
-                value={smsPhoneNumber}
-                onChange={(event) => setSmsPhoneNumber(event.target.value)}
-                placeholder="+14155552671"
-                className="h-10"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={sendSmsSetupText}
-                disabled={smsSetupStatus === "sending" || !smsPhoneNumber.trim()}
-              >
-                {smsSetupStatus === "sending" ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  "Send setup text"
-                )}
-              </Button>
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">
-              The first text asks you to save the number as StutterLab and
-              includes STOP opt-out language.
-            </p>
-            {smsSetupMessage && (
-              <p
-                className={`mt-2 text-sm ${
-                  smsSetupStatus === "error" ? "text-destructive" : "text-emerald-500"
-                }`}
-              >
-                {smsSetupMessage}
-              </p>
-            )}
-          </div>
+          <CommunicationsConsentSettings
+            onSmsSetup={sendSmsSetupText}
+            smsSetupStatus={smsSetupStatus}
+            smsSetupMessage={smsSetupMessage}
+          />
           {([
             { key: "dailyReminders" as const, label: "Daily practice reminders", description: "Get reminded to practice each day" },
             { key: "weeklyProgress" as const, label: "Weekly progress summary", description: "Receive a weekly report of your progress" },

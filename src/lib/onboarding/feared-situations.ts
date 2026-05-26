@@ -111,6 +111,9 @@ export interface OnboardingData {
   };
   assessmentProfile?: AssessmentProfile;
   recommendedEmphasis?: AssessmentScores["recommendedEmphasis"];
+  contactPhoneNumber?: string;
+  smsConsent?: boolean;
+  phoneCallConsent?: boolean;
 }
 
 export interface ConfidenceSituation {

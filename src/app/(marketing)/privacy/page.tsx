@@ -14,7 +14,7 @@ export default function PrivacyPage() {
         Privacy Policy
       </h1>
       <p className="text-muted-foreground mb-12">
-        Last updated: May 24, 2026
+        Last updated: May 25, 2026
       </p>
 
       <div className="prose prose-invert prose-teal max-w-none space-y-8">
@@ -190,7 +190,45 @@ export default function PrivacyPage() {
           </p>
         </Section>
 
-        <Section title="7. Your Rights">
+        <Section title="7. Text Messages &amp; Practice Phone Calls">
+          <p>
+            If you choose to provide a mobile number, StutterLab may contact you only
+            with your explicit consent:
+          </p>
+          <ul className="list-disc pl-6 space-y-2 mt-2">
+            <li>
+              <strong>SMS:</strong> Practice reminders and account-related updates.
+              Message frequency varies. Message and data rates may apply.
+            </li>
+            <li>
+              <strong>Phone calls:</strong> Automated practice calls when you use phone
+              training features (for example, Phone Call Simulator).
+            </li>
+          </ul>
+          <p className="mt-4">
+            You may opt in during onboarding or in Settings → Notifications. Consent is
+            not required to use the core program. We store your number and consent flags
+            in your profile preferences.
+          </p>
+          <p className="mt-2">
+            To opt out of texts, reply <strong>STOP</strong> to any StutterLab message or
+            disable SMS consent in Settings. To stop practice calls, disable phone-call
+            consent in Settings. Reply <strong>HELP</strong> for help, or contact{" "}
+            <a
+              href="mailto:support@stutterlab.com"
+              className="text-primary hover:underline"
+            >
+              support@stutterlab.com
+            </a>
+            . Full disclosure:{" "}
+            <Link href="/sms-consent" className="text-primary hover:underline">
+              SMS &amp; Phone Consent
+            </Link>
+            .
+          </p>
+        </Section>
+
+        <Section title="8. Your Rights">
           <p>You have the right to:</p>
           <ul className="list-disc pl-6 space-y-1 mt-2">
             <li>
@@ -221,7 +259,7 @@ export default function PrivacyPage() {
           </p>
         </Section>
 
-        <Section title="8. Adult-Only Service">
+        <Section title="9. Adult-Only Service">
           <p>
             StutterLab is intended for adults 18 and older only. We do not
             knowingly collect personal information from anyone under 18. If you
@@ -230,7 +268,7 @@ export default function PrivacyPage() {
           </p>
         </Section>
 
-        <Section title="9. Cookies">
+        <Section title="10. Cookies">
           <p>
             We use essential cookies for authentication and session management.
             We use PostHog for analytics, which may set cookies to track
@@ -239,7 +277,7 @@ export default function PrivacyPage() {
           </p>
         </Section>
 
-        <Section title="10. Changes to This Policy">
+        <Section title="11. Changes to This Policy">
           <p>
             We may update this Privacy Policy from time to time. We will notify
             you of material changes by posting the updated policy on this page
@@ -249,7 +287,7 @@ export default function PrivacyPage() {
           </p>
         </Section>
 
-        <Section title="11. Contact Us">
+        <Section title="12. Contact Us">
           <p>
             If you have questions about this Privacy Policy or your data,
             contact us at:

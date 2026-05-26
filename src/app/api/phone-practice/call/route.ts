@@ -6,6 +6,7 @@ import { fetchWithTimeout } from "@/lib/observability/timeout";
 import { logError, measureAsync } from "@/lib/observability/logger";
 import { getVoiceMetadata } from "@/lib/voice/server-personas";
 import { getMvpSmsConfig } from "@/lib/sms/mvp";
+import { hasPhoneCallConsentForNumber } from "@/lib/actions/comms";
 
 const E164_PHONE_RE = /^\+[1-9]\d{7,14}$/;
 
@@ -50,6 +51,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Phone number must be in E.164 format, like +14155552671" },
         { status: 400 }
+      );
+    }
+
+    const consented = await hasPhoneCallConsentForNumber(phoneNumber);
+    if (!consented) {
+      return NextResponse.json(
+        {
+          error:
+            "Phone-call consent is required. Enable practice calls in Settings or during onboarding.",
+        },
+        { status: 403 }
       );
     }
 
