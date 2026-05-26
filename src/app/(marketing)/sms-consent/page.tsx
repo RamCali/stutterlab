@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CommunicationsConsentForm } from "@/components/comms/communications-consent-form";
+import { CommunicationsConsentFormPreview } from "@/components/comms/communications-consent-form-preview";
 
 export const metadata: Metadata = {
   title: "SMS & Phone Consent | StutterLab",
@@ -48,15 +48,7 @@ export default function SmsConsentPage() {
             submitting your number constitutes consent for that channel only.
           </p>
           <div className="not-prose rounded-xl border border-border bg-card p-4 sm:p-6">
-            <CommunicationsConsentForm
-              phoneNumber=""
-              onPhoneNumberChange={() => {}}
-              smsConsent={false}
-              onSmsConsentChange={() => {}}
-              phoneCallConsent={false}
-              onPhoneCallConsentChange={() => {}}
-              compact
-            />
+            <CommunicationsConsentFormPreview />
             <p className="mt-4 text-xs text-muted-foreground">
               This public page is a read-only reference for carriers and compliance review.
               Live opt-in happens in the authenticated onboarding and settings flows.
