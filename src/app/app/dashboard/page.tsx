@@ -12,15 +12,20 @@ import {
   getOnboardingData,
   saveOnboardingData,
 } from "@/lib/onboarding/feared-situations";
+import { Card, CardContent } from "@/components/ui/card";
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
 import { seedFearedWords } from "@/lib/feared-words/store";
 import { getCurrentDay } from "@/lib/actions/user-progress";
 import { checkOnboardingStatus } from "@/lib/actions/user";
+import type { AssessmentProfile } from "@/lib/onboarding/scoring";
+import type { OnboardingData } from "@/lib/onboarding/feared-situations";
 import { checkHasActiveSubscription } from "@/lib/auth/premium";
 import { TodaysTasks } from "@/components/dashboard/todays-tasks";
 import { NorthStarCard } from "@/components/dashboard/north-star";
 import { WelcomeBackBanner } from "@/components/dashboard/welcome-back-banner";
 import { SLPAuthorityBadge } from "@/components/slp-authority-badge";
+import { getPracticeStreakLabel } from "@/lib/curriculum/personalization";
+import { EVIDENCE_DISCLAIMER } from "@/lib/evidence/technique-evidence";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -53,7 +58,7 @@ export default function DashboardPage() {
         checkOnboardingStatus()
           .then((result) => {
             if (result.onboardingCompleted && result.onboardingData) {
-              const nextData = {
+              const nextData: OnboardingData = {
                 completed: true,
                 name: result.onboardingData.name,
                 fearedSituations: result.onboardingData.fearedSituations,
@@ -89,6 +94,12 @@ export default function DashboardPage() {
                 severityScore: result.onboardingData.severityScore ?? undefined,
                 confidenceScore:
                   result.onboardingData.confidenceScore ?? undefined,
+                assessmentProfile:
+                  (result.onboardingData.assessmentProfile as
+                    | AssessmentProfile
+                    | undefined) ?? undefined,
+                recommendedEmphasis:
+                  result.onboardingData.recommendedEmphasis ?? undefined,
               };
               // Hydrate localStorage from DB
               saveOnboardingData(nextData);
@@ -134,18 +145,32 @@ export default function DashboardPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl md:text-3xl font-bold">{greeting}</h1>
-        <div className="flex items-center gap-2 mt-1">
-          <span className="text-sm md:text-base text-muted-foreground">
-            Day {currentDay}
-          </span>
-        </div>
+        <p className="text-sm md:text-base text-muted-foreground mt-1">
+          {getPracticeStreakLabel(currentDay)}
+        </p>
       </div>
+
+      {onboardingData?.referralGuidance?.shouldRecommendSlp && (
+        <Card className="border-amber-500/40 bg-amber-500/5">
+          <CardContent className="pt-4 pb-4 text-sm">
+            <p className="font-medium text-foreground">Consider speaking with an SLP</p>
+            <p className="text-muted-foreground mt-1">
+              {onboardingData.referralGuidance.reasons.join(" ")} StutterLab supports
+              daily practice between sessions — not a replacement for in-person care.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Welcome Back (shows only for returning users after 3+ day gap) */}
       <WelcomeBackBanner />
 
       {/* Today's Tasks */}
       <TodaysTasks dailyPlan={dailyPlan} currentDay={currentDay} />
+
+      <p className="text-xs text-muted-foreground text-center px-2">
+        {EVIDENCE_DISCLAIMER}
+      </p>
 
       {/* North Star Goal */}
       <NorthStarCard />

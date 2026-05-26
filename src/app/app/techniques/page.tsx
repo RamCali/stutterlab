@@ -2,6 +2,9 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { EvidenceBadge } from "@/components/evidence/evidence-badge";
+import type { EvidenceTier } from "@/lib/evidence/technique-evidence";
+import { EVIDENCE_DISCLAIMER } from "@/lib/evidence/technique-evidence";
 import {
   Wrench,
   Wind,
@@ -15,10 +18,22 @@ import {
   AudioWaveform,
 } from "lucide-react";
 
-const techniques = [
+const techniques: {
+  name: string;
+  category: string;
+  icon: typeof Wind;
+  color: string;
+  bg: string;
+  description: string;
+  when: string;
+  evidence: string;
+  science?: string;
+  evidenceTier: EvidenceTier;
+}[] = [
   {
     name: "Gentle Onset",
     category: "Fluency Shaping",
+    evidenceTier: "strong",
     icon: Wind,
     color: "text-cyan-500",
     bg: "bg-cyan-500/10",
@@ -30,6 +45,7 @@ const techniques = [
   {
     name: "Light Articulatory Contact",
     category: "Fluency Shaping",
+    evidenceTier: "strong",
     icon: Hand,
     color: "text-green-500",
     bg: "bg-green-500/10",
@@ -46,12 +62,14 @@ const techniques = [
     bg: "bg-purple-500/10",
     description: "Stretch vowel sounds and blend words together for continuous, flowing speech.",
     when: "Start at very slow rates (60 SPM) and gradually increase to natural speaking rate.",
-    evidence: "Shown to reduce stuttering by 90%+ in clinical trials. Continuous phonation activates different neural pathways.",
+    evidence: "Strong fluency shaping approach; effect sizes in reviews are large (d ≈ 0.75–1.63). Naturalness improves as rate increases.",
+    evidenceTier: "strong",
     science: "Similar to why singing eliminates stuttering for most people — continuous airflow and steady rhythm bypass the basal ganglia timing disruption that causes disfluency.",
   },
   {
     name: "Pausing Strategy",
     category: "Fluency Shaping",
+    evidenceTier: "strong",
     icon: Pause,
     color: "text-amber-500",
     bg: "bg-amber-500/10",
@@ -63,6 +81,7 @@ const techniques = [
   {
     name: "Cancellation",
     category: "Stuttering Modification",
+    evidenceTier: "moderate",
     icon: Undo2,
     color: "text-red-500",
     bg: "bg-red-500/10",
@@ -74,6 +93,7 @@ const techniques = [
   {
     name: "Pull-Out",
     category: "Stuttering Modification",
+    evidenceTier: "moderate",
     icon: ArrowUpRight,
     color: "text-orange-500",
     bg: "bg-orange-500/10",
@@ -85,6 +105,7 @@ const techniques = [
   {
     name: "Preparatory Set",
     category: "Stuttering Modification",
+    evidenceTier: "moderate",
     icon: Shield,
     color: "text-indigo-500",
     bg: "bg-indigo-500/10",
@@ -96,6 +117,7 @@ const techniques = [
   {
     name: "Voluntary Stuttering",
     category: "Desensitization",
+    evidenceTier: "moderate",
     icon: Zap,
     color: "text-yellow-500",
     bg: "bg-yellow-500/10",
@@ -112,7 +134,8 @@ const techniques = [
     bg: "bg-blue-500/10",
     description: "Altered auditory feedback disrupts the feedback loop that maintains stuttering, triggering a choral effect that increases fluency.",
     when: "Use during practice sessions or real-world speaking with headphones.",
-    evidence: "DAF alone reduces stuttering 60-80%. Combined DAF+FAF can reach 80%+ reduction.",
+    evidence: "Mixed evidence: helpful for some people in structured practice; large individual differences in conversation. Always practice carryover without the device.",
+    evidenceTier: "mixed",
     science: "A slight delay or pitch shift triggers the 'choral effect' — the brain processes your altered voice as another speaker, engaging unison-speech pathways that bypass the stuttering circuit.",
   },
 ];
@@ -139,11 +162,12 @@ export default function TechniquesPage() {
                   <tech.icon className={`h-5 w-5 ${tech.color}`} />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
                     <h3 className="font-medium text-base">{tech.name}</h3>
                     <Badge variant="secondary" className="text-xs">
                       {tech.category}
                     </Badge>
+                    <EvidenceBadge tier={tech.evidenceTier} />
                   </div>
                   <p className="text-base text-muted-foreground mb-2">{tech.description}</p>
                   <div className="space-y-1">
@@ -168,6 +192,10 @@ export default function TechniquesPage() {
           </Card>
         ))}
       </div>
+
+      <p className="text-xs text-muted-foreground text-center pb-4">
+        {EVIDENCE_DISCLAIMER}
+      </p>
     </div>
   );
 }

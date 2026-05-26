@@ -125,6 +125,12 @@ export async function checkOnboardingStatus(): Promise<{
     } | null;
     severityScore: number | null;
     confidenceScore: number | null;
+    assessmentProfile: string | null;
+    recommendedEmphasis: {
+      fluencyShaping: number;
+      stutteringModification: number;
+      cbt: number;
+    } | null;
   } | null;
 }> {
   const user = await requireAuth();
@@ -179,6 +185,12 @@ export async function checkOnboardingStatus(): Promise<{
       }) || null,
       severityScore: (tp.severityScore as number) || null,
       confidenceScore: (tp.confidenceScore as number) || null,
+      assessmentProfile: (tp.assessmentProfile as string) || null,
+      recommendedEmphasis: (tp.recommendedEmphasis as {
+        fluencyShaping: number;
+        stutteringModification: number;
+        cbt: number;
+      }) || null,
     },
   };
 }

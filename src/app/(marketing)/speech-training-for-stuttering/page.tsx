@@ -75,7 +75,7 @@ const faq = [
   },
   {
     q: "How long does speech therapy for stuttering take?",
-    a: "Treatment varies. Many people see improvement within 3-6 months of consistent practice. StutterLab's 90-day curriculum is designed for daily 25-minute sessions.",
+    a: "Progress varies. Many people notice change over months of consistent practice. StutterLab targets ~10 minutes of core daily practice, with optional deeper sessions when you have time.",
   },
   {
     q: "Can adults benefit from speech therapy for stuttering?",

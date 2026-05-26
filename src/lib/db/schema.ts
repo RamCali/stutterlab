@@ -644,6 +644,47 @@ export const audioLabPresets = pgTable("audio_lab_presets", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// ==================== OUTCOMES TRACKING ====================
+
+export const oasesCheckIns = pgTable(
+  "oases_check_ins",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    checkInDate: text("check_in_date").notNull(), // YYYY-MM-DD
+    scores: jsonb("scores").notNull(),
+    impactScore: real("impact_score").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("oases_check_ins_user_date_idx").on(table.userId, table.checkInDate),
+  ]
+);
+
+export const behavioralPredictions = pgTable(
+  "behavioral_predictions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    clientId: text("client_id"),
+    situation: text("situation").notNull(),
+    prediction: text("prediction").notNull(),
+    confidenceLevel: integer("confidence_level").notNull(),
+    anxietyBefore: integer("anxiety_before").notNull(),
+    anxietyAfter: integer("anxiety_after"),
+    actualOutcome: text("actual_outcome"),
+    completed: boolean("completed").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    completedAt: timestamp("completed_at"),
+  },
+  (table) => [
+    index("behavioral_predictions_user_created_idx").on(
+      table.userId,
+      table.createdAt
+    ),
+  ]
+);
+
 // ==================== EARLY ACCESS SIGNUPS ====================
 
 export const earlyAccessSignups = pgTable("early_access_signups", {

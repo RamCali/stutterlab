@@ -21,7 +21,7 @@ import { createMetadata, jsonLd } from "@/lib/seo";
 export const metadata = createMetadata({
   title: "Stuttering Exercises - Daily Practice for Better Fluency",
   description:
-    "Daily stuttering exercises for adults 18+. Gentle onset, breathing, prolonged speech, light contact, and more in a structured 90-day curriculum.",
+    "Daily stuttering exercises for adults 18+. Gentle onset, breathing, prolonged speech, light contact, and more — ~10 minutes a day, every day.",
   path: "/stuttering-exercises",
 });
 
@@ -68,7 +68,7 @@ const exercises = [
     difficulty: "Intermediate",
     duration: "10 min",
     description:
-      "Use Delayed Auditory Feedback to hear your voice on a delay. This naturally slows your speech and can reduce stuttering by up to 80%.",
+      "Use Delayed Auditory Feedback to hear your voice on a delay. Many people find it helpful in practice; effects vary in real conversation.",
     technique: "Start with 100ms delay. Read passages aloud. Gradually reduce delay as fluency improves.",
   },
   {
@@ -283,7 +283,7 @@ export default function StutteringExercisesPage() {
 
       <CtaSection
         title="You're Not Broken. You Just Need the Right Practice."
-        description="StutterLab structures these exercises into your personalized 90-day plan. See real progress, not just hope."
+        description="StutterLab turns these exercises into daily practice — personalized to your profile. Build the habit, track real progress."
         primaryCta="Start 7-Day Free Trial"
       />
     </>

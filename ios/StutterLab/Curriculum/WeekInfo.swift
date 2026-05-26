@@ -48,7 +48,7 @@ enum WeekData {
         10: "Pushing Boundaries",
         11: "Mastery Begins",
         12: "Strengthening Gains",
-        13: "Graduation",
+        13: "Practice milestone",
     ]
 
     static let milestones: [Int: String] = [
@@ -64,7 +64,7 @@ enum WeekData {
         10: "Feared words practice underway",
         11: "Advanced scenarios with confidence",
         12: "Community engagement & independence",
-        13: "Program complete — maintenance mode unlocked",
+        13: "90-day practice milestone — daily habit continues",
     ]
 
     /// Week number for a given day (1-13 for days 1-90, 14 for 91+)

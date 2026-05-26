@@ -106,10 +106,20 @@ export function getTodaysTechnique(day: number): TechniqueInfo {
  */
 export function getAdaptiveTechnique(
   day: number,
-  outcomes?: TechniqueOutcomeSummary | null
+  outcomes?: TechniqueOutcomeSummary | null,
+  /** When set, early days may include modification for anxiety/avoidance profiles */
+  earlyProfile?: "anxiety-heavy" | "avoidance-heavy" | null,
 ): TechniqueInfo {
-  // Phase 1 (days 1-14): Fluency shaping only (foundation)
+  // Phase 1 (days 1-14): Fluency shaping default; modification earlier for some profiles
   if (day <= 14) {
+    if (
+      earlyProfile &&
+      (earlyProfile === "anxiety-heavy" || earlyProfile === "avoidance-heavy") &&
+      day >= 5 &&
+      day % 4 === 0
+    ) {
+      return TECHNIQUE_DATA["voluntary_stuttering"];
+    }
     const idx = (day - 1) % FLUENCY_SHAPING_TECHNIQUES.length;
     return TECHNIQUE_DATA[FLUENCY_SHAPING_TECHNIQUES[idx]];
   }

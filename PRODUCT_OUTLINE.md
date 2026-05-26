@@ -11,7 +11,7 @@ Adults who stutter have evidence-based techniques available (d = 0.75-1.63) but 
 
 ## The Product (One Sentence)
 
-A daily speech practice app that gives adults who stutter SLP-designed exercises, an AI coach, and progress tracking — in under 10 minutes a day.
+A daily speech practice app (Headspace-style habit, not a fixed course) that gives adults who stutter SLP-designed exercises, simulated AI practice, and progress tracking — ~10 minutes core practice per day.
 
 ---
 
@@ -89,7 +89,7 @@ Saying no to these keeps the app lean:
 
 - No kids/preschool mode (adults 18+ only at launch)
 - No SLP dashboard
-- No DAF/FAF audio lab (mixed evidence, complex to build)
+- ~~No DAF/FAF audio lab~~ **Shipped** — labeled mixed evidence; introduced after baseline technique (day 6+); per-user responder tracking
 - No community features (needs critical mass)
 - No widgets (needs native wrapper)
 - No video content

@@ -129,12 +129,23 @@ function NewThoughtContent() {
 
   function handleSave() {
     if (isPredictionMode) {
-      addPrediction({
+      const created = addPrediction({
         situation,
         prediction,
         confidenceLevel,
         anxietyBefore,
       });
+      void import("@/lib/actions/outcomes").then(({ syncBehavioralPredictionToDb }) =>
+        syncBehavioralPredictionToDb({
+          clientId: created.id,
+          situation: created.situation,
+          prediction: created.prediction,
+          confidenceLevel: created.confidenceLevel,
+          anxietyBefore: created.anxietyBefore,
+          completed: false,
+          createdAt: created.createdAt,
+        }).catch(() => {}),
+      );
     } else {
       addThoughtRecord({
         situation,

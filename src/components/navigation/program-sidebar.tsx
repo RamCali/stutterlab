@@ -57,9 +57,11 @@ export function ProgramSidebar({ currentDay }: ProgramSidebarProps) {
       </div>
 
       <div className="mx-3 mt-5 rounded-md border border-border/60 bg-muted/20 px-3 py-3">
-        <p className="text-sm font-semibold">Day {currentDay}</p>
+        <p className="text-sm font-semibold">Daily practice</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          One focused speaking rep today. The program stays in the background.
+          {currentDay > 1
+            ? `${currentDay} days of showing up. Today's rep is what counts.`
+            : "One focused speaking rep today — build the habit."}
         </p>
       </div>
     </nav>

@@ -35,7 +35,7 @@ export default function TermsPage() {
           <p>
             StutterLab is an AI-powered speech training platform designed for
             adults 18 and older who stutter. The Service provides a structured
-            90-day program with daily exercises, AI speech coaching, progress
+            daily speech practice with guided exercises, simulated AI practice, progress
             tracking, and community features to help users build speaking
             confidence.
           </p>

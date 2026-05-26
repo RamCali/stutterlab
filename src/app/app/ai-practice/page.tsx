@@ -113,6 +113,14 @@ export default function AIPracticePage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
+      <Card className="border-amber-500/30 bg-amber-500/5">
+        <CardContent className="pt-4 pb-4 text-sm text-muted-foreground">
+          <strong className="text-foreground">Simulated practice</strong> — these
+          scenarios help you rehearse speaking in low-pressure settings. They are
+          not telepractice or a substitute for feedback from a licensed SLP.
+        </CardContent>
+      </Card>
+
       <div>
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <Brain className="h-7 w-7 text-primary" />

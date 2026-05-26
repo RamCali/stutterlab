@@ -22,6 +22,7 @@ import {
   getExposureLadderState,
   saveExposureAttempt,
   getAttemptsForRung,
+  canAttemptRung,
   type ExposureRung,
   type ExposureAttempt,
   type ExposureLadderState,
@@ -49,7 +50,6 @@ export default function ExposureLadderPage() {
   const [techniqueUsed, setTechniqueUsed] = useState("");
   const [reflection, setReflection] = useState("");
   const [outcome, setOutcome] = useState<"completed" | "partial" | "skipped">("completed");
-
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setState(getExposureLadderState());
@@ -57,6 +57,8 @@ export default function ExposureLadderPage() {
 
   function startLogging(rungId: string) {
     const rung = EXPOSURE_LADDER.find((r) => r.id === rungId);
+    if (!rung) return;
+    if (!canAttemptRung(rung.level, state)) return;
     setLoggingRung(rungId);
     setPredictedAnxiety(5);
     setActualAnxiety(5);
@@ -100,9 +102,17 @@ export default function ExposureLadderPage() {
           Exposure Ladder
         </h1>
         <p className="text-lg text-muted-foreground mt-1.5">
-          Gradually face speaking situations from easy to challenging
+          Gradually face speaking situations from easy to challenging — one level at a time
         </p>
       </div>
+
+      <Card className="border-border/60 bg-muted/20">
+        <CardContent className="pt-4 pb-4 text-sm text-muted-foreground">
+          Complete each level before moving up. Skipping rungs reduces the benefit of
+          graded exposure. If social anxiety feels overwhelming, consider working with
+          an SLP or psychologist alongside this tool.
+        </CardContent>
+      </Card>
 
       {/* Progress Summary */}
       <Card className="bg-primary/5 border-primary/20">

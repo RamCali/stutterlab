@@ -1,4 +1,8 @@
 import { DISFLUENCY_TYPES } from "@/lib/clinical/disfluency";
+import type {
+  AssessmentProfile,
+  AssessmentScores,
+} from "@/lib/onboarding/scoring";
 
 export interface FearedSituation {
   id: string;
@@ -105,6 +109,8 @@ export interface OnboardingData {
     urgency: "routine" | "recommended";
     reasons: string[];
   };
+  assessmentProfile?: AssessmentProfile;
+  recommendedEmphasis?: AssessmentScores["recommendedEmphasis"];
 }
 
 export interface ConfidenceSituation {

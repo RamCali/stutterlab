@@ -29,7 +29,7 @@ const approaches = [
     icon: AudioWaveform,
     title: "Delayed Auditory Feedback (DAF)",
     description:
-      "Hear your voice on a slight delay, naturally slowing speech rate and reducing stuttering blocks by up to 80%.",
+      "Hear your voice on a slight delay — can slow speech rate for some people in practice (mixed evidence for everyday conversation).",
   },
   {
     icon: Mic,

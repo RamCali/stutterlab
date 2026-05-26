@@ -57,7 +57,7 @@ export default function PrivacyPage() {
             </li>
             <li>
               Exercise completions, streak data, and progress through the
-              90-day program
+              daily practice program
             </li>
             <li>
               Self-reported data such as feared words, anxiety levels, and

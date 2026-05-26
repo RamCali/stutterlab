@@ -53,8 +53,25 @@ export default function MindsetPage() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshStore();
+
+    import("@/lib/actions/outcomes").then(({ syncBehavioralPredictionToDb }) => {
+      const { predictions } = getCBTStore();
+      for (const p of predictions) {
+        void syncBehavioralPredictionToDb({
+          clientId: p.id,
+          situation: p.situation,
+          prediction: p.prediction,
+          confidenceLevel: p.confidenceLevel,
+          anxietyBefore: p.anxietyBefore,
+          anxietyAfter: p.anxietyAfter,
+          actualOutcome: p.actualOutcome,
+          completed: p.completed,
+          completedAt: p.completedAt,
+          createdAt: p.createdAt,
+        }).catch(() => {});
+      }
+    });
   }, [refreshStore]);
 
   const stats = getThoughtRecordStats();

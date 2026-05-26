@@ -72,6 +72,17 @@ describe("getDailyPlan", () => {
     }
   });
 
+  it("day 1 does not include DAF before audio lab intro (day 6+)", () => {
+    const plan = getDailyPlan(1)!;
+    expect(plan.tasks.some((t) => t.type === "audio-lab")).toBe(false);
+    for (let day = 1; day <= 5; day++) {
+      const d = getDailyPlan(day)!;
+      expect(d.tasks.some((t) => t.type === "audio-lab")).toBe(false);
+    }
+    const day6 = getDailyPlan(6)!;
+    expect(day6.tasks.some((t) => t.type === "audio-lab")).toBe(true);
+  });
+
   it("adds onboarding-based personalization reasons to matching tasks", () => {
     const plan = getDailyPlan(3)!;
     const personalized = personalizeDailyPlan(plan, {

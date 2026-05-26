@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { EmbeddedCheckoutDialog } from "@/components/embedded-checkout";
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { ResearchParticipationSettings } from "@/components/settings/research-participation";
 import { trackProductEvent } from "@/lib/analytics/client";
 import {
   Dialog,
@@ -546,8 +547,18 @@ export default function SettingsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <ResearchParticipationSettings />
+
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                document
+                  .getElementById("research-consent")
+                  ?.scrollIntoView({ behavior: "smooth", block: "center" });
+              }}
+            >
               <Download className="h-4 w-4 mr-2" />
               Export My Data
             </Button>
@@ -593,7 +604,7 @@ export default function SettingsPage() {
                     icon: Flame,
                   },
                   {
-                    label: "Program day",
+                    label: "Practice streak (days)",
                     value: stats?.currentDay ?? 1,
                     icon: Calendar,
                   },

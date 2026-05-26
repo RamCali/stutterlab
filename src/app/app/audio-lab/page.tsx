@@ -20,6 +20,10 @@ import {
 } from "lucide-react";
 import { AudioEngine } from "@/lib/audio/AudioEngine";
 import { LiveCoachOverlay } from "@/components/coaching/LiveCoachOverlay";
+import { DafFeedbackPrompt } from "@/components/audio-lab/daf-feedback-prompt";
+import { EvidenceBadge } from "@/components/evidence/evidence-badge";
+import { MODALITY_EVIDENCE_TIER } from "@/lib/evidence/technique-evidence";
+import { recordDafPracticeSession } from "@/lib/audio/daf-responder";
 
 export default function AudioLabPage() {
   const engineRef = useRef<AudioEngine | null>(null);
@@ -46,6 +50,8 @@ export default function AudioLabPage() {
     "The rainbow is a division of white light into many beautiful colors."
   );
   const [choralRate, setChoralRate] = useState(0.8);
+  const [showDafFeedback, setShowDafFeedback] = useState(false);
+  const [dafWasUsedThisSession, setDafWasUsedThisSession] = useState(false);
 
   const levelCb = useCallback((level: number) => setInputLevel(level), []);
 
@@ -57,6 +63,10 @@ export default function AudioLabPage() {
       setInputLevel(0);
       setError(null);
       setAnalyserNode(null);
+      if (dafWasUsedThisSession) {
+        setShowDafFeedback(true);
+      }
+      setDafWasUsedThisSession(false);
       return;
     }
 
@@ -94,6 +104,10 @@ export default function AudioLabPage() {
       if (engine.getState().isActive) {
         setRunning(true);
         setAnalyserNode(engine.getAnalyserNode() ?? null);
+        if (dafEnabled) {
+          setDafWasUsedThisSession(true);
+          recordDafPracticeSession();
+        }
       }
     } catch (e) {
       setError(`Failed to start audio: ${e instanceof Error ? e.message : e}`);
@@ -149,7 +163,7 @@ export default function AudioLabPage() {
             Audio Lab
           </h1>
           <p className="text-lg text-muted-foreground mt-1.5">
-            Real-time audio training tools powered by Web Audio API
+            Optional auditory feedback for practice — effects vary in conversation
           </p>
         </div>
         <Badge variant="outline" className="text-xs">
@@ -157,6 +171,10 @@ export default function AudioLabPage() {
           PRO
         </Badge>
       </div>
+
+      {showDafFeedback && (
+        <DafFeedbackPrompt onDone={() => setShowDafFeedback(false)} />
+      )}
 
       {/* Error Banner */}
       {error && (
@@ -252,8 +270,12 @@ export default function AudioLabPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="flex items-center gap-2 mb-2">
+              <EvidenceBadge tier={MODALITY_EVIDENCE_TIER.daf} />
+            </div>
             <p className="text-sm text-muted-foreground mb-3">
-              Hear your voice with a slight delay. Reduces stuttering 60-80% for most people.
+              Hear your voice with a slight delay. Helpful for some people in
+              structured practice; always practice carryover without the device.
             </p>
             <div>
               <Label className="text-xs">Delay: {dafDelay}ms</Label>
@@ -287,8 +309,12 @@ export default function AudioLabPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="flex items-center gap-2 mb-2">
+              <EvidenceBadge tier={MODALITY_EVIDENCE_TIER.faf} />
+            </div>
             <p className="text-sm text-muted-foreground mb-3">
-              Shifts the pitch of your voice. Combined with DAF, can reduce stuttering up to 80%.
+              Shifts the pitch of your voice. May create a choral-like effect for
+              some people in practice; individual response varies.
             </p>
             <div>
               <Label className="text-xs">
@@ -328,8 +354,12 @@ export default function AudioLabPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="flex items-center gap-2 mb-2">
+              <EvidenceBadge tier={MODALITY_EVIDENCE_TIER.metronome} />
+            </div>
             <p className="text-sm text-muted-foreground mb-3">
-              Paced speaking with a steady beat. Helps establish smooth speech rhythm.
+              Paced speaking with a steady beat. Rhythmic cues can help in
+              structured reading; carryover to conversation is still practiced separately.
             </p>
             <div>
               <Label className="text-xs">Tempo: {metronomeBPM} BPM</Label>
@@ -367,8 +397,12 @@ export default function AudioLabPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="flex items-center gap-2 mb-2">
+              <EvidenceBadge tier={MODALITY_EVIDENCE_TIER.choral} />
+            </div>
             <p className="text-sm text-muted-foreground mb-3">
-              An AI voice reads along with you in unison. Choral effect eliminates stuttering for most people.
+              An AI voice reads along with you in unison. The choral effect helps
+              many people during guided practice — practice unaided speech too for transfer.
             </p>
             <div className="space-y-2">
               <div>

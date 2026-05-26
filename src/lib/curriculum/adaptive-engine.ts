@@ -1,11 +1,10 @@
 /**
- * Adaptive Engine — generates infinite personalized daily plans for day 91+.
+ * Adaptive Engine — personalized daily practice for day 91+ (ongoing habit).
  *
- * Days 1-90 use the curated curriculum from daily-plans.ts.
- * Day 91+ switches to this engine, which selects techniques based on
- * the user's A/B outcome data (fluency shaping vs stuttering modification).
+ * Days 1–90 use the rotation pool in daily-plans.ts.
+ * Day 91+ uses outcome-weighted technique selection (fluency shaping vs modification).
  *
- * This module is pure — no DB calls. It takes pre-fetched outcome data as input.
+ * Pure module — no DB calls.
  */
 
 import type { DailyPlan, DailyTask } from "./daily-plans";
@@ -26,7 +25,7 @@ const affirmations = [
   "Today, I practice not for perfection, but for progress.",
   "I am building new neural pathways with every exercise.",
   "Stuttering is neurology, not a character flaw. I practice to rewire, not to fix who I am.",
-  "fMRI studies prove that practice changes brain structure. Every session is literally reshaping my speech circuits.",
+  "Consistent practice can support neuroplasticity over time — keep showing up.",
   "70 million people stutter worldwide. I'm not alone, and I'm doing something about it.",
   "Avoidance makes stuttering harder. Speaking up — even imperfectly — is the path forward.",
   "The same brain that stutters also compensates, adapts, and grows. Neuroplasticity is on my side.",

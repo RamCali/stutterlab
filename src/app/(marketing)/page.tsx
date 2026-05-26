@@ -62,7 +62,7 @@ const painPoints = [
   {
     icon: Target,
     pain: "Rehearsing one sentence 10 times before you say it",
-    solve: "Rewire your speech patterns with clinically-proven DAF",
+    solve: "Practice with DAF when it helps you — effects vary by person",
   },
 ];
 
@@ -72,7 +72,7 @@ const features = [
     title: "Audio Lab",
     pain: "You've been told to \"just slow down.\" That's not how it works.",
     description:
-      "DAF, FAF, Choral Speaking & Metronome — the same clinical tools SLPs use, in your browser. Delayed Auditory Feedback alone reduces stuttering by up to 80% in clinical studies.",
+      "DAF, FAF, Choral Speaking & Metronome — tools many SLPs use in session. DAF can help some people in practice; effects vary in everyday conversation.",
     color: "text-primary",
     bg: "bg-primary/10",
   },
@@ -184,7 +184,7 @@ const faqs = [
   },
   {
     q: "I've tried other apps. They didn't work.",
-    a: "Most speech apps offer breathing exercises and call it training. StutterLab has a 90-day clinical curriculum, real-time AI conversation practice, DAF/FAF, feared word desensitization, and CBT — the full toolkit, not a fraction of it.",
+    a: "Most speech apps offer breathing exercises and call it training. StutterLab is daily practice (~10 min) with evidence-based techniques, simulated AI conversations, optional Audio Lab tools, feared-word work, and CBT-style mindset tools — built for consistency, like Headspace for speech.",
   },
   {
     q: "What if I don't have time?",
@@ -445,7 +445,7 @@ export default function LandingPage() {
               },
               {
                 title: "People looking for a quick fix",
-                detail: "There is no magic cure for stuttering. This is a 90-day training program that requires real effort.",
+                detail: "There is no magic cure for stuttering. This is a daily practice habit that requires real effort over time.",
               },
               {
                 title: "People who can\u2019t commit to 10 minutes a day",
@@ -581,7 +581,7 @@ export default function LandingPage() {
           <div className="flex flex-wrap justify-center gap-8 mb-12">
             {[
               { stat: "4.9/5", label: "Average rating" },
-              { stat: "90 days", label: "Full curriculum" },
+              { stat: "Daily", label: "Practice habit" },
               { stat: "24/7", label: "AI available anytime" },
               { stat: "SLP-built", label: "By a licensed clinician" },
             ].map((item) => (
@@ -649,22 +649,22 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
-                stat: "80%",
-                label: "fluency improvement with DAF",
+                stat: "d≈0.8+",
+                label: "fluency shaping effect sizes",
                 detail:
-                  "Delayed Auditory Feedback is one of the most-studied interventions in stuttering research. It changes how your brain processes speech in real time.",
+                  "Speech restructuring (gentle onset, light contact, prolonged speech) has among the strongest evidence for adults who stutter in systematic reviews.",
               },
               {
                 stat: "70M",
                 label: "people worldwide stutter",
                 detail:
-                  "You\u2019re not broken. Stuttering is a neurological difference affecting 1% of the population. Consistent practice works because of neuroplasticity.",
+                  "You\u2019re not broken. Stuttering is a neurological difference affecting about 1% of the population. Consistent practice can support change over time.",
               },
               {
                 stat: "10 min",
-                label: "daily practice changes brain structure",
+                label: "core daily practice",
                 detail:
-                  "fMRI studies show that consistent speech practice literally rewires the neural pathways responsible for fluency. Frequency matters more than duration.",
+                  "Short, repeatable sessions build the habit. Optional deeper practice when you have time — frequency matters more than marathon sessions.",
               },
             ].map((item) => (
               <Card key={item.label} className="border-border/60 text-center">

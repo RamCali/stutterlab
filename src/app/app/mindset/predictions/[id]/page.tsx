@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, CheckCircle2, FlaskConical } from "lucide-react";
 import { getPredictionById, completePrediction } from "@/lib/cbt/store";
+import { syncBehavioralPredictionToDb } from "@/lib/actions/outcomes";
 import type { Prediction } from "@/lib/cbt/store";
 
 export default function PredictionOutcomePage() {
@@ -29,6 +30,21 @@ export default function PredictionOutcomePage() {
   function handleComplete() {
     if (!prediction) return;
     completePrediction(predictionId, actualOutcome, anxietyAfter);
+    const updated = getPredictionById(predictionId);
+    if (updated) {
+      void syncBehavioralPredictionToDb({
+        clientId: updated.id,
+        situation: updated.situation,
+        prediction: updated.prediction,
+        confidenceLevel: updated.confidenceLevel,
+        anxietyBefore: updated.anxietyBefore,
+        anxietyAfter: updated.anxietyAfter,
+        actualOutcome: updated.actualOutcome,
+        completed: true,
+        completedAt: updated.completedAt,
+        createdAt: updated.createdAt,
+      });
+    }
     router.push("/app/mindset");
   }
 

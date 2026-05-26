@@ -254,3 +254,31 @@ export function getAttemptsForRung(rungId: string): ExposureAttempt[] {
 export function getRungById(id: string): ExposureRung | undefined {
   return EXPOSURE_LADDER.find((r) => r.id === id);
 }
+
+/** User may only attempt rungs at or below unlocked level */
+export function canAttemptRung(
+  rungLevel: number,
+  state: ExposureLadderState,
+): boolean {
+  return rungLevel <= state.unlockedLevel;
+}
+
+/**
+ * Skipping more than one rung ahead requires explicit acknowledgment
+ * (graded exposure should be sequential).
+ */
+export function requiresSkipAcknowledgment(
+  targetLevel: number,
+  state: ExposureLadderState,
+): boolean {
+  return targetLevel > state.unlockedLevel + 1;
+}
+
+export function getCompletionsForRung(
+  rungId: string,
+  state: ExposureLadderState,
+): number {
+  return state.attempts.filter(
+    (a) => a.rungId === rungId && a.outcome === "completed",
+  ).length;
+}

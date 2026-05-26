@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { EvidenceBadge } from "@/components/evidence/evidence-badge";
+import { LEARN_MODULE_EVIDENCE } from "@/lib/evidence/learn-modules";
 import {
   GraduationCap,
   Brain,
@@ -267,9 +269,9 @@ export default function LearnPage() {
         <CardContent className="py-3">
           <p className="text-sm text-muted-foreground">
             <span className="font-medium text-foreground">Backed by neuroscience.</span>{" "}
-            Stuttering is a neurodevelopmental disorder with ~70% genetic basis. fMRI studies show
-            structural differences in speech motor areas. StutterLab is for adults 18+ and turns
-            speech patterns into practice guidance, not diagnosis.
+            Stuttering is a neurodevelopmental disorder with a strong genetic component.
+            Research shows differences in speech motor areas. StutterLab is for adults 18+ and
+            turns speech patterns into practice guidance, not diagnosis.
           </p>
         </CardContent>
       </Card>
@@ -293,8 +295,11 @@ export default function LearnPage() {
                     <mod.icon className={`h-5 w-5 ${mod.color}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="text-xs text-muted-foreground">Module {mod.id}</span>
+                      {LEARN_MODULE_EVIDENCE[mod.id] && (
+                        <EvidenceBadge tier={LEARN_MODULE_EVIDENCE[mod.id]} />
+                      )}
                       {mod.isPremium && (
                         <Badge variant="outline" className="text-xs">
                           <Crown className="h-2.5 w-2.5 mr-0.5" />

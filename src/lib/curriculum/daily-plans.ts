@@ -1,21 +1,20 @@
 /**
- * 90-Day Structured Stuttering Training Curriculum
+ * Daily speech practice rotation (Headspace-style habit, not a fixed "course").
  *
  * Design principles:
- *   - 10 min average session (8-12 min range) — fits a busy professional's day
- *   - Front-load "wow" features: DAF on Day 1, AI chat by Day 3, challenges by Day 5
- *   - Every day = 1 foundation skill + 1 exciting feature (no boring days)
- *   - Journal every 2-3 days, mindfulness every 4-5 days, learn modules weekly
+ *   - ~10 min core session (8–12 min) — optional deep practice block when time allows
+ *   - Days 1–90: internal rotation pool; day number = practice streak counter, not a syllabus
+ *   - Day 91+: adaptive engine from session outcomes + onboarding emphasis
+ *   - DAF/Audio Lab introduced after baseline technique (day 6+); effects vary by person
+ *   - Personalization via applyPracticePersonalization() — profile shifts task mix
  *
- * Phase 1 (Days 1-14):  Quick Wins — taste everything, build the hook
- * Phase 2 (Days 15-30): Technique Depth — go deeper on fluency shaping
- * Phase 3 (Days 31-50): Modification & Mindset — stuttering modification + CBT
- * Phase 4 (Days 51-70): Real-World Transfer — harder scenarios, real conversations
- * Phase 5 (Days 71-90): Independence — mastery, maintenance, graduation
- * Phase 6 (Day 91+):   Adaptive Maintenance — infinite personalized plans
+ * Rotation phases (internal labels, not user-facing "course"):
+ *   1 Quick Wins · 2 Technique Depth · 3 Modification & Mindset
+ *   4 Real-World Transfer · 5 Independence · 6+ Adaptive practice
  */
 
 import { getAdaptiveDailyPlan as getAdaptiveDailyPlanImport } from "./adaptive-engine";
+import { applyPracticePersonalization } from "./personalization";
 import { getHarrisonReflection, HARRISON_AFFIRMATIONS } from "./harrison-observations";
 import type { OnboardingData } from "@/lib/onboarding/feared-situations";
 
@@ -82,7 +81,7 @@ const affirmations = [
   "Today, I practice not for perfection, but for progress.",
   "I am building new neural pathways with every exercise.",
   "Stuttering is neurology, not a character flaw. I practice to rewire, not to fix who I am.",
-  "fMRI studies prove that practice changes brain structure. Every session is literally reshaping my speech circuits.",
+  "Consistent practice can support neuroplasticity — research shows speech training is associated with brain changes over time.",
   "70 million people stutter worldwide. I'm not alone, and I'm doing something about it.",
   "Avoidance makes stuttering harder. Speaking up — even imperfectly — is the path forward.",
   "The same brain that stutters also compensates, adapts, and grows. Neuroplasticity is on my side.",
@@ -247,7 +246,7 @@ function getDayTitle(day: number, phase: number): string {
     "Celebrating Your Journey",         // Day 87: review all progress
     "Your Personal Toolkit",            // Day 88: reference card
     "Looking Forward",                  // Day 89: beyond 90 days
-    "Day 90: Graduation!",             // Day 90: final assessment
+    "90 Days of Practice!",            // Day 90: milestone — habit continues
   ];
   return titles[idx] || `Independence Day ${day}`;
 }
@@ -269,7 +268,6 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
   // Target: ~10 min/day (8-12 range)
   if (phase === 1) {
     if (day === 1) {
-      // THE "WHOA" MOMENT: DAF demo on Day 1
       tasks.push({
         title: "Gentle Onset — Easy Words",
         subtitle: "Say 5 words with a soft start",
@@ -278,15 +276,15 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         href: "/app/exercises",
       });
       tasks.push({
-        title: "DAF Demo",
-        subtitle: "Read a sentence with delayed feedback — feel the difference",
+        title: "Learn: How Practice Works",
+        subtitle: "Why daily reps matter — 3 min overview",
         duration: "3 min",
-        type: "audio-lab",
-        href: "/app/audio-lab",
+        type: "learn",
+        href: "/app/learn",
       });
       tasks.push({
         title: "Voice Journal",
-        subtitle: "Record how that felt — your Day 1 baseline",
+        subtitle: "Record how that felt — your first practice baseline",
         duration: "2 min",
         type: "journal",
         href: "/app/voice-journal/new",
@@ -300,11 +298,11 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         href: "/app/exercises",
       });
       tasks.push({
-        title: "DAF Reading Practice",
-        subtitle: "Read a short paragraph with DAF on",
+        title: "Pausing Preview",
+        subtitle: "Try deliberate pauses between phrases",
         duration: "4 min",
-        type: "audio-lab",
-        href: "/app/audio-lab",
+        type: "exercise",
+        href: "/app/exercises",
       });
     } else if (day === 3) {
       // FIRST AI CHAT: the "I just practiced a real conversation" moment
@@ -339,11 +337,11 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
         href: "/app/exercises",
       });
       tasks.push({
-        title: "DAF + Pausing Combined",
-        subtitle: "Read with DAF and add intentional pauses",
+        title: "Pausing — Full Sentences",
+        subtitle: "Chunk sentences with intentional pauses",
         duration: "4 min",
-        type: "audio-lab",
-        href: "/app/audio-lab",
+        type: "exercise",
+        href: "/app/exercises",
       });
       tasks.push({
         title: "Mindfulness Check-In",
@@ -377,9 +375,23 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
       });
     } else if (day === 6) {
       tasks.push({
-        title: "Rhythm Reading",
-        subtitle: "Read with a metronome beat — feel the flow of syllable-timed speech",
+        title: "Audio Lab: DAF Introduction",
+        subtitle: "Try delayed feedback in reading — effects vary; many people find it helpful in practice",
         duration: "4 min",
+        type: "audio-lab",
+        href: "/app/audio-lab",
+      });
+      tasks.push({
+        title: "DAF-Off Carryover",
+        subtitle: "Read the same passage without DAF — practice transferring slower pace",
+        duration: "3 min",
+        type: "exercise",
+        href: "/app/exercises/daf-assisted-reading",
+      });
+      tasks.push({
+        title: "Rhythm Reading",
+        subtitle: "Read with a metronome beat — syllable-timed speech (mixed evidence for conversation)",
+        duration: "3 min",
         type: "exercise",
         href: "/app/rhythm-reading",
       });
@@ -1206,26 +1218,26 @@ function getDayTasks(day: number, phase: number): DailyTask[] {
       });
     }
 
-    // Day 90: Graduation
+    // Day 90: 90-day practice milestone (habit continues — not an endpoint)
     if (day === 90) {
       tasks.length = 1;
       tasks.push({
-        title: "Final Assessment",
-        subtitle: "Your graduation reading — see your full journey",
+        title: "Progress Assessment",
+        subtitle: "Compare a reading to your baseline — see how far you've come",
         duration: "4 min",
         type: "exercise",
         href: "/app/progress/assess",
       });
       tasks.push({
-        title: "Voice Journal — Graduation",
-        subtitle: "Record your graduation message to yourself",
+        title: "Voice Journal — 90-Day Reflection",
+        subtitle: "Record a message to yourself about your practice journey",
         duration: "3 min",
         type: "journal",
         href: "/app/voice-journal/new",
       });
       tasks.push({
-        title: "Celebrate & Plan Ahead",
-        subtitle: "Review your achievements and set your next goal",
+        title: "Set Your Next Practice Goal",
+        subtitle: "Daily practice continues — what do you want to focus on next?",
         duration: "2 min",
         type: "mindfulness",
         href: "/app/mindfulness",
@@ -1252,7 +1264,7 @@ function getTaskReason(type: TaskType, day: number, phase: number): string {
   // Exercise — varies by phase
   if (type === "exercise") {
     if (phase === 1) {
-      if (day <= 3) return "Gentle onset is the highest-impact technique for reducing blocks — research shows 60-80% fewer blocks when mastered.";
+      if (day <= 3) return "Gentle onset is among the best-supported fluency shaping skills for reducing hard blocks on word starts.";
       if (day <= 7) return "You're building muscle memory for smooth speech initiation — repetition in week 1 creates automatic habits.";
       return "Combining techniques you've learned this week strengthens neural pathways — variety prevents plateaus.";
     }
@@ -1264,8 +1276,8 @@ function getTaskReason(type: TaskType, day: number, phase: number): string {
 
   // Audio Lab (DAF/FAF)
   if (type === "audio-lab") {
-    if (day === 1) return "DAF on Day 1 gives you an immediate \"whoa\" moment — most people are 60-80% more fluent instantly.";
-    if (phase === 1) return "DAF creates a feedback loop that naturally slows and smooths your speech — building confidence for harder tasks.";
+    if (day >= 6 && day <= 10) return "DAF can help some people slow and smooth speech in practice — effects vary in real conversation; always practice carryover without the device.";
+    if (phase === 1) return "Audio feedback tools support technique practice for some users — pair with unaided speech so skills transfer.";
     if (phase === 2) return "Combining audio tools with techniques deepens the fluency effect and builds transfer to unaided speech.";
     if (phase >= 3) return "Audio tools support your technique practice — the goal is gradually reducing reliance as your skills strengthen.";
     return "Audio feedback maintains your fluency gains while you work on harder real-world transfer.";
@@ -1304,14 +1316,14 @@ function getTaskReason(type: TaskType, day: number, phase: number): string {
       }
       return "CBT-based mindfulness restructures the anxiety-stuttering loop — changing how you think about speaking.";
     }
-    return "Maintaining a mindfulness practice is the #1 predictor of long-term fluency maintenance after program completion.";
+    return "Maintaining a mindfulness practice supports long-term confidence and reduces the anxiety–tension cycle around speaking.";
   }
 
   // Feared Words
   if (type === "feared-words") {
     if (day <= 14) return "Identifying your trigger words removes avoidance behavior — facing them head-on is more effective than substituting.";
     if (phase === 3) return "Practicing feared words with modification techniques reduces the emotional charge around specific sounds.";
-    return "Feared word mastery is personalized to your specific triggers — this is why your program is different from generic drills.";
+    return "Feared word practice targets your specific triggers — personalization makes daily practice relevant to your life.";
   }
 
   // Challenge
@@ -1326,17 +1338,16 @@ function getTaskReason(type: TaskType, day: number, phase: number): string {
     return "Understanding the science behind your techniques increases confidence and compliance — knowing why it works helps you do it.";
   }
 
-  return "This exercise is part of your structured 90-day program — each task builds on the previous one.";
+  return "This exercise is part of today's practice rotation — consistency matters more than a fixed schedule.";
 }
 
-/** Get plan for a specific day (days 1-90 use curated curriculum, 91+ use adaptive engine) */
+/** Get plan for a practice day (1–90 rotation pool; 91+ adaptive engine) */
 export function getDailyPlan(day: number): DailyPlan | null {
   if (day < 1) return null;
   if (day <= 90) {
     const plans = generateDailyPlans();
     return plans[day - 1];
   }
-  // Day 91+: delegate to adaptive engine (balanced default when no outcome data)
   return getAdaptiveDailyPlanImport(day);
 }
 
@@ -1344,13 +1355,17 @@ export function personalizeDailyPlan(
   plan: DailyPlan,
   onboardingData?: OnboardingData | null,
 ): DailyPlan {
+  const result = applyPracticePersonalization(plan, onboardingData);
+
   const focusReasons = getPersonalPracticeFocus(onboardingData);
-  if (focusReasons.length === 0) return plan;
+  if (focusReasons.length === 0) return result;
 
   return {
-    ...plan,
-    tasks: plan.tasks.map((task) => {
-      const personalReason = focusReasons.find((focus) => focus.taskTypes.includes(task.type));
+    ...result,
+    tasks: result.tasks.map((task) => {
+      const personalReason = focusReasons.find((focus) =>
+        focus.taskTypes.includes(task.type),
+      );
       if (!personalReason) return task;
 
       return {

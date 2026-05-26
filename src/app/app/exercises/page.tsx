@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { BookOpen, Search, Crown } from "lucide-react";
 import { exercises } from "@/lib/exercises/exercise-data";
+import { EvidenceBadge } from "@/components/evidence/evidence-badge";
+import { EXERCISE_EVIDENCE_TIER } from "@/lib/evidence/technique-evidence";
 
 /** Exercises with dedicated pages route there instead of /exercises/[id] */
 const CUSTOM_EXERCISE_ROUTES: Record<string, string> = {
@@ -102,13 +104,16 @@ export default function ExercisesPage() {
                     <p className="text-xs text-muted-foreground mb-2">
                       {ex.description}
                     </p>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Badge
                         variant="secondary"
                         className={`text-xs ${difficultyColors[ex.difficulty]}`}
                       >
                         {ex.difficulty}
                       </Badge>
+                      {EXERCISE_EVIDENCE_TIER[ex.id] && (
+                        <EvidenceBadge tier={EXERCISE_EVIDENCE_TIER[ex.id]} />
+                      )}
                       <span className="text-xs text-muted-foreground">
                         {ex.duration}
                       </span>

@@ -1,14 +1,12 @@
 import Foundation
 
-// MARK: - 90-Day Structured Stuttering Treatment Curriculum
+// MARK: - Daily Speech Practice Rotation
 
 /// Ported from src/lib/curriculum/daily-plans.ts
+/// Headspace-style daily habit — day number is a practice streak counter.
+/// Days 1–90 are an internal rotation pool, not a fixed course syllabus.
 ///
-/// Phase 1 (Days 1-14):  Foundation — breathing, gentle onset, basic exercises
-/// Phase 2 (Days 15-30): Building Blocks — light contact, prolonged speech
-/// Phase 3 (Days 31-50): Technique Integration — cancellation, pull-out, CBT
-/// Phase 4 (Days 51-70): Real-World Practice — AI conversations, feared words
-/// Phase 5 (Days 71-90): Mastery & Maintenance — advanced scenarios, independence
+/// Rotation phases: Quick Wins · Technique Depth · Modification · Transfer · Independence
 
 enum DailyPlanGenerator {
 
@@ -26,7 +24,7 @@ enum DailyPlanGenerator {
         "Today, I practice not for perfection, but for progress.",
         "I am building new neural pathways with every exercise.",
         "Stuttering is neurology, not a character flaw. I practice to rewire, not to fix who I am.",
-        "fMRI studies prove that practice changes brain structure. Every session is literally reshaping my speech circuits.",
+        "Consistent practice can support neuroplasticity — research links speech training to brain changes over time.",
         "70 million people stutter worldwide. I'm not alone, and I'm doing something about it.",
         "Avoidance makes stuttering harder. Speaking up — even imperfectly — is the path forward.",
         "The same brain that stutters also compensates, adapts, and grows. Neuroplasticity is on my side.",
@@ -141,7 +139,7 @@ enum DailyPlanGenerator {
         "Celebrating Your Journey",
         "Your Personal Toolkit",
         "Looking Forward",
-        "Day 90: Graduation!",
+        "90 Days of Practice!",
     ]
 
     // MARK: - Generate Plan for a Day
