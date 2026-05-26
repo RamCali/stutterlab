@@ -440,7 +440,245 @@ StutterLab uses a **hard paywall with free trial** — no permanent free tier.
 - Post-conversion month 1: weekly "wins" email with practice stats
 - Cancel flow: offer pause (1 month) before full cancellation
 
+> **Production pricing (current):** Premium is **$99/month** or **$999/year** (see `docs/launch-readiness-checklist.md`, `PRD.md`). Older sections below reference lower test tiers ($9.99/mo, $59.99/yr, $299/yr) from strategy drafts — use those for A/B ideas, not as live prices until Stripe is updated.
+
 ---
+
+## Product Validation: Pricing, First-Minutes Value & Free Beta Testers
+
+Use this section before scaling paid acquisition. Goal: prove that **value is obvious in the first few minutes** and that **$99/mo feels fair after a real practice win** — not only on the paywall.
+
+### Is $99/Month Extreme?
+
+**Short answer:** High for a consumer app category; not absurd if sold as a serious daily program (SLP-designed path + tools + AI), not “another stuttering app.”
+
+| Benchmark | Typical range | vs StutterLab ($99/mo) |
+|-----------|---------------|-------------------------|
+| Speech / fluency apps | ~$60–150/**year** | ~8–16× higher monthly |
+| Wellness apps (Calm, Headspace) | ~$70–100/**year** | ~12× higher annually |
+| One SLP session | $150–250/session | Cheaper than weekly in-person care |
+| DAF hardware | $2,000–4,000 one-time | Cheaper than device; ongoing practice |
+
+**When $99/mo is defensible**
+
+- Buyer believes they get **ongoing structured practice**, not a content library: 90-day plan, daily session, Audio Lab (DAF/FAF), AI simulators, feared-word drills, progress they can see.
+- Positioning anchors to **therapy adjunct** (“one session = $150–250; daily practice = $99/mo”).
+- Audience is warm: SLP-referred, NSA/community, high-intent search — not cold Meta with no product proof.
+
+**When $99/mo hurts**
+
+- Compared to Stamurai / category apps on price alone.
+- User hits paywall **before** first speak/practice win (current funnel: onboarding → dashboard → `/checkout/trial` if unsubscribed).
+- Trial-to-paid & day-3 return are weak — price is rarely the only problem.
+
+**ARR tradeoff** (from `docs/1m-arr-roadmap.md`):
+
+- 1,000 × $99/mo ≈ $1.19M ARR
+- 1,200 × $69/mo ≈ $994k ARR — more subscribers, often easier in a small TAM
+
+**Decision checklist**
+
+| Question | If yes → $99 can work | If no → price may be too high |
+|----------|----------------------|-------------------------------|
+| Users complete first practice and return day 3+? | ✓ | ✗ |
+| Paywall shows program + tools + AI, not “subscription”? | ✓ | ✗ |
+| Trial-to-paid consistently >15% at this price? | ✓ | ✗ |
+| Primary channel is warm / clinical-adjacent? | ✓ | ✗ |
+| Cold paid social with no trial proof? | | ✗ |
+
+**Price fairness pulse** (after first completed practice, not at paywall):
+
+> “Programs like this often cost $150+ per session with a clinician. StutterLab is $99/month for daily practice. How fair does that feel?”  
+> Too cheap / Fair / Too expensive / Way too expensive
+
+If most say “Fair” after a good session but conversion is low → billing/trust UX. If “Way too expensive” after a good session → positioning or price test ($69/mo, annual-first $999/yr).
+
+---
+
+### “Value Obvious in the First Few Minutes” — Definition
+
+Within **~3–5 minutes** of signing up, a new user can answer: *“This is for me, and I just did something useful”* — without reading marketing or comparing prices.
+
+**Canonical paths** (measure one primary path per cohort; don’t mix in one funnel):
+
+| Path | Clock starts | Value moment (success) |
+|------|----------------|-------------------------|
+| **A — Daily practice** | Dashboard after onboarding | Finishes Speak step or full 4-step session (`/app/practice`) |
+| **B — AI practice** | Opens first scenario | `scenario_completed` / `first_session_completed` |
+| **C — Paywall-first** | Sees `/checkout/trial` | Starts trial after seeing plan preview |
+
+For premium pricing, **Path A or B** matters most. Path C only tells you if paywall copy converts — not if the product earned trust.
+
+---
+
+### How to Test First-Minutes Value
+
+#### 1. Qualitative — moderated first session (5–8 users)
+
+**Protocol (30 min each)**
+
+1. Fresh account; do not coach features.
+2. Screen-share: *“Try to do your first practice.”*
+3. Timer starts at onboarding complete (or signup).
+4. Stop when they say *“I get it”* or stall >2 minutes.
+
+**Capture sheet**
+
+| User | Time to first speak/audio | Time to first “win” | Quote at 3 min | Pay $99? (1–5) | Blocker |
+|------|---------------------------|---------------------|----------------|---------|
+| 1 | | | | | |
+
+**Pass criteria (rule of thumb)**
+
+- ≥5/8 complete a real speak interaction within **5 minutes**
+- ≥5/8 explain one benefit in their own words (not “it has AI”)
+- ≤2/8 ask *“what do I do now?”* on dashboard
+
+**5-second test:** Show dashboard 5 seconds after onboarding → hide → *“What will this help you do today?”* Vague answers (“speech stuff”) = value not obvious yet.
+
+#### 2. Quantitative — funnel & metrics
+
+Events land in `product_events` via `trackProductEvent` → `POST /api/events`. **Today:** checkout + AI voice are instrumented; **daily practice** (`/app/practice`) saves sessions but does not mirror `first_session_completed` — add events before relying on DB-only funnels.
+
+**Target funnel**
+
+```
+onboarding_complete
+  → dashboard_viewed (first time)
+  → first_action_started (practice | ai | audio-lab)
+  → first_speak_completed (mic / speak step)
+  → first_session_completed
+  → paywall_viewed / checkout_started
+  → purchase | trial_start
+```
+
+**Metrics**
+
+| Metric | Formula | Early target |
+|--------|---------|--------------|
+| Time to first speak | median(`first_speak` − `signup`) | **< 5 min** |
+| Activation rate | % `first_session_completed` in first visit | **> 40%** |
+| Paywall-before-value | % checkout before any speak event | **< 30%** |
+| 3-min bounce | % exit <3 min, zero actions | **< 50%** |
+| Trial after value | checkout where speak happened first | Compare A/B |
+
+**Example query** (adapt timestamps / event names):
+
+```sql
+SELECT percentile_cont(0.5) WITHIN GROUP (
+  ORDER BY EXTRACT(EPOCH FROM (s.created_at - o.created_at)) / 60
+)
+FROM product_events o
+JOIN product_events s ON s.user_id = o.user_id
+WHERE o.event_name = 'onboarding_complete'
+  AND s.event_name = 'first_session_completed';
+```
+
+Proxy until events exist: `profiles.onboarding_completed` + `exercise_sessions` first row per user.
+
+#### 3. A/B tests (one change, ~2 weeks or ~200 signups per variant)
+
+| Test | A | B | Learn |
+|------|---|---|-------|
+| Paywall timing | Checkout before first practice | 1 free Day-1 practice, then paywall | Value before price |
+| First action | Dashboard with multiple tasks | Single CTA: “Start Day 1 (3 min)” | Focus vs choice |
+| Onboarding | Full assessment | Short (goals + 1 feared word) | Time to speak |
+| Instant win | Normal Day 1 | 60s breathe + DAF preview phrase | Tool “magic” in minute 2 |
+
+**Rule:** If B lifts trial starts but **day-3 return** drops, you only improved perceived value — not delivery.
+
+#### 4. Session replay
+
+Record first visits: `/app/dashboard`, `/app/practice`, `/checkout/trial`. Review 10 sessions where `checkout_started` fired but **no** `first_session_completed` — note hesitation (onboarding length, paywall, mic permission, empty dashboard).
+
+#### 5. Post-practice micro-survey
+
+One tap after first completed session: *“Was this worth your time?”* 👍 / 👎 — segment by time-to-first-speak.
+
+---
+
+### Free Beta Tester Program (Get Users + Feedback Before Paid Scale)
+
+**Purpose:** 10–30 adults who stutter use the **full program free for 4–6 weeks**, give structured feedback, and validate first-minutes value + willingness to pay — without optimizing for revenue yet.
+
+#### Who to recruit
+
+| Channel | Approach |
+|---------|----------|
+| Personal network | 5–10 people who stutter or avoid speaking situations |
+| Reddit r/Stutter | Genuine post: looking for beta testers for daily practice app; follow sub rules |
+| NSA chapter / Stutter Social | Ask chapter lead for 2–3 volunteers; offer to share aggregate learnings |
+| SLP contacts | Homework-between-sessions positioning; 2–3 clients with consent |
+| X / LinkedIn | Short post: adult-focused, SLP-designed, need feedback not testimonials yet |
+
+**Screening (short form)**
+
+- Adult, self-identifies as stuttering or high speech avoidance
+- Will commit to **3 sessions in week 1**, **1 check-in call or async form in week 2**
+- OK with screen recording or written notes
+- Not currently in acute crisis (refer out if needed)
+
+#### What to give them
+
+- **Full Premium access, no card** for beta period (manual comp, invite link, or Stripe coupon — whatever is fastest operationally).
+- Clear expectation: *“We’re testing whether the first week feels useful — honest feedback preferred over politeness.”*
+- Optional: private Slack/Discord or email thread for bugs + “I got stuck here.”
+
+#### Feedback forms
+
+Use **[docs/beta-tester-feedback-form.md](docs/beta-tester-feedback-form.md)** — screening, after session 1, week 1, exit interview, cohort tracker, and SQL for `product_events`.
+
+#### What to ask (feedback template)
+
+**After first session (same day)**
+
+1. What were you trying to do when you opened the app?
+2. How long until you actually spoke (or used the mic)?
+3. In one sentence: what is this app for?
+4. Was anything confusing or blocking? (paywall, mic, onboarding length, “what’s next”)
+5. 👍 / 👎 — Was the first session worth your time?
+
+**After week 1**
+
+1. Did you come back on days 2–3? Why or why not?
+2. Which feature felt most valuable? Which felt skippable?
+3. What would make you open the app tomorrow?
+4. At **$99/month** after a week of use, how fair does that feel? (Too cheap / Fair / Too expensive / Way too expensive)
+5. Would you recommend to a friend who stutters? Why/why not?
+
+**Exit interview (20 min, optional)**
+
+- Walk through onboarding + dashboard with think-aloud.
+- Show paywall only after they’ve done one practice — ask if price matches what they experienced.
+
+#### Success criteria for beta (before heavy paid ads)
+
+| Signal | Target |
+|--------|--------|
+| Median time to first speak | < 5 minutes |
+| Week-1: ≥3 practices | ≥50% of beta cohort |
+| “Worth your time” 👍 after session 1 | ≥70% |
+| Can articulate one benefit unprompted | ≥70% |
+| “Fair” or “Too cheap” on $99 after week 1 | ≥40% (directional, small N) |
+| Critical blockers (can’t complete session 1) | <20% of cohort |
+
+#### What not to optimize in beta
+
+- App Store ranking, paid CPI, or top-of-funnel volume
+- Perfect paywall conversion (many betas skip paywall entirely)
+- Feature breadth — fix **first session + day-3 return** first
+
+#### Beta → paid transition
+
+When criteria above look healthy:
+
+1. Turn on paywall for new signups; keep beta cohort grandfathered or offer annual discount.
+2. Run one paywall A/B: **one free practice before checkout** vs current order.
+3. Only then scale Reddit/Apple Ads/YouTube with `first_practice_completed` and `checkout_started` as primary optimization events.
+
+**Beta outreach copy (draft)**
+
+> I’m building StutterLab — daily speech practice for adults who stutter (SLP-designed, AI + real technique reps). I’m looking for **10–15 beta testers** to use it free for a month and tell me honestly what works and what’s confusing — especially in the **first 5 minutes**. No testimonial required. DM or email [you] if interested.
 
 ---
 

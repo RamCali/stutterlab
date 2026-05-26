@@ -52,6 +52,7 @@ import { TransferGapReport } from "@/components/insights/TransferGapReport";
 import { CohortInsightBadge } from "@/components/insights/CohortInsightBadge";
 import { OasesCheckInCard } from "@/components/outcomes/oases-check-in-card";
 import { BehavioralExperimentsCard } from "@/components/outcomes/behavioral-experiments-card";
+import { QuickWeeklyReviewCard } from "@/components/weekly-review/quick-weekly-review-card";
 import type { PhonemeHeatmapData, TechniqueHistory, CoachingInsight, TransferReport } from "@/lib/analysis/types";
 
 /* ─── Heatmap helpers ─── */
@@ -262,6 +263,7 @@ export default function ProgressPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <QuickWeeklyReviewCard />
         <OasesCheckInCard />
         <BehavioralExperimentsCard />
       </div>

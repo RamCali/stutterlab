@@ -15,6 +15,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { BillingInterval } from "@/lib/stripe";
 import { trackProductEvent } from "@/lib/analytics/client";
+import { trackFunnelEventOnce } from "@/lib/analytics/funnel-events";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -41,7 +42,7 @@ export default function CheckoutTrialPage() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      trackProductEvent("checkout_started", { interval, surface: "trial_page" });
+      trackFunnelEventOnce("paywall_viewed", { surface: "trial_page", interval });
     }
   }, [status, interval]);
 

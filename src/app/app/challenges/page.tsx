@@ -19,9 +19,9 @@ import { getUserGamificationStats } from "@/lib/gamification/engine";
 import { getAchievementStatus } from "@/lib/gamification/achievements";
 import {
   getTodayChallenge,
-  completeDailyChallenge,
   type DailyChallenge,
 } from "@/lib/actions/challenges";
+import { UnifiedMicroChallenge } from "@/components/challenges/unified-micro-challenge";
 
 const DIFFICULTY_COLORS: Record<string, string> = {
   easy: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
@@ -40,7 +40,6 @@ export default function ChallengesPage() {
     completed: boolean;
   } | null>(null);
   const [loading, setLoading] = useState(true);
-  const [completing, setCompleting] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -56,26 +55,6 @@ export default function ChallengesPage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
-
-  async function handleCompleteChallenge() {
-    if (!todayData || todayData.completed || completing) return;
-    setCompleting(true);
-    try {
-      await completeDailyChallenge(todayData.challenge.id);
-      setTodayData((prev) => prev ? { ...prev, completed: true } : null);
-      // Refresh stats
-      const [newStats, newAch] = await Promise.all([
-        getUserGamificationStats(""),
-        getAchievementStatus(""),
-      ]);
-      setStats(newStats);
-      setAchievements(newAch);
-    } catch {
-      // Handle error silently
-    } finally {
-      setCompleting(false);
-    }
-  }
 
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
   const level = stats?.level;
@@ -143,81 +122,20 @@ export default function ChallengesPage() {
         </Card>
       )}
 
-      {/* Today's Real-World Challenge */}
-      <Card className={todayData?.completed ? "border-emerald-500/30 bg-emerald-500/5" : "border-primary/30 bg-primary/5"}>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Target className="h-4 w-4" />
-            Today&apos;s Real-World Challenge
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {todayData ? (
-            <div className="space-y-4">
-              <div className="flex items-start gap-4">
-                <div className="text-4xl">{todayData.challenge.icon}</div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold">{todayData.challenge.title}</h3>
-                    <Badge
-                      variant="outline"
-                      className={`text-xs ${DIFFICULTY_COLORS[todayData.challenge.difficulty]}`}
-                    >
-                      {todayData.challenge.difficulty}
-                    </Badge>
-                    <Badge variant="secondary" className="text-xs">
-                      +{todayData.challenge.xpReward} XP
-                    </Badge>
-                  </div>
-                  <p className="text-base text-muted-foreground">
-                    {todayData.challenge.description}
-                  </p>
-                </div>
-              </div>
-
-              {/* Tips */}
-              <div className="pl-14 space-y-1">
-                {todayData.challenge.tips.map((tip, i) => (
-                  <p key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
-                    <span className="text-primary mt-0.5">•</span>
-                    {tip}
-                  </p>
-                ))}
-              </div>
-
-              {todayData.completed ? (
-                <div className="pl-14 flex items-center gap-2 text-emerald-500">
-                  <CheckCircle2 className="h-5 w-5" />
-                  <span className="font-medium text-sm">Completed! +{todayData.challenge.xpReward} XP earned</span>
-                </div>
-              ) : (
-                <div className="pl-14">
-                  <Button
-                    onClick={handleCompleteChallenge}
-                    disabled={completing}
-                    size="lg"
-                    className="w-full sm:w-auto"
-                  >
-                    {completing ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    ) : (
-                      <CheckCircle2 className="h-4 w-4 mr-2" />
-                    )}
-                    I Did It!
-                  </Button>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Complete this challenge in real life, then tap &quot;I Did It&quot; to earn XP.
-                  </p>
-                </div>
-              )}
-            </div>
-          ) : loading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            </div>
-          ) : null}
-        </CardContent>
-      </Card>
+      {todayData && !loading ? (
+        <UnifiedMicroChallenge
+          challengeId={todayData.challenge.id}
+          challengeTitle={todayData.challenge.title}
+          technique={todayData.challenge.tips[0]}
+          tips={todayData.challenge.tips}
+        />
+      ) : loading ? (
+        <Card>
+          <CardContent className="py-8 flex justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </CardContent>
+        </Card>
+      ) : null}
 
       {/* Achievements */}
       <div>

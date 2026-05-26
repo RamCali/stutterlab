@@ -23,6 +23,11 @@ import {
 import { getCurrentDay, advanceDay, getUserOutcomeSummary } from "@/lib/actions/user-progress";
 import { completeSession } from "@/lib/actions/exercises";
 import type { TechniqueOutcomeSummary } from "@/lib/actions/user-progress";
+import {
+  trackFirstActionStarted,
+  trackFunnelEvent,
+  trackFunnelEventOnce,
+} from "@/lib/analytics/funnel-events";
 
 export default function PracticePage() {
   const router = useRouter();
@@ -36,6 +41,19 @@ export default function PracticePage() {
   // Initialize session start time on mount
   useEffect(() => {
     sessionStartRef.current = Date.now();
+    trackFunnelEvent("practice_session_started", {
+      currentDay,
+      techniqueId: technique.id,
+    });
+    trackFunnelEventOnce("first_practice_started", {
+      currentDay,
+      techniqueId: technique.id,
+    });
+    trackFirstActionStarted("practice", {
+      currentDay,
+      techniqueId: technique.id,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once on mount
   }, []);
 
   // Fetch real currentDay and outcomes on mount
@@ -56,6 +74,13 @@ export default function PracticePage() {
   const contentLevel = fearedWordLevel ?? baseContentLevel;
 
   function handleStepComplete() {
+    if (currentStep === 2) {
+      trackFunnelEventOnce("first_speak_completed", {
+        surface: "practice",
+        techniqueId: technique.id,
+        currentDay,
+      });
+    }
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
@@ -85,6 +110,21 @@ export default function PracticePage() {
         note,
       });
       await advanceDay();
+
+      trackFunnelEvent("practice_session_completed", {
+        techniqueId: technique.id,
+        techniqueCategory: technique.category,
+        durationSeconds,
+        currentDay,
+        confidenceBefore,
+        confidenceAfter,
+        selfRatedFluency: fluencyRating,
+      });
+      trackFunnelEventOnce("first_practice_completed", {
+        techniqueId: technique.id,
+        durationSeconds,
+        currentDay,
+      });
     } catch (err) {
       console.error("Failed to save session:", err);
     }

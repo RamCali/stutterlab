@@ -10,6 +10,7 @@ import {
   Sun,
 } from "lucide-react";
 import { PanicButton } from "@/components/panic-button";
+import { OfflineBundleProvider } from "@/components/offline/offline-bundle-provider";
 import { ProgramProvider, useProgram } from "@/components/navigation/program-context";
 import { ProgramSidebar } from "@/components/navigation/program-sidebar";
 import { MobileWeekNav } from "@/components/navigation/mobile-week-nav";
@@ -163,6 +164,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <ProgramProvider>
+      <OfflineBundleProvider />
       <AppShell>{children}</AppShell>
     </ProgramProvider>
   );

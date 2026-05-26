@@ -36,6 +36,10 @@ import { getSessionComparison } from "@/lib/actions/analytics";
 import type { SessionScorecard, SessionComparison } from "@/lib/analysis/types";
 import { CohortInsightBadge } from "@/components/insights/CohortInsightBadge";
 import { trackProductEvent } from "@/lib/analytics/client";
+import {
+  trackFirstActionStarted,
+  trackFunnelEventOnce,
+} from "@/lib/analytics/funnel-events";
 import { classifyDisfluencies, estimateSyllables } from "@/lib/audio/speech-metrics";
 import {
   getCompletedScenarioSteps,
@@ -207,6 +211,7 @@ export default function AIConversationPage() {
       blockAwareMode,
       turnMode,
     });
+    trackFirstActionStarted("ai", { scenario });
 
     timerRef.current = setInterval(() => {
       setElapsedSeconds((s) => s + 1);
@@ -566,13 +571,15 @@ export default function AIConversationPage() {
         taskProgress,
         durationSeconds: elapsedSeconds,
       });
-      if (typeof window !== "undefined" && !localStorage.getItem("stutterlab_first_session_completed")) {
-        localStorage.setItem("stutterlab_first_session_completed", "true");
-        trackProductEvent("first_session_completed", {
-          scenario,
-          durationSeconds: elapsedSeconds,
-        });
-      }
+      trackFunnelEventOnce("first_session_completed", {
+        surface: "ai",
+        scenario,
+        durationSeconds: elapsedSeconds,
+      });
+      trackFunnelEventOnce("first_ai_call_completed", {
+        scenario,
+        durationSeconds: elapsedSeconds,
+      });
       // Compute session scorecard (client-side, no DB needed)
       const scoringTurns = turns.map((t) => ({
         role: t.role as "user" | "assistant",

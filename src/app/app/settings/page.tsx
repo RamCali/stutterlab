@@ -12,6 +12,8 @@ import { EmbeddedCheckoutDialog } from "@/components/embedded-checkout";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { ResearchParticipationSettings } from "@/components/settings/research-participation";
 import { CommunicationsConsentSettings } from "@/components/settings/communications-consent-settings";
+import { NotificationPrefsSettings } from "@/components/settings/notification-prefs-settings";
+import { SlpSharePackButton } from "@/components/settings/slp-share-pack-button";
 import { trackProductEvent } from "@/lib/analytics/client";
 import {
   Dialog,
@@ -111,11 +113,6 @@ export default function SettingsPage() {
       .catch(() => {});
   }, []);
 
-  const [notifications, setNotifications] = useState({
-    dailyReminders: true,
-    weeklyProgress: true,
-    newExercises: true,
-  });
 
   function handleUpgrade() {
     setCheckoutOpen(true);
@@ -349,24 +346,7 @@ export default function SettingsPage() {
             smsSetupStatus={smsSetupStatus}
             smsSetupMessage={smsSetupMessage}
           />
-          {([
-            { key: "dailyReminders" as const, label: "Daily practice reminders", description: "Get reminded to practice each day" },
-            { key: "weeklyProgress" as const, label: "Weekly progress summary", description: "Receive a weekly report of your progress" },
-            { key: "newExercises" as const, label: "New exercise alerts", description: "Know when new exercises are added" },
-          ]).map((setting) => (
-            <div key={setting.key} className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">{setting.label}</p>
-                <p className="text-xs text-muted-foreground">{setting.description}</p>
-              </div>
-              <Switch
-                checked={notifications[setting.key]}
-                onCheckedChange={(checked) =>
-                  setNotifications((prev) => ({ ...prev, [setting.key]: checked }))
-                }
-              />
-            </div>
-          ))}
+          <NotificationPrefsSettings />
         </CardContent>
       </Card>
 
@@ -504,6 +484,7 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <ResearchParticipationSettings />
+          <SlpSharePackButton />
 
           <div className="flex items-center gap-3">
             <Button

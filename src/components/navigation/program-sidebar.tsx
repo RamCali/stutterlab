@@ -4,12 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Brain,
+  Calendar,
   Home,
   Library,
   MessageCircleWarning,
   Phone,
   Settings,
   TrendingUp,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +25,8 @@ const MVP_LINKS = [
   { href: "/app/techniques", label: "Techniques", icon: Library },
   { href: "/app/ai-practice", label: "AI Practice", icon: Brain },
   { href: "/app/feared-words", label: "Feared Words", icon: MessageCircleWarning },
+  { href: "/app/speaking-calendar", label: "Speaking Calendar", icon: Calendar },
+  { href: "/app/practice-rooms", label: "Practice Rooms", icon: Users },
   { href: "/app/progress", label: "Progress", icon: TrendingUp },
   { href: "/app/settings", label: "Settings", icon: Settings },
 ] as const;

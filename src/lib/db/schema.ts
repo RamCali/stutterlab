@@ -709,3 +709,128 @@ export const productEvents = pgTable(
     index("product_events_name_created_idx").on(table.eventName, table.createdAt),
   ]
 );
+
+// ==================== QUICK CALM / MOMENT LOGS ====================
+
+export const momentLogs = pgTable(
+  "moment_logs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    technique: text("technique").notNull(),
+    severity: integer("severity").notNull(),
+    context: text("context"),
+    notes: text("notes"),
+    helped: boolean("helped"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("moment_logs_user_created_idx").on(table.userId, table.createdAt)]
+);
+
+// ==================== SPEAKING CALENDAR ====================
+
+export const speakingEvents = pgTable(
+  "speaking_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    title: text("title").notNull(),
+    eventType: text("event_type").notNull(),
+    eventDate: timestamp("event_date").notNull(),
+    notes: text("notes"),
+    microPlan: jsonb("micro_plan"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("speaking_events_user_date_idx").on(table.userId, table.eventDate)]
+);
+
+// ==================== MICRO-CHALLENGE ATTEMPTS (UNIFIED) ====================
+
+export const microChallengeAttempts = pgTable(
+  "micro_challenge_attempts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    challengeId: text("challenge_id").notNull(),
+    challengeTitle: text("challenge_title").notNull(),
+    technique: text("technique"),
+    source: text("source").default("app").notNull(),
+    predictedAnxiety: integer("predicted_anxiety").notNull(),
+    actualAnxiety: integer("actual_anxiety"),
+    outcome: text("outcome").notNull(),
+    reflection: text("reflection"),
+    voiceNoteUrl: text("voice_note_url"),
+    xpEarned: integer("xp_earned").default(0).notNull(),
+    attemptDate: text("attempt_date").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("micro_challenge_attempts_user_date_idx").on(table.userId, table.attemptDate),
+  ]
+);
+
+// ==================== WEEKLY REVIEWS ====================
+
+export const weeklyReviews = pgTable(
+  "weekly_reviews",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    weekStart: text("week_start").notNull(),
+    topWin: text("top_win").notNull(),
+    topAvoidance: text("top_avoidance"),
+    targetSituation: text("target_situation").notNull(),
+    nextWeekPlan: jsonb("next_week_plan").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("weekly_reviews_user_week_idx").on(table.userId, table.weekStart)]
+);
+
+// ==================== NOTIFICATION PREFS ====================
+
+export const userNotificationPrefs = pgTable("user_notification_prefs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull().unique(),
+  dailyReminders: boolean("daily_reminders").default(true).notNull(),
+  weeklyProgress: boolean("weekly_progress").default(true).notNull(),
+  newExercises: boolean("new_exercises").default(false).notNull(),
+  smartReminders: boolean("smart_reminders").default(true).notNull(),
+  reminderHour: integer("reminder_hour").default(9).notNull(),
+  reminderMinute: integer("reminder_minute").default(0).notNull(),
+  phoneE164: text("phone_e164"),
+  smsEnabled: boolean("sms_enabled").default(false).notNull(),
+  lastReminderSentAt: timestamp("last_reminder_sent_at"),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ==================== GROUP PRACTICE ROOMS ====================
+
+export const practiceRooms = pgTable(
+  "practice_rooms",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    hostUserId: text("host_user_id").notNull(),
+    title: text("title").notNull(),
+    description: text("description"),
+    scheduledAt: timestamp("scheduled_at").notNull(),
+    durationMinutes: integer("duration_minutes").default(15).notNull(),
+    maxParticipants: integer("max_participants").default(8).notNull(),
+    status: text("status").default("scheduled").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("practice_rooms_scheduled_idx").on(table.scheduledAt)]
+);
+
+export const practiceRoomParticipants = pgTable(
+  "practice_room_participants",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    roomId: uuid("room_id")
+      .references(() => practiceRooms.id, { onDelete: "cascade" })
+      .notNull(),
+    userId: text("user_id").notNull(),
+    anonymousName: text("anonymous_name").notNull(),
+    joinedAt: timestamp("joined_at").defaultNow().notNull(),
+  },
+  (table) => [index("practice_room_participants_room_user_idx").on(table.roomId, table.userId)]
+);

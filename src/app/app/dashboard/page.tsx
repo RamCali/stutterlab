@@ -26,6 +26,7 @@ import { WelcomeBackBanner } from "@/components/dashboard/welcome-back-banner";
 import { SLPAuthorityBadge } from "@/components/slp-authority-badge";
 import { getPracticeStreakLabel } from "@/lib/curriculum/personalization";
 import { EVIDENCE_DISCLAIMER } from "@/lib/evidence/technique-evidence";
+import { trackFunnelEventOnce } from "@/lib/analytics/funnel-events";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -35,6 +36,11 @@ export default function DashboardPage() {
   const [onboardingData, setOnboardingData] =
     useState<ReturnType<typeof getOnboardingData>>(null);
   const [currentDay, setCurrentDay] = useState(1);
+
+  useEffect(() => {
+    if (!onboarded || !hydrated) return;
+    trackFunnelEventOnce("dashboard_viewed");
+  }, [onboarded, hydrated]);
 
   useEffect(() => {
     queueMicrotask(() => {

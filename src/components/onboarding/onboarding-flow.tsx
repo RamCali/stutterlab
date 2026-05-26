@@ -41,6 +41,10 @@ import {
   type AssessmentScores,
 } from "@/lib/onboarding/scoring";
 import { PHASE_LABELS } from "@/lib/curriculum/daily-plans";
+import {
+  markOnboardingCompleted,
+  trackFunnelEventOnce,
+} from "@/lib/analytics/funnel-events";
 
 const SUGGESTED_WORDS = [
   "my name",
@@ -356,6 +360,16 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     } catch {
       // localStorage fallback is sufficient
     }
+
+    markOnboardingCompleted();
+    trackFunnelEventOnce("onboarding_complete", {
+      severity: computed.severityLabel,
+      severityScore: computed.severityScore,
+      painPointCount: selectedPainPoints.size,
+      fearedSituationCount: selectedFears.size,
+      fearedWordCount: fearedWordInputs.length,
+      assessmentProfile: computed.profile,
+    });
 
     onComplete(data);
   }
