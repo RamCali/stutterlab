@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { track, EVENTS } from "@/lib/analytics";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +31,12 @@ export function PremiumGate({
 
   // All paid plans are equivalent now
   const hasAccess = currentPlan !== "free";
+
+  useEffect(() => {
+    if (!hasAccess) {
+      track(EVENTS.PAYWALL_VIEWED, { feature: featureName });
+    }
+  }, [hasAccess, featureName]);
 
   if (hasAccess) {
     return (
@@ -71,7 +78,13 @@ export function PremiumGate({
           {/* Billing interval toggle */}
           <BillingToggle interval={interval} onIntervalChange={setInterval} />
 
-          <Button onClick={() => setCheckoutOpen(true)} className="w-full">
+          <Button
+            onClick={() => {
+              track(EVENTS.CHECKOUT_STARTED, { feature: featureName, interval });
+              setCheckoutOpen(true);
+            }}
+            className="w-full"
+          >
             <Crown className="h-4 w-4 mr-2" />
             {isExpiredTrial
               ? `Reactivate — ${interval === "month" ? "$99/mo" : "$999/yr"}`
