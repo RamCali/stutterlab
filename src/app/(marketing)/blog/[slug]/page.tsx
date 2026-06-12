@@ -26,6 +26,7 @@ export async function generateMetadata({ params }: Props) {
     title: post.title,
     description: post.description,
     path: `/blog/${slug}`,
+    image: post.image,
   });
 }
 
@@ -79,6 +80,7 @@ export default async function BlogPostPage({ params }: Props) {
           headline: post.title,
           description: post.description,
           datePublished: post.date,
+          ...(post.image && { image: post.image }),
           author: { "@type": "Person", name: post.author },
           publisher: {
             "@type": "Organization",
@@ -86,6 +88,19 @@ export default async function BlogPostPage({ params }: Props) {
           },
         })}
       />
+      {post.faq.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={jsonLd({
+            "@type": "FAQPage",
+            mainEntity: post.faq.map((item) => ({
+              "@type": "Question",
+              name: item.question,
+              acceptedAnswer: { "@type": "Answer", text: item.answer },
+            })),
+          })}
+        />
+      )}
 
       <article className="py-12 px-6">
         <div className="max-w-3xl mx-auto">
@@ -124,10 +139,10 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
 
           {/* Hero image */}
-          {post.heroImage && (
+          {post.image && (
             <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden mt-8">
               <Image
-                src={post.heroImage}
+                src={post.image}
                 alt={post.title}
                 fill
                 className="object-cover"
@@ -141,6 +156,27 @@ export default async function BlogPostPage({ params }: Props) {
           <div className="mt-10">
             <MDXRemote source={post.content} components={mdxComponents} />
           </div>
+
+          {/* FAQ */}
+          {post.faq.length > 0 && (
+            <section className="mt-12 pt-8 border-t border-border/60">
+              <h2 className="text-2xl font-bold mb-6">
+                Frequently Asked Questions
+              </h2>
+              <div className="space-y-6">
+                {post.faq.map((item) => (
+                  <div key={item.question}>
+                    <h3 className="text-lg font-semibold mb-2">
+                      {item.question}
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {item.answer}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Tags */}
           {post.tags.length > 0 && (

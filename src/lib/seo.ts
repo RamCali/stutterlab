@@ -7,14 +7,21 @@ export function createMetadata({
   title,
   description,
   path,
+  image,
   noIndex = false,
 }: {
   title: string;
   description: string;
   path: string;
+  image?: string;
   noIndex?: boolean;
 }): Metadata {
   const url = `${SITE_URL}${path}`;
+  const imageUrl = image
+    ? image.startsWith("http")
+      ? image
+      : `${SITE_URL}${image}`
+    : undefined;
   return {
     title: `${title} | ${SITE_NAME}`,
     description,
@@ -26,11 +33,13 @@ export function createMetadata({
       siteName: SITE_NAME,
       type: "website",
       locale: "en_US",
+      ...(imageUrl && { images: [{ url: imageUrl }] }),
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      ...(imageUrl && { images: [imageUrl] }),
     },
     ...(noIndex && { robots: { index: false, follow: false } }),
   };

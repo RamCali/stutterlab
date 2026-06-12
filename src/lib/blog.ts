@@ -5,6 +5,11 @@ import readingTime from "reading-time";
 
 const BLOG_DIR = path.join(process.cwd(), "content/blog");
 
+export interface BlogFaq {
+  question: string;
+  answer: string;
+}
+
 export interface BlogPost {
   slug: string;
   title: string;
@@ -16,7 +21,8 @@ export interface BlogPost {
   readingTime: string;
   content: string;
   published: boolean;
-  heroImage?: string;
+  faq: BlogFaq[];
+  image?: string;
 }
 
 export function getAllPosts(): BlogPost[] {
@@ -49,7 +55,8 @@ export function getPostBySlug(slug: string): BlogPost | null {
     readingTime: stats.text,
     content,
     published: data.published !== false,
-    heroImage: data.heroImage || null,
+    faq: Array.isArray(data.faq) ? data.faq : [],
+    image: data.image || data.heroImage || undefined,
   };
 }
 

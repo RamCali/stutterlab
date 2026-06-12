@@ -60,10 +60,10 @@ export default function BlogIndexPage() {
               {posts.map((post) => (
                 <Link key={post.slug} href={`/blog/${post.slug}`}>
                   <Card className="h-full border-border/60 hover:border-primary/30 transition-colors overflow-hidden">
-                    {post.heroImage && (
+                    {post.image && (
                       <div className="relative w-full aspect-[16/9]">
                         <Image
-                          src={post.heroImage}
+                          src={post.image}
                           alt={post.title}
                           fill
                           className="object-cover"
