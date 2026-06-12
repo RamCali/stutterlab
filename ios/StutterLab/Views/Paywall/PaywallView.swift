@@ -7,7 +7,7 @@ struct PaywallView: View {
     @EnvironmentObject var appViewModel: AppViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var selectedProduct: Product?
-    @State private var error: String?
+    @State private var showTrialReminder = false
 
     private var storeKit: StoreKitService { appViewModel.storeKitService }
 
@@ -49,28 +49,16 @@ struct PaywallView: View {
 
                     // CTA
                     if let product = selectedProduct ?? storeKit.products.last {
-                        Button(action: {
-                            Task {
-                                do {
-                                    let success = try await storeKit.purchase(product)
-                                    if success { dismiss() }
-                                } catch {
-                                    self.error = error.localizedDescription
-                                }
-                            }
-                        }) {
+                        Button(action: { showTrialReminder = true }) {
                             Text("Try 7 Days Free")
                         }
                         .buttonStyle(SLPrimaryButtonStyle())
                         .slHaptic(.heavy)
                         .padding(.horizontal, SLSpacing.s4)
-                        .disabled(storeKit.purchaseInProgress)
-                    }
-
-                    if let error {
-                        Text(error)
-                            .font(.slXS)
-                            .foregroundColor(.sunsetAmber)
+                        .sheet(isPresented: $showTrialReminder) {
+                            TrialReminderView(product: product)
+                                .environmentObject(appViewModel)
+                        }
                     }
 
                     // Restore
