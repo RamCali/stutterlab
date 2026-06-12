@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { EmbeddedCheckoutDialog } from "@/components/embedded-checkout";
+import Link from "next/link";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { ResearchParticipationSettings } from "@/components/settings/research-participation";
 import { CommunicationsConsentSettings } from "@/components/settings/communications-consent-settings";
@@ -326,6 +327,25 @@ export default function SettingsPage() {
               "Save Changes"
             )}
           </Button>
+
+          <div className="border-t border-border/60 pt-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="font-medium text-sm">Speech profile</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  View and update everything you shared during onboarding — severity, fears,
+                  goals, therapy history, and more.
+                </p>
+              </div>
+              <Link href="/speech-profile">
+                <Button variant="outline" size="sm">
+                  <ClipboardList className="h-4 w-4 mr-1" />
+                  View profile
+                </Button>
+              </Link>
+            </div>
+          </div>
+
           <div className="border-t border-border/60 pt-4">
             <SignOutButton />
           </div>

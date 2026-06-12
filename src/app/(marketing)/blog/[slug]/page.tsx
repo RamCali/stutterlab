@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Calendar, Clock, User } from "lucide-react";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { Badge } from "@/components/ui/badge";
@@ -139,12 +140,16 @@ export default async function BlogPostPage({ params }: Props) {
 
           {/* Hero image */}
           {post.image && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={post.image}
-              alt={post.title}
-              className="mt-8 w-full rounded-xl border border-border/60"
-            />
+            <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden mt-8">
+              <Image
+                src={post.image}
+                alt={post.title}
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 768px) 100vw, 768px"
+              />
+            </div>
           )}
 
           {/* Content */}

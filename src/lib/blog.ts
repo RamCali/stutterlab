@@ -56,7 +56,7 @@ export function getPostBySlug(slug: string): BlogPost | null {
     content,
     published: data.published !== false,
     faq: Array.isArray(data.faq) ? data.faq : [],
-    image: data.image || undefined,
+    image: data.image || data.heroImage || undefined,
   };
 }
 
