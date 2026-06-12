@@ -31,6 +31,14 @@ import {
   FLUENCY_PERSISTENCE_OPTIONS,
   PHYSICAL_BEHAVIORS,
   STUTTERING_TYPES,
+  USER_TYPE_OPTIONS,
+  AGE_RANGE_OPTIONS,
+  ONSET_OPTIONS,
+  THERAPY_HISTORY_OPTIONS,
+  TENSION_LOCATIONS,
+  BLOCK_EMOTIONS,
+  PRIMARY_GOAL_OPTIONS,
+  DAILY_TIME_OPTIONS,
   saveOnboardingData,
   type OnboardingData,
 } from "@/lib/onboarding/feared-situations";
@@ -125,7 +133,7 @@ const COACHING_TONES = [
   { id: "encouraging", label: "Encouraging", desc: "Motivating and confidence-focused" },
 ];
 
-const TOTAL_STEPS = 11;
+const TOTAL_STEPS = 15;
 
 interface OnboardingFlowProps {
   onComplete: (data?: OnboardingData) => void;
@@ -137,11 +145,27 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   // Step 0: Name
   const [name, setName] = useState("");
 
-  // Step 1: Severity dimensions + Stuttering Types
+  // Step 1 (NEW): Persona & demographics
+  const [userType, setUserType] = useState("");
+  const [ageRange, setAgeRange] = useState("");
+  const [onsetTiming, setOnsetTiming] = useState("");
+
+  // Step 2: Severity dimensions + Stuttering Types (was step 1)
   const [stutterFrequency, setStutterFrequency] = useState("");
   const [stutterDuration, setStutterDuration] = useState("");
   const [stutterImpact, setStutterImpact] = useState("");
   const [stutteringTypes, setStutteringTypes] = useState<Set<string>>(new Set());
+
+  // Step 3 (NEW): Therapy history
+  const [therapyHistory, setTherapyHistory] = useState("");
+
+  // Step 9 (NEW): Tension locations + block emotions
+  const [tensionLocations, setTensionLocations] = useState<Set<string>>(new Set());
+  const [blockEmotions, setBlockEmotions] = useState<Set<string>>(new Set());
+
+  // Step 11 (NEW): Primary goal type + daily time commitment
+  const [primaryGoalType, setPrimaryGoalType] = useState("");
+  const [dailyTimeCommitment, setDailyTimeCommitment] = useState("");
 
   // Step 2: Confidence Ratings
   const [confidenceRatings, setConfidenceRatings] = useState<Record<string, number>>({});
@@ -241,7 +265,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   function goToCommsConsent() {
     addWordsFromText(currentWordInput);
     setCommsError(null);
-    setStep(9);
+    setStep(13);
   }
 
   function skipCommsConsent() {
@@ -267,7 +291,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     setCommsError(null);
     const result = calculateScores(buildScoringInput());
     setScores(result);
-    setStep(10);
+    setStep(14);
   }
 
   async function handleFinish() {
@@ -300,6 +324,14 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       physicalBehaviors: Array.from(physicalBehaviors),
       fastOrUnclearSpeech,
       familyHistory,
+      userType,
+      ageRange,
+      onsetTiming,
+      therapyHistory,
+      tensionLocations: Array.from(tensionLocations),
+      blockEmotions: Array.from(blockEmotions),
+      primaryGoalType,
+      dailyTimeCommitment,
       referralGuidance: computed.referralGuidance,
       contactPhoneNumber: contactPhoneNumber.trim() || undefined,
       smsConsent: smsConsent || undefined,
@@ -339,6 +371,14 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           physicalBehaviors: Array.from(physicalBehaviors),
           fastOrUnclearSpeech,
           familyHistory,
+          userType,
+          ageRange,
+          onsetTiming,
+          therapyHistory,
+          tensionLocations: Array.from(tensionLocations),
+          blockEmotions: Array.from(blockEmotions),
+          primaryGoalType,
+          dailyTimeCommitment,
           referralGuidance: computed.referralGuidance,
           assessmentProfile: computed.profile,
           recommendedEmphasis: computed.recommendedEmphasis,
@@ -429,8 +469,101 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
         )}
 
-        {/* Step 1: Severity Dimensions + Stuttering Types */}
+        {/* Step 1: Persona & Demographics */}
         {step === 1 && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold">A little about you</h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                StutterLab adapts to who you are. These help us route you to the right exercises.
+              </p>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Who will be using StutterLab?</label>
+              <div className="grid grid-cols-1 gap-2 mt-1.5">
+                {USER_TYPE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setUserType(opt.id)}
+                    className={`flex items-center gap-3 p-3 rounded-lg border text-left transition-all ${
+                      userType === opt.id
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                        : "hover:border-primary/50"
+                    }`}
+                  >
+                    <span className="text-xl">{opt.emoji}</span>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{opt.label}</p>
+                      <p className="text-sm text-muted-foreground">{opt.desc}</p>
+                    </div>
+                    {userType === opt.id && <Check className="h-4 w-4 text-primary flex-shrink-0" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">What&apos;s your age range?</label>
+              <div className="grid grid-cols-2 gap-2 mt-1.5">
+                {AGE_RANGE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setAgeRange(opt.id)}
+                    className={`p-3 rounded-lg border text-left transition-all ${
+                      ageRange === opt.id
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                        : "hover:border-primary/50"
+                    }`}
+                  >
+                    <p className="text-sm font-medium">{opt.label}</p>
+                    <p className="text-sm text-muted-foreground">{opt.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">When did your stuttering begin?</label>
+              <div className="grid grid-cols-1 gap-2 mt-1.5">
+                {ONSET_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setOnsetTiming(opt.id)}
+                    className={`flex items-center gap-3 p-3 rounded-lg border text-left transition-all ${
+                      onsetTiming === opt.id
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                        : "hover:border-primary/50"
+                    }`}
+                  >
+                    <span className="text-xl">{opt.emoji}</span>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{opt.label}</p>
+                      <p className="text-sm text-muted-foreground">{opt.desc}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Button variant="ghost" size="sm" onClick={() => setStep(0)}>
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                Back
+              </Button>
+              <Button
+                onClick={() => setStep(2)}
+                disabled={!userType || !ageRange || !onsetTiming}
+              >
+                Continue
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Severity Dimensions + Stuttering Types */}
+        {step === 2 && (
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-2xl font-bold">
@@ -572,12 +705,12 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
 
             <div className="flex items-center justify-between">
-              <Button variant="ghost" size="sm" onClick={() => setStep(0)}>
+              <Button variant="ghost" size="sm" onClick={() => setStep(1)}>
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
               <Button
-                onClick={() => setStep(2)}
+                onClick={() => setStep(3)}
                 disabled={!stutterFrequency || !stutterDuration || !stutterImpact}
               >
                 Continue
@@ -592,8 +725,70 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
         )}
 
-        {/* Step 2: Confidence Rating */}
-        {step === 2 && (
+        {/* Step 3: Therapy History */}
+        {step === 3 && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold">Your therapy history</h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Have you worked on this before? Your answer shapes which techniques we lead with.
+              </p>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">
+                Have you participated in speech therapy or fluency work before?
+              </label>
+              <div className="grid grid-cols-1 gap-2 mt-1.5">
+                {THERAPY_HISTORY_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setTherapyHistory(opt.id)}
+                    className={`flex items-center gap-3 p-3 rounded-lg border text-left transition-all ${
+                      therapyHistory === opt.id
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                        : "hover:border-primary/50"
+                    }`}
+                  >
+                    <span className="text-xl">{opt.emoji}</span>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{opt.label}</p>
+                      <p className="text-sm text-muted-foreground">{opt.desc}</p>
+                    </div>
+                    {therapyHistory === opt.id && (
+                      <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {therapyHistory === "currently" && (
+              <Card className="border-amber-300/60 bg-amber-50 dark:bg-amber-950/20">
+                <CardContent className="pt-4 pb-4">
+                  <p className="text-sm text-amber-950 dark:text-amber-100">
+                    Great — StutterLab works alongside your SLP. Share your practice data with
+                    them anytime from Settings.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            <div className="flex items-center justify-between">
+              <Button variant="ghost" size="sm" onClick={() => setStep(2)}>
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                Back
+              </Button>
+              <Button onClick={() => setStep(4)} disabled={!therapyHistory}>
+                Continue
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Confidence Rating */}
+        {step === 4 && (
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-2xl font-bold">Rate your confidence</h2>
@@ -637,12 +832,12 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
 
             <div className="flex items-center justify-between">
-              <Button variant="ghost" size="sm" onClick={() => setStep(1)}>
+              <Button variant="ghost" size="sm" onClick={() => setStep(3)}>
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
               <Button
-                onClick={() => setStep(3)}
+                onClick={() => setStep(5)}
                 disabled={Object.keys(confidenceRatings).length < 3}
               >
                 Continue
@@ -657,8 +852,8 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
         )}
 
-        {/* Step 3: Feared Situations */}
-        {step === 3 && (
+        {/* Step 5: Feared Situations */}
+        {step === 5 && (
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-2xl font-bold">
@@ -700,7 +895,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
 
             <div className="flex items-center justify-between">
-              <Button variant="ghost" size="sm" onClick={() => setStep(2)}>
+              <Button variant="ghost" size="sm" onClick={() => setStep(4)}>
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
@@ -710,7 +905,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     {selectedFears.size} selected
                   </Badge>
                 )}
-                <Button onClick={() => setStep(4)}>
+                <Button onClick={() => setStep(6)}>
                   {selectedFears.size === 0 ? "Skip" : "Continue"}
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
@@ -719,8 +914,8 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
         )}
 
-        {/* Step 4: Feared Words */}
-        {step === 4 && (
+        {/* Step 6: Feared Words */}
+        {step === 6 && (
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-2xl font-bold">Which words make you scan ahead?</h2>
@@ -813,7 +1008,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
 
             <div className="flex items-center justify-between">
-              <Button variant="ghost" size="sm" onClick={() => setStep(3)}>
+              <Button variant="ghost" size="sm" onClick={() => setStep(5)}>
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
@@ -827,7 +1022,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   onClick={() => {
                     addWordsFromText(currentWordInput);
                     setCurrentWordInput("");
-                    setStep(5);
+                    setStep(7);
                   }}
                 >
                   {fearedWordInputs.length === 0 ? "Skip" : "Continue"}
@@ -838,8 +1033,8 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
         )}
 
-        {/* Step 5: Pain Points + Avoidance Behaviors + Speaking Frequency */}
-        {step === 5 && (
+        {/* Step 7: Pain Points + Avoidance Behaviors + Speaking Frequency */}
+        {step === 7 && (
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-2xl font-bold">
@@ -933,12 +1128,12 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
 
             <div className="flex items-center justify-between">
-              <Button variant="ghost" size="sm" onClick={() => setStep(4)}>
+              <Button variant="ghost" size="sm" onClick={() => setStep(6)}>
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
               <Button
-                onClick={() => setStep(6)}
+                onClick={() => setStep(8)}
                 disabled={selectedPainPoints.size === 0}
               >
                 Continue
@@ -953,8 +1148,8 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
         )}
 
-        {/* Step 6: Adult Fluency Context */}
-        {step === 6 && (
+        {/* Step 8: Adult Fluency Context */}
+        {step === 8 && (
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-2xl font-bold">A little more context</h2>
@@ -1057,12 +1252,12 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
 
             <div className="flex items-center justify-between">
-              <Button variant="ghost" size="sm" onClick={() => setStep(5)}>
+              <Button variant="ghost" size="sm" onClick={() => setStep(7)}>
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
               <Button
-                onClick={() => setStep(7)}
+                onClick={() => setStep(9)}
                 disabled={!fluencyPersistence || !fastOrUnclearSpeech || !familyHistory}
               >
                 Continue
@@ -1072,8 +1267,88 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
         )}
 
-        {/* Step 7: Speech Goals / North Star */}
-        {step === 7 && (
+        {/* Step 9: Tension Locations + Block Emotions */}
+        {step === 9 && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold">When a block happens…</h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Where you feel tension — and what you feel — both shape the right exercises.
+              </p>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">
+                Where do you feel physical tension during a stutter?
+              </label>
+              <p className="text-sm text-muted-foreground mt-0.5 mb-2">Select all that apply.</p>
+              <div className="space-y-2">
+                {TENSION_LOCATIONS.map((loc) => {
+                  const isSelected = tensionLocations.has(loc.id);
+                  return (
+                    <button
+                      key={loc.id}
+                      onClick={() => toggleSet(setTensionLocations, loc.id)}
+                      className={`w-full flex items-center gap-3 p-3 rounded-lg border text-left transition-all ${
+                        isSelected
+                          ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                          : "hover:border-primary/50"
+                      }`}
+                    >
+                      <span className="text-lg">{loc.emoji}</span>
+                      <span className="text-sm flex-1">{loc.label}</span>
+                      {isSelected && <Check className="h-4 w-4 text-primary flex-shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">
+                When you experience a stuttering block, how does it usually make you feel?
+              </label>
+              <p className="text-sm text-muted-foreground mt-0.5 mb-2">Select all that apply.</p>
+              <div className="grid grid-cols-1 gap-2">
+                {BLOCK_EMOTIONS.map((emo) => {
+                  const isSelected = blockEmotions.has(emo.id);
+                  return (
+                    <button
+                      key={emo.id}
+                      onClick={() => toggleSet(setBlockEmotions, emo.id)}
+                      className={`w-full flex items-center gap-3 p-3 rounded-lg border text-left transition-all ${
+                        isSelected
+                          ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                          : "hover:border-primary/50"
+                      }`}
+                    >
+                      <span className="text-lg">{emo.emoji}</span>
+                      <span className="text-sm flex-1">{emo.label}</span>
+                      {isSelected && <Check className="h-4 w-4 text-primary flex-shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Button variant="ghost" size="sm" onClick={() => setStep(8)}>
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                Back
+              </Button>
+              <Button
+                onClick={() => setStep(10)}
+                disabled={tensionLocations.size === 0 || blockEmotions.size === 0}
+              >
+                Continue
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 10: Speech Goals / North Star */}
+        {step === 10 && (
           <div className="space-y-6">
             <div className="text-center">
               <Star className="h-10 w-10 text-primary mx-auto mb-3" />
@@ -1126,11 +1401,11 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
 
             <div className="flex items-center justify-between">
-              <Button variant="ghost" size="sm" onClick={() => setStep(6)}>
+              <Button variant="ghost" size="sm" onClick={() => setStep(9)}>
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
-              <Button onClick={() => setStep(8)}>
+              <Button onClick={() => setStep(11)}>
                 Continue
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
@@ -1138,8 +1413,83 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
         )}
 
-        {/* Step 8: Practice Fit + Buy-In */}
-        {step === 8 && (
+        {/* Step 11: Primary Goal Type + Daily Time Commitment */}
+        {step === 11 && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold">What success looks like</h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Tell us what you&apos;re after and how much time you can give. We&apos;ll calibrate the plan
+                to fit your real life.
+              </p>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">What&apos;s your primary goal with StutterLab?</label>
+              <div className="grid grid-cols-1 gap-2 mt-1.5">
+                {PRIMARY_GOAL_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setPrimaryGoalType(opt.id)}
+                    className={`flex items-center gap-3 p-3 rounded-lg border text-left transition-all ${
+                      primaryGoalType === opt.id
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                        : "hover:border-primary/50"
+                    }`}
+                  >
+                    <span className="text-xl">{opt.emoji}</span>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{opt.label}</p>
+                      <p className="text-sm text-muted-foreground">{opt.desc}</p>
+                    </div>
+                    {primaryGoalType === opt.id && (
+                      <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">
+                How much time can you commit to practicing each day?
+              </label>
+              <div className="grid grid-cols-2 gap-2 mt-1.5">
+                {DAILY_TIME_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setDailyTimeCommitment(opt.id)}
+                    className={`p-3 rounded-lg border text-left transition-all ${
+                      dailyTimeCommitment === opt.id
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                        : "hover:border-primary/50"
+                    }`}
+                  >
+                    <p className="text-sm font-medium">{opt.label}</p>
+                    <p className="text-sm text-muted-foreground">{opt.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Button variant="ghost" size="sm" onClick={() => setStep(10)}>
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                Back
+              </Button>
+              <Button
+                onClick={() => setStep(12)}
+                disabled={!primaryGoalType || !dailyTimeCommitment}
+              >
+                Continue
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 12: Practice Fit + Buy-In */}
+        {step === 12 && (
           <div className="space-y-6">
             <div className="text-center">
               <Target className="h-10 w-10 text-primary mx-auto mb-3" />
@@ -1222,7 +1572,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             </div>
 
             <div className="flex items-center justify-between">
-              <Button variant="ghost" size="sm" onClick={() => setStep(7)}>
+              <Button variant="ghost" size="sm" onClick={() => setStep(11)}>
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
@@ -1237,8 +1587,8 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
         )}
 
-        {/* Step 9: Communications consent */}
-        {step === 9 && (
+        {/* Step 13: Communications consent */}
+        {step === 13 && (
           <div className="space-y-6">
             <div className="text-center">
               <Phone className="h-10 w-10 text-primary mx-auto mb-3" />
@@ -1260,7 +1610,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             />
 
             <div className="flex items-center justify-between gap-2">
-              <Button variant="ghost" size="sm" onClick={() => setStep(8)}>
+              <Button variant="ghost" size="sm" onClick={() => setStep(12)}>
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
@@ -1277,8 +1627,8 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
         )}
 
-        {/* Step 10: Results Screen */}
-        {step === 10 && scores && (
+        {/* Step 14: Results Screen */}
+        {step === 14 && scores && (
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-2xl font-bold">Your Speech Assessment</h2>
@@ -1442,7 +1792,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             )}
 
             <div className="flex items-center justify-between">
-              <Button variant="ghost" size="sm" onClick={() => setStep(8)}>
+              <Button variant="ghost" size="sm" onClick={() => setStep(12)}>
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>

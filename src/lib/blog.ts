@@ -16,6 +16,7 @@ export interface BlogPost {
   readingTime: string;
   content: string;
   published: boolean;
+  heroImage?: string;
 }
 
 export function getAllPosts(): BlogPost[] {
@@ -48,6 +49,7 @@ export function getPostBySlug(slug: string): BlogPost | null {
     readingTime: stats.text,
     content,
     published: data.published !== false,
+    heroImage: data.heroImage || null,
   };
 }
 

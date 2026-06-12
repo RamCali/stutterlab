@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Calendar, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -58,7 +59,18 @@ export default function BlogIndexPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {posts.map((post) => (
                 <Link key={post.slug} href={`/blog/${post.slug}`}>
-                  <Card className="h-full border-border/60 hover:border-primary/30 transition-colors">
+                  <Card className="h-full border-border/60 hover:border-primary/30 transition-colors overflow-hidden">
+                    {post.heroImage && (
+                      <div className="relative w-full aspect-[16/9]">
+                        <Image
+                          src={post.heroImage}
+                          alt={post.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      </div>
+                    )}
                     <CardContent className="pt-6">
                       <Badge
                         variant="secondary"
