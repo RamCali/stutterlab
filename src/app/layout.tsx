@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Inter, Roboto, Montserrat } from "next/font/google";
+import Script from "next/script";
 import { Providers } from "@/components/providers";
 import "./globals.css";
+
+const GA_ID = "G-9B42W9RL5D";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -106,6 +109,18 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             />
           </noscript>
         )}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_ID}');
+          `}
+        </Script>
         <Providers>{children}</Providers>
       </body>
     </html>

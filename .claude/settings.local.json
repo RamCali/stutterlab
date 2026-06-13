@@ -87,7 +87,26 @@
       "Bash(npx drizzle-kit studio:*)",
       "Bash(npx tsx:*)",
       "Bash(npx shadcn@latest add:*)",
-      "Bash(npm info:*)"
+      "Bash(npm info:*)",
+      "Bash(mv \"8 Best Stuttering Exercises You Can Practice Daily_StutterLab.com.png\" \"best-stuttering-exercises.png\")",
+      "Bash(mv \"Can AI Help Stuttering_ How Artificial Intelligence Is Changing Speech Therapy_StutterLab.com.png\" \"can-ai-help-stuttering.png\")",
+      "Bash(mv \"Speech Training at Home_ How to Practice Stuttering Exercises Between Sessions_StutterLab.com.png\" \"speech-therapy-at-home.png\")",
+      "Bash(mv \"Delayed Auditory Feedback \\(DAF\\)_ How It Works and How to Practice_StutterLab.com.png\" \"delayed-auditory-feedback.png\")",
+      "Bash(mv \"Famous People Who Stutter_ What Their Strategies Teach Us_StutterLab.com.png\" \"famous-people-who-stutter.png\")",
+      "Bash(git fetch *)",
+      "Bash(git log *)",
+      "Bash(gh pr create --base main --head claude/friendly-cray-t0edip --title 'Add 8 new blog posts + PostHog analytics + AEO upgrades' --body ' *)",
+      "Bash(git checkout *)",
+      "Bash(git pull *)",
+      "Bash(git merge *)",
+      "Bash(sed -i '' 's|image: \"/blog-images/delayed-auditory-feedback-daf-guide.jpg\"|image: \"/blog-images/delayed-auditory-feedback.png\"|' content/blog/delayed-auditory-feedback-daf-guide.mdx)",
+      "Bash(sed -i '' 's|image: \"/blog-images/famous-people-who-stutter.jpg\"|image: \"/blog-images/famous-people-who-stutter.png\"|' content/blog/famous-people-who-stutter.mdx)",
+      "Bash(sed -i '' 's|image: \"/blog-images/how-to-stop-stuttering-adults.jpg\"|image: \"/blog-images/how-to-stop-stuttering-as-adult.png\"|' content/blog/how-to-stop-stuttering-adults.mdx)",
+      "Bash(sed -i '' 's|image: \"/blog-images/job-interview-tips-stuttering.jpg\"|image: \"/blog-images/job-interviews-stuttering.png\"|' content/blog/job-interview-tips-stuttering.mdx)",
+      "Bash(sed -i '' 's|image: \"/blog-images/voluntary-stuttering-technique.jpg\"|image: \"/blog-images/voluntary-stuttering.png\"|' content/blog/voluntary-stuttering-technique.mdx)",
+      "Bash(sed -i '' 's|image: \"/blog-images/can-ai-help-stuttering.jpg\"|image: \"/blog-images/can-ai-help-stuttering.png\"|' content/blog/can-ai-help-stuttering.mdx)",
+      "Bash(sed -i '' 's|image: \"/blog-images/best-stuttering-exercises.jpg\"|image: \"/blog-images/best-stuttering-exercises.png\"|' content/blog/best-stuttering-exercises.mdx)",
+      "Bash(sed -i '' 's|image: \"/blog-images/speech-therapy-at-home.jpg\"|image: \"/blog-images/speech-therapy-at-home.png\"|' content/blog/speech-therapy-at-home.mdx)"
     ]
   }
 }
